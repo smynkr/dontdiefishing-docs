@@ -1,0 +1,91 @@
+---
+title: How Infolitico works
+description: "The autonomous publishing pipeline: sourcing, faith-angle
+  judgment, deterministic verse selection, drafting, guarding, and publishing."
+---
+
+import { Rss, ShieldCheck } from 'lucide-react';
+
+Infolitico publishes without human editorial writers. A named-stage pipeline
+takes a source event through sourcing, judgment, drafting, guarding, and
+publishing. Each stage either passes the story forward or rejects it — and
+rejection is a normal, deliberate outcome.
+
+<ProcessFlow
+  accent="#5E0F1C"
+  caption="From a real news event to a published devotional article: every stage either advances the story or rejects it. Rejections are expected — a story with no genuine faith connection is never forced into a devotional frame."
+  steps={[
+  { title: "Source evidence", description: "A curated feed event must carry a nonempty factual summary — not just a headline." },
+  { title: "Faith-angle judgment", description: "The theme extractor decides whether the event has a natural faith/values angle at all." },
+  { title: "Verse selection", description: "A deterministic hash of the event picks one curated NLT verse — same event, same verse." },
+  { title: "Outline and draft", description: "Structure the arc, then write the 300–500 word article with reflection and prayer." },
+  { title: "Guard and review", description: "Content gates, headline novelty, and person checks run before anything can publish." },
+  { title: "Publish", description: "The image gate clears and the story goes live on the site and newsletter." },
+]}
+/>
+
+## The stages
+
+### Source-evidence preflight
+
+Before any model work, the pipeline requires a nonempty factual source summary
+that is more than the headline repeated. Feed rows without real evidence are
+rejected (`source_event_summary_missing_or_too_thin`) and never consume a
+generation slot.
+
+### Faith-angle judgment (`theme-extractor`)
+
+The extractor reads the source event and decides whether it has a natural
+faith/values angle at all. The most common rejection is
+`no_natural_faith_connection` — in one observed day, 16 of 20 candidates were
+rejected on this ground and none were forced through. When the verdict is
+`write`, the stage also extracts the theme (for example *stewardship* or
+*perseverance*) and produces the factual news summary used downstream.
+
+### Verse selection (`verse-selector`)
+
+A Bible verse is selected deterministically: the index into the curated
+`bible_verses` database is derived from a SHA-256 hash of the source event's
+ID, so re-running the pipeline for the same event always picks the same verse.
+When a verse is not recommended, the article publishes with a reflection but
+no verse blockquote. Optional theologian commentary quotes are attached in
+code — capped at three, deterministically ordered — and are **never** allowed
+to round-trip through a model's structured response, so a careless or hostile
+model cannot smuggle a fabricated quote into the article.
+
+### Outline and draft
+
+The outline stage structures the arc: headline, news paragraphs, reflection
+arc, and prayer focus. The draft stage writes the full 300–500 word article
+from that outline. The verified NLT verse block is the only full-verse
+quotation; the reflection discusses its meaning primarily in original prose
+and may weave in at most one commentary quote — verbatim, attributed, never
+invented.
+
+### Guard and review
+
+The `polish-and-guard` stage is the last-line content gate. Editorial review,
+headline-novelty checks, and a pre-publish person check run next. The image
+gate clears, and the story publishes.
+
+## Determinism and safety by design
+
+- The same source event always yields the same verse and the same article
+  structure — the pipeline is reproducible, not whimsical.
+- Scripture text is reproduced exactly from the curated database; the
+  pipeline never fabricates or modifies a verse (see
+  [editorial standards](/editorial-standards)).
+- Verified data (verses, commentary quotes, protected-person policy) is
+  attached in code between stages, never trusted to a model's own output.
+- Every story must clear the guards before publication; a story that fails a
+  gate is rejected, not repaired by prompt.
+
+<Cards>
+  <Card icon={<ShieldCheck />} title="Editorial standards" href="/infolitico/editorial-standards">
+    The hard rules the pipeline enforces.
+  </Card>
+
+  <Card icon={<Rss />} title="Content sources" href="/infolitico/content-sources">
+    Where the source events come from.
+  </Card>
+</Cards>

@@ -1,0 +1,58 @@
+---
+title: Infolitico
+description: "Fully autonomous, faith-framed news: accurate reporting of today's
+  events connected to Scripture, reflection, and prayer — a two-minute morning
+  read."
+---
+
+import { BookOpen, CircleHelp, Compass, Flame, Mail, Newspaper, Rss, ShieldCheck, Workflow } from 'lucide-react';
+
+Infolitico is a fully autonomous, faith-framed news site. Every article reports
+a real event from today's news cycle accurately, then connects it to a relevant
+Bible verse with a short spiritual reflection — a morning devotional that
+starts with today's headlines.
+
+<Callout type="warn">
+  Infolitico is fully automated end to end: sourcing, drafting, guarding, and
+  publishing run without human editorial writers. The pipeline protects source
+  provenance, exact curated Scripture text, and editorial safety before any
+  story can publish.
+</Callout>
+
+<ProductPreview
+  src="/screenshots/infolitico.png"
+  alt="Infolitico landing page: the day's news headlines with faith-framed reflections and Scripture"
+  accent="#5E0F1C"
+  caption="Each article leads with accurate reporting and carries a curated NLT verse, a reflection, and a prayer."
+  highlights={[
+  { text: "Real events, reported accurately — sourced from a curated public feed diet.", icon: Newspaper },
+  { text: "A relevant Bible verse, reproduced exactly from the curated database.", icon: BookOpen },
+  { text: "A short reflection and prayer that connect the news to faith.", icon: Flame },
+]}
+/>
+
+<Cards>
+  <Card icon={<Compass />} title="Get started" href="/infolitico/getting-started">
+    How to read Infolitico and what it is — and isn't.
+  </Card>
+
+  <Card icon={<Workflow />} title="How it works" href="/infolitico/how-it-works">
+    The autonomous pipeline from source event to published story.
+  </Card>
+
+  <Card icon={<ShieldCheck />} title="Editorial standards" href="/infolitico/editorial-standards">
+    Accuracy, Scripture integrity, and the safety gates.
+  </Card>
+
+  <Card icon={<Rss />} title="Content sources" href="/infolitico/content-sources">
+    The curated feed diet and sourcing rules.
+  </Card>
+
+  <Card icon={<Mail />} title="Newsletter" href="/infolitico/newsletter">
+    The morning newsletter and daily rhythm.
+  </Card>
+
+  <Card icon={<CircleHelp />} title="FAQ" href="/infolitico/faq">
+    Reader questions about automation, faith framing, and accuracy.
+  </Card>
+</Cards>

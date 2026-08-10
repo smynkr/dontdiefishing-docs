@@ -1,0 +1,73 @@
+---
+title: "Safety & conditions"
+description: "Data sources, hazard categories, and the limitations of DontDieFishing's safety information."
+---
+
+Data sources, hazard categories, and the limitations of DontDieFishing's
+safety information.
+
+## Data sources
+
+DontDieFishing aggregates conditions from multiple authoritative sources:
+
+| Data                | Source                    | Refresh     |
+| ------------------- | ------------------------- | ----------- |
+| Stream level & flow | USGS NWIS gauges          | 15 min      |
+| Weather & forecasts | NOAA / NWS                | Hourly      |
+| Tide data           | NOAA CO-OPS               | 6 min       |
+| Water temperature   | USGS + community          | Hourly      |
+| Flood warnings      | NWS AHPS                  | Real-time   |
+| Hazard reports      | Community + land managers | As reported |
+
+## Safety status
+
+The green / yellow / red status is computed from:
+
+- **Green** — no active warnings, water within normal range, weather favorable
+- **Yellow** — elevated but not dangerous: rising water, moderate wind,
+  reduced visibility, or a nearby (not spot-specific) advisory
+- **Red** — active danger: flood stage exceeded, lightning within 10 miles,
+  strong current advisory, or a spot-specific hazard report
+
+Status updates automatically as conditions change. You can enable push alerts
+for saved spots to be notified on status transitions.
+
+## Hazard categories
+
+- **Current** — strong or unexpected water flow (dam releases, tidal surge)
+- **Flood** — water above safe wading/fishing levels
+- **Weather** — lightning, high wind, extreme cold/heat
+- **Access** — unsafe banks, washed-out roads, closed areas
+- **Water quality** — harmful algae bloom, contamination advisory
+- **Wildlife** — alligator, snake, or large predator activity
+
+## Limitations
+
+<Warning>
+  DontDieFishing is a decision-support tool, not a guarantee of safety.
+  Conditions can change faster than data refreshes. Community reports are
+  unverified observations. Always assess conditions in person before entering
+  the water, and never fish alone in remote areas.
+</Warning>
+
+- USGS gauges are point measurements — conditions may differ upstream or
+  downstream of the gauge
+- Weather forecasts are probabilistic, not deterministic
+- Community reports reflect one observer's judgment at one point in time
+- Some spots have no nearby gauge or weather station; these show limited data
+
+## Reporting a hazard
+
+Tap **Report Hazard** on any spot page. Select the hazard type, add a
+description and optional photo, and submit. Reports are reviewed and typically
+appear within one hour. Urgent hazards (immediate danger to life) are flagged
+for priority review.
+
+<Cards>
+  <Card title="Finding spots" icon="map-pin" href="/dontdiefishing/finding-spots">
+    How to search, filter, and evaluate spots.
+  </Card>
+  <Card title="FAQ" icon="circle-help" href="/dontdiefishing/faq">
+    Common questions and fixes.
+  </Card>
+</Cards>

@@ -1,0 +1,76 @@
+---
+title: Editorial standards
+description: "The hard rules Infolitico enforces: accurate reporting, exact
+  Scripture text, no fabricated quotes, and protected-person policy — enforced
+  in code, not prompts."
+---
+
+import { CircleQuestionMark, Workflow } from 'lucide-react';
+
+Infolitico's editorial standards are not style guidelines — they are enforced
+rules. The enforcement lives in the pipeline's code and database policies, not
+in model prompts, so a careless or hostile model cannot talk its way past a
+safety rule.
+
+## The hard rules
+
+### 1. Never fabricate or modify Bible verse text
+
+Every verse is reproduced **exactly** from the curated `bible_verses`
+database. The pipeline never writes a verse from memory, never paraphrases a
+quoted verse, and never edits the wording of a curated verse. The verified
+NLT block is the only full-verse quotation in an article.
+
+### 2. No fabricated quotes attributed as real
+
+Commentary quotes are fetched from the `commentary_quotes` table and attached
+to the article **in code** between pipeline stages — the outline and draft
+models receive them as verified input and cannot emit their own quote text.
+At most one quote may appear in an article, verbatim and attributed.
+
+### 3. Protected people and minors are database-owned policy
+
+Policy about protected people and minors is enforced by the database and the
+pipeline's code, not by asking a model to "remember the rules." A pre-publish
+person check runs before any story can publish.
+
+### 4. The last-line content gate
+
+`polish-and-guard` is the final content gate before publication. Combined
+with editorial review, headline-novelty checks, and the pre-publish person
+check, a story must clear every gate or it is rejected — never patched by
+prompt.
+
+## News first, faith second
+
+The article leads with accurate, concise reporting; the spiritual layer rides
+on top and never replaces it. The pipeline's source-evidence preflight rejects
+events that cannot be factually summarized, and the faith-angle stage rejects
+events with no genuine faith connection. A story is never forced into a
+devotional frame.
+
+## Voice, bounded
+
+- **Warm and conversational** — a thoughtful friend sharing a morning
+  devotional, not a pastor at a pulpit.
+- **Values, not politics** — family, personal responsibility, stewardship,
+  gratitude, character, community, and faith in God's plan. Never party
+  names, candidate endorsements, or left/right framing.
+- **Earnest and sincere** — no irony, no hedging, no academic distance.
+- **Short and accessible** — 300–500 words, a two-minute read.
+
+<Callout type="warn">
+  Rejection is the pipeline's primary safety mechanism. If a story cannot be
+  reported accurately, connected genuinely to faith, and cleared by every
+  gate, it is not published.
+</Callout>
+
+<Cards>
+  <Card icon={<Workflow />} title="How it works" href="/infolitico/how-it-works">
+    Where each rule is enforced in the pipeline.
+  </Card>
+
+  <Card icon={<CircleQuestionMark />} title="FAQ" href="/infolitico/faq">
+    Reader questions about accuracy and automation.
+  </Card>
+</Cards>

@@ -1,0 +1,49 @@
+---
+title: Content sources
+description: "Where Infolitico's source events come from: a curated public feed
+  diet with verified publisher URLs, and how events are admitted."
+---
+
+import { ShieldCheck, Workflow } from 'lucide-react';
+
+Infolitico sources its stories from a curated diet of public feeds. The feed
+list is deliberate: a small set of trusted, real-world news sources, trimmed
+and expanded over time based on source-health review.
+
+## The feed diet
+
+The pipeline ingests public RSS/Atom feeds from a curated set of sources. The
+diet is intentionally limited — it is a morning devotional's news cycle, not a
+fire hose. Feed health is monitored, and source-health review happens before
+any targeted direct-source expansion.
+
+## Admission into the pipeline
+
+An event is admitted only when it carries real factual evidence:
+
+- The source summary must be nonempty and more than the headline repeated.
+- Feed chrome (such as "submitted by …", link lists, or comment counts) is
+  never promoted into factual evidence.
+- Rows without sufficient evidence are rejected before any model work, so
+  junk rows never consume a generation slot.
+
+## Discovery URLs and verified publisher URLs
+
+The pipeline distinguishes between discovery URLs (where an event was found)
+and verified publisher URLs (the canonical article location). Provenance is
+carried through the pipeline so a published story's source is traceable.
+
+## The reader feed is separate from ingestion
+
+The public reader feed on the site is a publishing surface, not an ingestion
+source. Ingestion and publishing are deliberately separate paths.
+
+<Cards>
+  <Card icon={<Workflow />} title="How it works" href="/infolitico/how-it-works">
+    What happens after a source event is admitted.
+  </Card>
+
+  <Card icon={<ShieldCheck />} title="Editorial standards" href="/infolitico/editorial-standards">
+    The rules that govern what may be published.
+  </Card>
+</Cards>

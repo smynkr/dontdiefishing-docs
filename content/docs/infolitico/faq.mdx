@@ -1,0 +1,71 @@
+---
+title: FAQ
+description: "Reader questions about Infolitico: automation, accuracy, faith
+  framing, and Scripture."
+---
+
+import { Compass, ShieldCheck } from 'lucide-react';
+
+## Is Infolitico written by humans?
+
+No. Infolitico is fully autonomous: sourcing, drafting, guarding, and
+publishing run without human editorial writers. The pipeline's safety gates
+are enforced in code and database policy, not by prompts.
+
+## How do I know the news is real?
+
+Every article reports a real event from a curated public feed, and the
+pipeline requires a nonempty factual source summary before any drafting
+happens. Source provenance (discovery URL and verified publisher URL) is
+carried through the pipeline. Stories that cannot be factually summarized are
+rejected.
+
+## How are Bible verses chosen?
+
+Deterministically. A SHA-256 hash of the source event's ID selects the verse
+index from the curated `bible_verses` database — the same event always yields
+the same verse. Verses are reproduced exactly from that database; the
+pipeline never fabricates or modifies Scripture text.
+
+## Do all articles include a verse?
+
+No. When the pipeline's verse selector determines a verse is not recommended
+for a story, the article publishes with a reflection but no verse blockquote.
+
+## What about the commentary quotes I see in articles?
+
+Commentary quotes come from a curated `commentary_quotes` table, are attached
+in code (never invented by a model), and appear at most one per article —
+verbatim and attributed.
+
+## Why do some stories get rejected?
+
+Rejection is the pipeline's primary safety mechanism. A story with no genuine
+faith connection (`no_natural_faith_connection`), insufficient factual
+evidence, or a failed safety gate is not published — it is never forced into
+a devotional frame.
+
+## Is Infolitico political?
+
+No. The site's sensibility is values-based — family, personal responsibility,
+stewardship, gratitude, character, community, and faith in God's plan. It
+never uses party names, candidate endorsements, or left/right framing.
+
+## Is Infolitico satire?
+
+No. Every story reports a real event that actually happened.
+
+## How much does it cost?
+
+The site is free to read. The morning newsletter is available by subscribing
+on [infolitico.com](https://infolitico.com).
+
+<Cards>
+  <Card icon={<Compass />} title="Get started" href="/infolitico/getting-started">
+    How to read Infolitico.
+  </Card>
+
+  <Card icon={<ShieldCheck />} title="Editorial standards" href="/infolitico/editorial-standards">
+    The rules behind these answers.
+  </Card>
+</Cards>

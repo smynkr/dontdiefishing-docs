@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "source_index": {
+    ".codex/harness-memory.json": [
+      "ledger"
+    ],
+    "README.md": [
+      "current-state",
+      "ledger"
+    ],
+    "_migration/tools/lib/shared.mjs": [
+      "current-state",
+      "ledger"
+    ],
+    "components/brand/products.ts": [
+      "ledger"
+    ],
+    "docs.json": [
+      "current-state",
+      "ledger"
+    ],
+    "dontdiefishing/index.mdx": [
+      "current-state"
+    ],
+    "next.config.mjs": [
+      "current-state",
+      "ledger"
+    ],
+    "package.json": [
+      "current-state",
+      "ledger"
+    ],
+    "public/logo.svg": [
+      "ledger"
+    ]
+  },
+  "source_sha256": {
+    ".codex/harness-memory.json": "fca2018eb925f14f0d451f85a22fda327a805fad7c2ad9d6e30130a27d7d2cb3",
+    "README.md": "ba9c63cf6ed1d114ccfbe1c71174fbf72d966d2c1853d3827681e1d2fc1e927c",
+    "_migration/tools/lib/shared.mjs": "a1bc34d508bd1ac9d97ed2431ab80208b867ea50ae6777a4587fc7cc7b89f984",
+    "components/brand/products.ts": "8b2072340665a45f23439b9c773473b4307c5ed9a8add566d2c02cdebe2e16fe",
+    "docs.json": "c3e518568c00511a347b625866fb09c4f9638500d51e0a712924331cc94a81be",
+    "dontdiefishing/index.mdx": "0d40b7fa6d644ab3fbacb9264836225871fcda4c585c237bfa58551beff82c31",
+    "next.config.mjs": "46a4ad63ada8938dd51027ef3e42cb70cc2e019a4a6223f30d2308070cd0de38",
+    "package.json": "bd2eee76f102c0ea277df67e8cc46d710f87fa71265745e00409882665a9f7e1",
+    "public/logo.svg": "b1e0a58ed1f20974b24cd945719e49f0122a2fc04a8fe58db76c5df96fc07ef1"
+  }
+}

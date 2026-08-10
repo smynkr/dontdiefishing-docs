@@ -1,0 +1,18 @@
+{
+  "title": "Infolitico",
+  "root": true,
+  "icon": "Flame",
+  "description": "Fully autonomous faith-framed news — accurate reporting connected to Scripture, reflection, and prayer.",
+  "pages": [
+    "---[Rocket]Get started---",
+    "index",
+    "getting-started",
+    "---[Workflow]Product---",
+    "how-it-works",
+    "editorial-standards",
+    "content-sources",
+    "---[Mail]Reader---",
+    "newsletter",
+    "faq"
+  ]
+}
