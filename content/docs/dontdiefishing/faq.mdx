@@ -1,0 +1,71 @@
+---
+title: FAQ & troubleshooting
+description: Common questions and fixes for DontDieFishing.
+---
+
+import { History, ShieldCheck } from 'lucide-react';
+
+Common questions and fixes for DontDieFishing.
+
+## General
+
+### Is DontDieFishing free?
+
+Core features — spot browsing, conditions, and hazard warnings — are free.
+Premium adds offline maps, extended forecasts, and unlimited saved spots.
+
+### Where does the data come from?
+
+See [Safety & conditions](/dontdiefishing/safety-conditions) for the full data-source table.
+Primary sources are USGS, NOAA, and NWS — all U.S. government services.
+
+### Is my location shared with other users?
+
+No. Your location is used only to center the map and calculate distances.
+Other users never see your position.
+
+## Spots
+
+### A spot near me is missing
+
+The spot database is growing. Tap **Suggest a Spot** on the map (long-press
+any location) to submit a new fishing spot. Include the name, water type, and
+access notes.
+
+### The conditions look wrong
+
+Condition data refreshes on a schedule (see
+[Safety & conditions](/dontdiefishing/safety-conditions)). If data seems stale:
+
+- Check the "Last updated" timestamp on the spot page
+- USGS gauges occasionally go offline for maintenance
+- Submit a community report with your on-site observation
+
+### Can I use this for saltwater fishing?
+
+Yes. Surf, pier, jetty, and inshore spots include tide data from NOAA CO-OPS
+and saltwater species profiles.
+
+## Alerts
+
+### I am not getting push notifications
+
+- Ensure notifications are enabled for the app in your phone's Settings
+- Check that the saved spot has alerts toggled on (spot page → bell icon)
+- Alerts only fire on status transitions (e.g., green → yellow), not
+  continuously
+
+## Contact
+
+For bugs, data corrections, or feature requests:
+[support@dontdiefishing.com](mailto:support@dontdiefishing.com).
+
+<Cards>
+  <Card icon={<ShieldCheck />} title="Safety & conditions" href="/dontdiefishing/safety-conditions">
+    Data sources, hazard categories, and the limitations of the safety information.
+  </Card>
+
+  <Card icon={<History />} title="Changelog" href="/dontdiefishing/changelog">
+    What's new in DontDieFishing documentation.
+  </Card>
+</Cards>

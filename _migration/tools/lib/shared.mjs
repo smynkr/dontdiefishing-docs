@@ -44,6 +44,7 @@ const GENERIC_LUCIDE_ICONS = {
   'file-text': 'FileText',
   'flask-conical': 'FlaskConical',
   gavel: 'Gavel',
+  history: 'History',
   globe: 'Globe',
   'grid-2x2': 'Grid2x2',
   house: 'House',

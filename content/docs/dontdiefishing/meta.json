@@ -1,0 +1,17 @@
+{
+  "title": "DontDieFishing",
+  "root": true,
+  "icon": "LifeBuoy",
+  "description": "Find safe fishing spots with real-time water conditions, weather, and hazard data.",
+  "pages": [
+    "---[Rocket]Get started---",
+    "index",
+    "getting-started",
+    "---[MapPin]Product---",
+    "finding-spots",
+    "safety-conditions",
+    "---[CircleQuestionMark]Support---",
+    "faq",
+    "changelog"
+  ]
+}
