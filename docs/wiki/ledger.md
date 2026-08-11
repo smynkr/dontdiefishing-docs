@@ -9,6 +9,34 @@ sources: [".codex/harness-memory.json", "README.md", "package.json", "next.confi
 
 # Durable ledger
 
+## 2026-08-11 — Dark-first DontDieFishing brand theme pass
+
+- fd theme tokens replaced the template cyan with the ocean palette: navy
+  `#1A3A5C` on paper, amber `#F59E0B` (status color) on the `#0A0A0F` void,
+  ring/accent/glow aligned, `.ax-glow` and constellation recolored to amber,
+  dead Axiom CSS utilities removed.
+- Dark is now the presentation default (`RootProvider theme={{ defaultTheme: 'dark' }}`).
+- app/icon.svg: replaced the Infolitico flame mark (template leak) with the
+  lifebuoy mark.
+- docs.json identity: name DontDieFishing, brand colors, logo href to
+  dontdiefishing.com; the stale Axiom "Sign in" primary was dropped (no app
+  host evidence).
+- Support mailtos in page-feedback and search dialog corrected from
+  support@menuwright.com to support@dontdiefishing.com.
+- OG card and 404 rebranded to the lifebuoy and the water-at-night voice;
+  per-page siteName fixed to DontDieFishing Docs.
+- Verified: gates green, dark default + toggle; deployed via PR #4.
+
+Re-establish with:
+
+```bash
+npm run test:links
+npm run links:check
+npm run types:check
+npm run build
+npm run memory:check
+```
+
 ## 2026-08-10 — Standalone DontDieFishing docs site established
 
 - Scoped from the axiom-docs Fumadocs stack as a single-product site:
