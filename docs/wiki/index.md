@@ -1,10 +1,10 @@
 ---
-title: MenuWright Docs wiki
+title: DontDieFishing Docs wiki
 category: index
 updated: 2026-08-10
 ---
 
-# MenuWright Docs wiki
+# DontDieFishing Docs wiki
 
 This wiki is the durable project memory for `dontdiefishing-docs`. Read the
 generated `docs/AGENT_SOT.md` first, then use the pages below for the task at
