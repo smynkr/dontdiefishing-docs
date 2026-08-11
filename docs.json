@@ -1,18 +1,18 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Axiomancer Labs",
+  "name": "DontDieFishing",
   "description": "DontDieFishing documentation \u2014 safe fishing spots with real-time water conditions, weather, and hazard data.",
   "colors": {
-    "primary": "#00D4FF",
-    "light": "#5DE5FF",
-    "dark": "#0099BF"
+    "primary": "#1A3A5C",
+    "light": "#F59E0B",
+    "dark": "#1A3A5C"
   },
   "favicon": "/favicon.svg",
   "logo": {
     "light": "/logo.svg",
     "dark": "/logo.svg",
-    "href": "https://axiomancer.io"
+    "href": "https://dontdiefishing.com"
   },
   "navigation": {
     "products": [
@@ -63,12 +63,7 @@
         "label": "DontDieFishing",
         "href": "https://dontdiefishing.com"
       }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Sign in",
-      "href": "https://app.axiomlayer.io"
-    }
+    ]
   },
   "footer": {
     "socials": {

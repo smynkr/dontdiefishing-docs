@@ -25,9 +25,9 @@
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* Product accent palette, exposed as Tailwind colors */
-  --color-tt-accent: #1a3a5c;
-  --color-tt-accent-light: #f59e0b;
-  --color-tt-accent-dark: #122a42;
+  --color-ddf-accent: #1a3a5c;
+  --color-ddf-accent-light: #f59e0b;
+  --color-ddf-accent-dark: #122a42;
 }
 
 html {
