@@ -9,6 +9,22 @@ sources: [".codex/harness-memory.json", "README.md", "package.json", "next.confi
 
 # Durable ledger
 
+## 2026-08-11 — Review-lane fixes: identity regeneration and a11y
+
+- content/docs regenerated: meta.json title is now DontDieFishing (llms.txt and
+  search breadcrumbs were still "Axiomancer Labs"). Infolitico's generated
+  tree also carried unprefixed links the migration rewrites — now in sync.
+- FocusDeadEndHeading span -> div (valid HTML); 404 heading focus.
+- docs.json identity themed (was entirely Axiomancer); @theme token prefix ddf-.
+- Billing copy: 50 monthly credits is a Crossplay Pro entitlement (tiletactician).
+
+Re-establish with:
+
+```bash
+npm run memory:check
+```
+
+
 ## 2026-08-11 — docs.json asset-path fix
 
 - `favicon` and `logo` in docs.json pointed at `/images/favicon.svg` and
