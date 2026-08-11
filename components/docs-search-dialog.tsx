@@ -71,10 +71,10 @@ function SearchEmpty({ query, searching }: { query: string; searching: boolean }
           <p className="mt-5 text-xs leading-5 text-fd-muted-foreground">
             Still stuck? Email{' '}
             <a
-              href="mailto:support@menuwright.com"
+              href="mailto:support@dontdiefishing.com"
               className="font-medium text-fd-primary underline-offset-4 transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
             >
-              support@menuwright.com
+              support@dontdiefishing.com
             </a>
           </p>
         </>
