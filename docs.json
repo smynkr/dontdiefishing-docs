@@ -8,10 +8,10 @@
     "light": "#5DE5FF",
     "dark": "#0099BF"
   },
-  "favicon": "/images/favicon.svg",
+  "favicon": "/favicon.svg",
   "logo": {
-    "light": "/images/logo-light.svg",
-    "dark": "/images/logo-dark.svg",
+    "light": "/logo.svg",
+    "dark": "/logo.svg",
     "href": "https://axiomancer.io"
   },
   "navigation": {
