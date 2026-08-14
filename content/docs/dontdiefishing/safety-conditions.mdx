@@ -13,14 +13,25 @@ safety information.
 
 DontDieFishing aggregates conditions from multiple authoritative sources:
 
-| Data                | Source                    | Refresh     |
-| ------------------- | ------------------------- | ----------- |
-| Stream level & flow | USGS NWIS gauges          | 15 min      |
-| Weather & forecasts | NOAA / NWS                | Hourly      |
-| Tide data           | NOAA CO-OPS               | 6 min       |
-| Water temperature   | USGS + community          | Hourly      |
-| Flood warnings      | NWS AHPS                  | Real-time   |
-| Hazard reports      | Community + land managers | As reported |
+| Data                | Source                                     | Refresh       |
+| ------------------- | ------------------------------------------ | ------------- |
+| Stream level & flow | USGS NWIS gauges                           | 15 min        |
+| Weather & forecasts | NOAA / NWS                                 | Hourly        |
+| Tide data           | NOAA CO-OPS                                | 6 min         |
+| Water temperature   | USGS + community                           | Hourly        |
+| Flood warnings      | NWS AHPS                                   | Real-time     |
+| Hazard reports      | Community + land managers                  | As reported   |
+| Fishing regulations | State fish & wildlife agencies (23 states) | Daily recheck |
+
+<Callout>
+  Fishing regulations — size limits, bag limits, and seasonal closures — are
+  sourced from official state fish and wildlife agencies for all 23
+  launch-site states. Each regulation card on a spot page links directly to
+  its official source and shows a last-checked date. A daily automated
+  recheck fingerprints agency pages and flags rules for re-curation when
+  content changes. Regulation data is a reference summary, not a complete
+  rulebook; always consult the official agency page before fishing.
+</Callout>
 
 ## Safety status
 
@@ -58,6 +69,8 @@ for saved spots to be notified on status transitions.
 - Weather forecasts are probabilistic, not deterministic
 - Community reports reflect one observer's judgment at one point in time
 - Some spots have no nearby gauge or weather station; these show limited data
+- Regulation summaries are transcribed from official sources on the date
+  shown; in-season emergency orders may not yet be reflected
 
 ## Reporting a hazard
 
