@@ -1,0 +1,108 @@
+---
+title: Fishing regulations
+description: Browse cited saltwater fishing regulation references, season
+  windows, limits, and official source links by jurisdiction.
+---
+
+import { MapPin, ShieldCheck } from 'lucide-react';
+
+The **/regulations** catalog is a reference view for selected saltwater recreational fishing rules. It normalizes cited source rows so you can compare season windows, status, and limits without replacing the rules published by the relevant authority.
+
+<Callout type="warn">
+  This catalog is reference information, not permission to fish or retain a catch. Rules can vary by location, method, vessel, species identification, and emergency closure. Verify the applicable official rules before you go.
+</Callout>
+
+## Supported jurisdictions
+
+The catalog currently has 23 supported jurisdictions. It is a selected reference subset, not a complete rulebook for every U.S. state or territory.
+
+| Jurisdiction   | Code | Official source                                                                                                                          |
+| -------------- | ---- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Alaska         | AK   | [ADF\&G sport fishing regulations](https://www.adfg.alaska.gov/index.cfm?adfg=fishingSportFishingInfo.main)                              |
+| Alabama        | AL   | [Alabama Marine Resources regulations](https://www.outdooralabama.com/saltwater-fishing/saltwater-regulations)                           |
+| California     | CA   | [CDFW ocean sport fishing regulations](https://wildlife.ca.gov/Fishing/Ocean/Regulations/Fishing-Map)                                    |
+| Connecticut    | CT   | [CT DEEP marine sport fishing](https://portal.ct.gov/DEEP/Fishing/Saltwater-Fishing)                                                     |
+| Florida        | FL   | [FWC saltwater fishing regulations](https://myfwc.com/fishing/saltwater/recreational/)                                                   |
+| Georgia        | GA   | [GA Coastal Resources Division regulations](https://coastalgadnr.org/recfishingregs)                                                     |
+| Hawaii         | HI   | [DLNR Division of Aquatic Resources regulations](https://dlnr.hawaii.gov/dar/fishing/fishing-regulations/)                               |
+| Louisiana      | LA   | [LDWF recreational fishing regulations](https://www.wlf.louisiana.gov/page/recreational-fishing-regulations)                             |
+| Maine          | ME   | [Maine DMR recreational fishing](https://www.maine.gov/dmr/recreational-fishing)                                                         |
+| Maryland       | MD   | [MD DNR recreational fishing regulations](https://dnr.maryland.gov/fisheries/Pages/regulations/recreational-fishing.aspx)                |
+| Massachusetts  | MA   | [Massachusetts recreational saltwater fishing regulations](https://www.mass.gov/info-details/recreational-saltwater-fishing-regulations) |
+| Mississippi    | MS   | [Mississippi DMR regulations](https://dmr.ms.gov/recreational-catch-limits/)                                                             |
+| North Carolina | NC   | [NC size and bag limits](https://www.deq.nc.gov/about/divisions/marine-fisheries/rules-proclamations-and-size-and-bag-limits)            |
+| New Hampshire  | NH   | [NH Fish and Game marine fishing](https://www.wildlife.state.nh.us/fishing/marine.html)                                                  |
+| New Jersey     | NJ   | [NJ DEP Fish & Wildlife marine fishing](https://dep.nj.gov/njfw/fishing/marine/)                                                         |
+| New York       | NY   | [NY DEC saltwater fishing regulations](https://www.dec.ny.gov/things-to-do/saltwater-fishing/regulations)                                |
+| Oregon         | OR   | [ODFW marine zone regulations](https://myodfw.com/recreation-report/fishing-report/marine-zone)                                          |
+| Puerto Rico    | PR   | [DRNA fishing regulations](https://www.drna.pr.gov/programa-de-estadisticas-de-pesca-recreativa-marina/)                                 |
+| Rhode Island   | RI   | [RI DEM marine fisheries](https://dem.ri.gov/fishing/marine-fisheries)                                                                   |
+| South Carolina | SC   | [SCDNR marine sport fishing](https://www.dnr.sc.gov/marine/sportfishing.html)                                                            |
+| Texas          | TX   | [TPWD saltwater regulations](https://tpwd.texas.gov/regulations/outdoor-annual/fishing/saltwater-fishing)                                |
+| Virginia       | VA   | [VMRC recreational saltwater rules](https://mrc.virginia.gov/regulations/swrecfishingrules.shtm)                                         |
+| Washington     | WA   | [WDFW fishing regulations](https://wdfw.wa.gov/fishing/regulations)                                                                      |
+
+Each state view also links to its configured source and shows the source's update and check timestamps. Follow the source link for the authority's current details, proclamations, emergency orders, and local qualifications.
+
+## Read the catalog
+
+Select a jurisdiction, then review one row per listed species. The table provides:
+
+- **Listed season windows** — a month-by-month view of the normalized schedule.
+- **Bag** — the possession limit, or the active window's bag limit when that is the only limit available.
+- **Min size** — the listed minimum size in inches.
+- **Listing** — the current status badge described below.
+
+When a status is not current and verified, the catalog does not present stale values as current limits. Closed and verify rows can show `—` in the limit columns; a detail page may retain a clearly labeled last-listed/reference value.
+
+## Normalized season windows
+
+Normalized rules use one of three rule kinds:
+
+- `year_round` — the rule is listed as open year-round and has no season-window rows.
+- `scheduled` — the rule has one or more season windows.
+- `closed` — the rule is explicitly closed and has an empty season-window list.
+
+A scheduled window has a `start` and `end` month/day in `MM-DD` form. A window may cross the end of the calendar year, such as a season that starts in the fall and ends the following year. A window can also carry an optional non-negative integer `bag_limit`; a value of `0` represents no retention for that window.
+
+The normalized record can also include:
+
+- Minimum and maximum size in inches. A maximum can be inclusive (`maximum`) or exclusive (`less than`).
+- A possession-limit note and applicability notes.
+- The authority and citation used for the row.
+- The source URL, source-updated date, source-checked timestamp, effective year, and whether the row is federal.
+
+Overlapping windows, malformed windows, or a rule whose window shape does not match its rule kind cannot safely select one limit. Those rows fail closed to **VERIFY**.
+
+## Status badges
+
+The status evaluator uses the launch site's IANA time zone and the current effective year. **CLOSING SOON** uses a seven-day closing window by default.
+
+| Badge            | Meaning                                                                                                                                                                                                                          |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **OPEN**         | A current, provenance-backed rule has an active year-round or scheduled window with retention available. Current bag and minimum-size values can be shown.                                                                       |
+| **CLOSING SOON** | The active scheduled window closes within seven calendar days. Current values can be shown, but check the linked authority before you go.                                                                                        |
+| **CLOSED**       | The rule is explicitly closed, no scheduled window is active, or the active window has a `bag_limit` of `0`.                                                                                                                     |
+| **VERIFY**       | The app cannot safely authorize a current status: the row is reference-only, provenance is incomplete, the source check is stale, the effective year does not match, the time zone is invalid, or the rule is invalid/ambiguous. |
+
+**VERIFY is not the same as CLOSED.** It means the catalog does not have enough current, unambiguous evidence to label the rule open or closed.
+
+## Source freshness and official links
+
+A source check is fresh for seven days. Missing, invalid, future, or older-than-seven-day checks cannot authorize a current schedule badge. The catalog highlights stale sources and tells you that statuses may not reflect the latest official rules.
+
+Use the **SOURCE** link in each state or species view to open the configured public authority page. The source bar shows the latest available **UPDATED** and **CHECKED** values and the jurisdiction-specific disclaimer. Those disclaimers explain when a public page is only an informational summary—for example, when statutes, administrative code, proclamations, or emergency orders remain authoritative.
+
+<Callout type="warn">
+  Always verify the current official regulations immediately before fishing or retaining a catch. DontDieFishing provides cited listings and status guidance; it does not grant permission and cannot account for every local or emergency rule.
+</Callout>
+
+<Cards>
+  <Card icon={<MapPin />} title="Finding spots" href="/dontdiefishing/finding-spots">
+    Search launch sites and review conditions, access, and hazards.
+  </Card>
+
+  <Card icon={<ShieldCheck />} title="Safety & conditions" href="/dontdiefishing/safety-conditions">
+    Understand the condition signals and their limitations.
+  </Card>
+</Cards>
