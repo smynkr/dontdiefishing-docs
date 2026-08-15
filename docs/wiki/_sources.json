@@ -45,8 +45,8 @@
     "components/brand/products.ts": "8b2072340665a45f23439b9c773473b4307c5ed9a8add566d2c02cdebe2e16fe",
     "docs.json": "02f5b88f9148aeea9227403cf67f18fe42cabadb0eeed38a201da38fa6869330",
     "dontdiefishing/index.mdx": "fc4d97c549b298bb149278561876d74be344f8fa8df81af369d1403f59efb64c",
-    "next.config.mjs": "ed6e4140102b121cc8e29bf3b4452522db37dc0c41d40aed4de70aaa8acdbbbd",
-    "package.json": "bd2eee76f102c0ea277df67e8cc46d710f87fa71265745e00409882665a9f7e1",
+    "next.config.mjs": "d56eff07a74355ceb32de279d0b3f225a20a3de8850b87615b9dc0c6266abdb0",
+    "package.json": "e3faaf669b7f9b476e0210916434c5c4fd8dd829c316376321127e713943757a",
     "public/logo.svg": "b1e0a58ed1f20974b24cd945719e49f0122a2fc04a8fe58db76c5df96fc07ef1"
   }
 }
