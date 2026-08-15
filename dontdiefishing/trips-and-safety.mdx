@@ -51,7 +51,7 @@ The trip list's monitoring panel summarizes wind sustained, gusts, wave height, 
 
 ## Ongoing monitoring and exports
 
-Upcoming plans are monitored until you cast off. The trip list fetches live conditions for active launch sites, deduplicating sites shared by multiple plans. It displays the latest score, status, condition age, and a **LAST CHECK / NEXT** readout. The monitoring copy calls out hourly condition checks and a further re-check six hours before launch; push and email fire when monitored conditions cross the relevant threshold.
+Upcoming plans are monitored until you cast off. The trip list fetches live conditions for active launch sites, deduplicating sites shared by multiple plans. It displays the latest score, status, condition age, and a **LAST CHECK / NEXT** readout. The monitor runs every 30 minutes; when a monitored trip status changes, its event fans out to Web Push subscriptions and enabled native Expo installations. This status-event path does not send email.
 
 Use **EXPORT** to download a CSV of the trip list. The file contains these columns:
 

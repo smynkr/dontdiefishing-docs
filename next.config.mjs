@@ -34,6 +34,9 @@ const config = {
       { source: '/finding-spots', destination: '/dontdiefishing/finding-spots' },
       { source: '/safety-conditions', destination: '/dontdiefishing/safety-conditions' },
       { source: '/faq', destination: '/dontdiefishing/faq' },
+      { source: '/regulations', destination: '/dontdiefishing/regulations' },
+      { source: '/alerts', destination: '/dontdiefishing/alerts' },
+      { source: '/trips-and-safety', destination: '/dontdiefishing/trips-and-safety' },
       { source: '/changelog', destination: '/dontdiefishing/changelog' },
     ];
   },
