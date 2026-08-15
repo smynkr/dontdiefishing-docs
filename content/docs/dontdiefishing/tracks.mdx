@@ -1,0 +1,98 @@
+---
+title: GPS tracks
+description: Record mobile GPS sessions offline, then replay distance, speed,
+  AIS, and conditions on the web.
+---
+
+import { BookOpen, Rocket } from 'lucide-react';
+
+> **PREVIEW — unreleased:** Mobile GPS recording is not available in a released
+> store build. No store build has reached users yet; DDF-41 remains pending.
+
+DontDieFishing records a phone-GPS session on mobile and makes the finished
+session available for replay on the web app's **/tracks** route.
+
+## Record on mobile
+
+Open **Trips** in the mobile app and select **Record** on a trip, or start an ad-hoc recording when you are not linking the session to a planned trip. The button changes to **Stop** while a session is active.
+
+The recorder:
+
+- Uses the phone's GPS only.
+- Samples about once per second while the app is in the foreground.
+- Uses a slower background cadence (about one sample every five seconds) when background location permission is granted.
+- Skips stationary points when the phone has moved less than roughly five metres since the previous recorded point.
+- Stores speed over ground and course over ground when the device supplies them.
+- Caps a session at 20,000 points.
+
+Foreground location permission is required to start recording. Background permission is optional: without it, foreground recording still works, but the recorder cannot continue using its background task.
+
+Select **Stop** when the session is over. The app uploads points in batches and finalizes the track before reporting that it was saved. The mobile confirmation points you to **Recent tracks** on the web for replay.
+
+## Offline recording and retries
+
+The recorder keeps session metadata and points on the device while the session is running. A stop can therefore finish its local work even when the upload or finalization request cannot reach the server.
+
+If upload or finalization fails:
+
+- Your points stay on the device; they are not discarded when the request fails.
+- The mobile app reports that the upload failed and that the points will retry on the next launch.
+- Pending uploads are flushed when the Trips screen starts, and the recorder retries interrupted uploads and finalization.
+- A dead previous session can be archived locally before a new recording starts, so an offline start does not overwrite its unuploaded points.
+- A track that has been deleted or pruned on the server is cleared from the pending retry state instead of retrying forever.
+
+A live session is not finalized by recovery while its foreground watcher or registered background task is still running. Stop the active session before starting another one.
+
+## Replay on the web
+
+Sign in to the web app and open the **/tracks** route. The sessions rail lists recent sessions newest first, including the launch site when a session is trip-linked and **Ad-hoc session** when it is not. Up to 20 sessions are loaded in the recent list. A session that is still open is marked **LIVE**.
+
+The replay surface includes:
+
+- A map with the recorded path and a moving position at the current playhead.
+- **Play/Pause** and a progress slider for the playhead.
+- Elapsed time and total duration.
+- Replay speeds of **1×**, **2×**, and **4×**.
+- Current speed at the playhead.
+- A speed profile for the session.
+
+The metrics panel calculates:
+
+- **Distance** in nautical miles (`nm`)
+- **Duration**
+- **Max speed** in knots (`kt`)
+- **Average speed** in knots
+- Recorded point count
+- The current risk score and status when a trip's launch-site conditions can be loaded
+
+If speed samples are unavailable, the replay can use distance and duration to calculate an average when both are available; otherwise it displays a dash.
+
+## AIS nearby and AIS tracks
+
+When AIS data was returned for the session, **AIS nearby** shows the closest recorded contacts at the current playhead. Each row includes the vessel name or MMSI, its AIS type, and range in nautical miles; the list is limited to the three closest contacts.
+
+Use **SHOW AIS TRACKS** to display the recorded AIS paths on the map. Move the playhead to inspect nearby contacts at a different point in your session. If no AIS data was recorded, the panel explains that there are no AIS contacts for the session.
+
+## Live risk and conditions
+
+For a trip-linked track, replay loads the current conditions for the trip's launch site. **Conditions now** can show a narrative and chips for wind, waves, temperature, visibility, precipitation, and tide. The metrics panel shows the current score and labels it **GO**, **CAUTION**, **NO-GO**, or **UNKNOWN** when a score is unavailable.
+
+These are current conditions at replay time, not a guarantee that conditions were the same throughout the recorded session. A track with no linked launch site can still be replayed, but it has no trip site from which to load the live condition score.
+
+## Log a catch from a track
+
+Select **LOG A CATCH HERE** in the conditions panel to open the logbook. Record the catch there; when a logbook entry has a linked track, its card exposes a **TRACK** link back to replay.
+
+## GPX export
+
+GPX export is **disabled** in the product. The replay surface shows an unavailable **EXPORT GPX** control; it cannot start a download.
+
+<Cards>
+  <Card icon={<BookOpen />} title="Logbook" href="/dontdiefishing/logbook">
+    Add catches, trip details, conditions, and photos.
+  </Card>
+
+  <Card icon={<Rocket />} title="Getting started" href="/dontdiefishing/getting-started">
+    Set up the app and find your first fishing spot.
+  </Card>
+</Cards>
