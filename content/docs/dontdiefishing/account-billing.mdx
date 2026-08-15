@@ -1,0 +1,85 @@
+---
+title: Account & billing
+description: Manage your DontDieFishing profile, sign-in, Pro subscription,
+  billing portal, and account data.
+---
+
+import { BookOpen, CircleQuestionMark, Route } from 'lucide-react';
+
+Use **Settings** to manage your profile, subscription, notifications, vessels, analytics consent, and account data.
+
+## Sign in and create an account
+
+On the web, you can:
+
+- Create an account with an email address and password.
+- Sign in with an email address and password.
+- Continue with Google or Apple.
+
+Email sign-up sends you to the sign-in page with a reminder to check your email and confirm the account. The web app protects the dashboard, trips, sites, settings, and other app pages; an unauthenticated visit is sent to **Sign in** and the requested path is retained for the redirect after authentication.
+
+## Profile settings
+
+The **Account** section in Settings lets you edit your **Display name** and save it. Your current email is shown as a read-only field. The page notes that email changes go through a confirmation link rather than being edited inline.
+
+Saving the display name updates your profile and refreshes the page. If the session is no longer available, Settings asks you to sign in again; a failed profile update leaves an error so you can retry.
+
+## Free and Pro
+
+The Free tier includes the core app experience. The current Pro card lists these Pro perks:
+
+- Everything in Free
+- Full 7-day fishable calendar
+- Week-ahead comparison across saved sites
+- Next-GO day surfaced automatically
+
+The subscription card offers two billing intervals:
+
+| Interval | Price shown in the product                           |
+| -------- | ---------------------------------------------------- |
+| Yearly   | $39.99/yr (shown as $3.33/mo equivalent; save \~33%) |
+| Monthly  | $4.99/mo                                             |
+
+The Free card labels the offer **CANCEL ANYTIME**. The exact price and availability shown in the product are the source of truth for checkout.
+
+## Start Pro checkout
+
+From Settings, choose **YEARLY** or **MONTHLY**. The web app sends the selected interval to its authenticated checkout endpoint, then redirects you to the returned Stripe Checkout URL. Checkout accepts valid promotion codes configured in Stripe.
+
+An account with an active Pro subscription cannot start a second Pro checkout. Use the billing portal instead. If checkout cannot be prepared, Settings shows an error and keeps you on the account page.
+
+## Renewal and billing portal
+
+For an active Pro subscription, Settings reads the subscription expiry value and shows **RENEWS** with the date when one is available. The entitlement is reconciled from the customer's Stripe subscription state; a customer with no active configured Pro subscription is treated as Free.
+
+Active Pro accounts have two actions:
+
+- **BILLING PORTAL** opens a Stripe billing portal session and returns to Settings.
+- **INVOICES** uses the same billing-portal action, where the product exposes billing documents.
+
+If no Stripe subscription is bound to the account, the portal endpoint reports that no subscription was found. If the portal cannot be opened, Settings shows an error so you can retry.
+
+## Delete your account
+
+The Settings **Danger zone** explains the impact before you request deletion:
+
+- Trips are removed.
+- Tracks are removed.
+- Logbook entries are removed.
+- Float plan links stop working immediately.
+
+The **DELETE ACCOUNT** control links to the product's Contact page. Use that contact path to request account deletion; the Settings page does not delete the account inline.
+
+<Cards>
+  <Card icon={<CircleQuestionMark />} title="FAQ & troubleshooting" href="/dontdiefishing/faq">
+    Fix authentication, permissions, network, and stale-data problems.
+  </Card>
+
+  <Card icon={<BookOpen />} title="Logbook" href="/dontdiefishing/logbook">
+    Record catches and manage trip details.
+  </Card>
+
+  <Card icon={<Route />} title="Tracks" href="/dontdiefishing/tracks">
+    Replay mobile GPS sessions and inspect their metrics.
+  </Card>
+</Cards>

@@ -37,6 +37,7 @@ const GENERIC_LUCIDE_ICONS = {
   'calendar-clock': 'CalendarClock',
   'chart-line': 'ChartLine',
   clock: 'Clock',
+  'credit-card': 'CreditCard',
   cloud: 'Cloud',
   compass: 'Compass',
   flame: 'Flame',

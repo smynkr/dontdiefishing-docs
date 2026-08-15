@@ -38,9 +38,16 @@
                 "pages": [
                   "dontdiefishing/finding-spots",
                   "dontdiefishing/safety-conditions",
-                  "dontdiefishing/mobile-app",
-                  "dontdiefishing/fishable-days"
-                ]
+
+                 "dontdiefishing/mobile-app",
+                 "dontdiefishing/fishable-days",
+                 "dontdiefishing/logbook",
+                 "dontdiefishing/tracks",
+                 "dontdiefishing/account-billing",
+                 "dontdiefishing/regulations",
+                 "dontdiefishing/alerts",
+                 "dontdiefishing/trips-and-safety",
+                 "dontdiefishing/how-scoring-works"                ]
               },
               {
                 "group": "Support",
