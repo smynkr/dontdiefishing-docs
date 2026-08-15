@@ -27,7 +27,9 @@ const config = {
       // Clean standalone URLs: docs.dontdiefishing.com/<page> serves the
       // /dontdiefishing/<page> route. The canonical source keeps its product
       // prefix; the rewrite keeps the pretty URL in the address bar.
-      { source: '/', destination: '/dontdiefishing' },
+      // `/` itself is NOT rewritten — app/(home)/page.tsx renders the
+      // product index there (a rewrite-only `/` 404s on soft navigation,
+      // because the client router does not apply rewrites).
       { source: '/getting-started', destination: '/dontdiefishing/getting-started' },
       { source: '/finding-spots', destination: '/dontdiefishing/finding-spots' },
       { source: '/safety-conditions', destination: '/dontdiefishing/safety-conditions' },
