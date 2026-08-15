@@ -54,12 +54,14 @@ The selected vessel type supplies default thresholds. Values are wind and gust
 in knots, waves in feet, visibility in miles, current in knots, and water
 temperature in °F.
 
-| Vessel type | Wind / gust | Waves | Visibility | Current | Water temperature | Lightning |
-| ----------- | ----------- | ----- | ---------- | ------- | ----------------- | --------- |
-| Powerboat   | 25 / 35     | 6     | 1          | 4       | 45                | Moderate  |
-| Sailboat    | 30 / 40     | 8     | 1          | 4       | 45                | Moderate  |
-| Kayak       | 15 / 20     | 2     | 0.5        | 2       | 55                | Low       |
-| Paddleboard | 15 / 20     | 2     | 0.5        | 2       | 55                | Low       |
+| Vessel type | Wind / gust | Waves | Visibility | Current | Water temperature |
+| ----------- | ----------- | ----- | ---------- | ------- | ----------------- |
+| Powerboat   | 25 / 35     | 6     | 1          | 4       | 45                |
+| Sailboat    | 30 / 40     | 8     | 1          | 4       | 45                |
+| Kayak       | 15 / 20     | 2     | 0.5        | 2       | 55                |
+| Paddleboard | 15 / 20     | 2     | 0.5        | 2       | 55                |
+
+The scorer does not read a vessel-specific lightning threshold. **High** lightning risk is a hard veto for every vessel; lower lightning levels remain weighted signals.
 
 You can override threshold values for a vessel with custom thresholds. The
 selected scoring profile—**cautious**, **moderate**, or **experienced**—changes
@@ -118,16 +120,27 @@ official NWS guidance before departure.
 ## Freshness and unknown values
 
 The web conditions endpoint reuses a cached snapshot only when it is less than
-30 minutes old. When no fresh snapshot exists, it calls the aggregator; if that
-fetch fails, the endpoint returns an error instead of returning a score from an
-unknown fetch.
+30 minutes old. Without a fresh snapshot it calls the aggregator. If that
+aggregate-level fetch fails, the endpoint returns an error instead of a score
+from an unknown fetch.
 
-At signal level, missing values are marked unavailable. Their base weight is
-excluded and redistributed across available signals; the missing value is not a
-measured favorable condition. The shared scorer does not infer a per-signal
-freshness state (`is_stale` is `false` in its returned rows), so treat a missing
-or unverified source as unknown. Read unknown as fail-closed for trip planning:
-do not interpret it as GO, and verify the official source before departure.
+Individual source fetchers degrade independently: the alerts fetcher returns an
+empty alert list, while the forecast fetcher returns `lightning_risk: "none"`
+and `null` values for forecast measurements it could not obtain. The aggregator
+passes those fallback values to the scorer without an error marker.
+
+This behavior is **fail-open**, not fail-closed. An empty alert list cannot
+trigger an alert veto, and fallback lightning maps to zero modeled risk.
+Unknown alerts or lightning can therefore contribute to a **GO** result. Other
+missing numeric signals are represented as unavailable; their normalized value
+is 0 and their adjusted weight is 0, with the base weight redistributed among
+available signals. A `fetched_at` timestamp does not prove every source was
+successfully fetched, and returned signal rows currently have `is_stale: false`.
+
+Treat a missing, unverified, or degraded input as unknown: verify current
+conditions directly with authoritative NWS and NDBC sources before launch, and
+make the launch decision with current conditions and your own judgment. Do not
+read an absent or degraded score as authorization to launch.
 
 <Callout type="warn">
   DontDieFishing provides planning guidance only. Marine warnings may have
