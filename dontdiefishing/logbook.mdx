@@ -1,0 +1,100 @@
+---
+title: "Logbook"
+description: "Record catches, trip details, conditions, and photos in the DontDieFishing logbook."
+---
+
+Record what happened on the water, then use the logbook to compare catches with the conditions attached to each trip.
+
+## Record a trip
+
+Choose a date (today or earlier) and add one or more catch lines. Each line has:
+
+| Field | What to enter |
+| --- | --- |
+| Species | Select a species from the list, or choose **Other** |
+| Count | A non-negative whole number; required when a catch line is used |
+| Size | Optional measurement in inches |
+| Weight | Optional measurement in pounds |
+
+Add another line with **+ Add species** when one trip includes more than one species. Leave the catch lines empty to record a skunked trip. A catch line with a species but no count is not saved; the editor asks you to complete the line instead.
+
+The entry form also accepts:
+
+- **Notes** — up to 2,000 characters for what worked, tide observations, or other details
+- **Bait / lure** — up to 120 characters
+- **Boat** — choose a vessel profile or leave the trip without a boat
+- **Duration** — hours and minutes
+- **Gas consumed** — gallons
+- **Engine hours**
+- **Passengers** — crew count
+
+## Draft catches
+
+A mobile trip can create a draft catch with the trip's recorded conditions attached. Drafts appear in their own **DRAFT CATCHES** section until you finish the details.
+
+1. Select **Add details** to open the draft editor.
+2. Enter or correct the species, count, size, weight, notes, bait/lure, and any enabled trip fields.
+3. Select **Save details**. The existing primary catch is updated rather than duplicated.
+4. Select **Confirm** to move the draft into the confirmed catches list.
+
+If you do not want to keep the draft, select **Dismiss**. Confirming while the editor has unsaved values saves those values first; a failed save leaves the draft unconfirmed. A draft can also be dismissed without adding catch details.
+
+## Entry sections
+
+Use **Entry sections** to choose which fields are shown on entries and forms. The available sections are:
+
+- Catch details (species, count, size, and weight)
+- Weather & conditions (wind, waves, temperatures, and tide attached from the trip)
+- Distance travelled (from track replay)
+- Trip duration (automatically derived from a track when available, and editable)
+- Boat used
+- Gas consumed
+- Engine hours
+- Passengers
+- Photos (Pro)
+
+Catch details, weather & conditions, distance, duration, and boat are on by default. Gas, engine hours, passengers, and photos are off by default. Turning a section off hides it without clearing the stored value; hidden fields are not validated or overwritten by a later save.
+
+## Filters and summaries
+
+The filter row is built from the species in your entries. Use **ALL SPECIES** to show confirmed entries, a species name to narrow both confirmed entries and drafts, or **DRAFTS** to show only drafts. Entries are sorted newest first.
+
+The logbook header summarizes:
+
+- Total fish and number of species
+- Total entries and how many drafts still need confirmation
+- Largest recorded size and its species
+- The launch site with the most recorded fish
+- The tide window with the most recorded fish when conditions are attached
+
+The side panels add three views of the same recorded data:
+
+- **Catches by risk band** groups fish totals into **GO**, **CAUTION**, and **NO-GO** using the condition snapshot recorded with each entry. A catch without enough snapshot data remains unknown rather than receiving a current score.
+- **Best tide phase** groups recorded fish by the tide phase saved on the entry.
+- **Top species** ranks species by recorded count and shows the best recorded size when one exists.
+
+When Insights data is available, it adds species-by-month trends, per-site catch counts, and the conditions in which you catch best (catch rate is shown as catches per day). If there is not enough history yet, the panel asks you to log more trips.
+
+## Edit an entry
+
+Select **Edit** on a confirmed entry to change catch lines, boat, duration, gas, engine hours, passengers, bait/lure, or notes. You can add or remove catch lines, and you can save an entry with no catch lines to keep it marked as a skunked trip. The editor validates species and count together and accepts size, weight, duration, and numeric trip fields only when their values are valid.
+
+## Track links
+
+When an entry has a linked track and **Distance travelled** is enabled, its card includes a **TRACK** link. Open it to replay that session, inspect its distance and speed metrics, and see the conditions associated with the trip. Track-linked duration is displayed automatically until you explicitly edit it.
+
+## Photo galleries (Pro)
+
+Photo galleries are a Pro feature. Enable **Photos** in Entry sections, then select **+ Photo** on an entry. Each entry supports up to **10 photos**; each image must be **10 MB or smaller**. Select a thumbnail to open the full-size image, or delete an image from the gallery. If the gallery cannot be loaded or a photo upload fails, the entry keeps its existing data and shows the error so you can retry.
+
+<Cards>
+  <Card title="Tracks" icon="route" href="/dontdiefishing/tracks">
+    Record GPS sessions on mobile and replay them on the web.
+  </Card>
+  <Card title="Account & billing" icon="credit-card" href="/dontdiefishing/account-billing">
+    Manage your profile, subscription, billing portal, and account data.
+  </Card>
+  <Card title="Safety & conditions" icon="shield-check" href="/dontdiefishing/safety-conditions">
+    Understand the condition data attached to your entries.
+  </Card>
+</Cards>

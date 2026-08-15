@@ -10,19 +10,52 @@ Common questions and fixes for DontDieFishing.
 ### Is DontDieFishing free?
 
 Core features — spot browsing, conditions, and hazard warnings — are free.
-Premium adds offline maps, extended forecasts, and unlimited saved spots.
+The current Pro card lists:
+
+- A full 7-day fishable calendar
+- Week-ahead comparison across saved sites
+- The next-GO day surfaced automatically
+
+The current Pro card does **not** list offline maps, extended forecasts, or
+unlimited saved spots as Pro perks.
 
 ### Where does the data come from?
 
-See [Safety & conditions](/dontdiefishing/safety-conditions) for the full data-source table.
-Primary sources are USGS, NOAA, and NWS — all U.S. government services.
+See [Safety & conditions](/dontdiefishing/safety-conditions) for the full
+data-source table. Primary sources include USGS, NOAA, and NWS services.
 
 ### Is my location shared with other users?
 
 No. Your location is used only to center the map and calculate distances.
 Other users never see your position.
 
-## Spots
+## Authentication
+
+### How do I create an account?
+
+On the web, select **Sign up** and enter an email address and password, or
+continue with Google or Apple. Email sign-up sends you to the sign-in page
+with a reminder to check your email and confirm the account.
+
+### Why am I sent to Sign in?
+
+The app pages require an authenticated session. If you open a protected page
+without a session, DontDieFishing sends you to **Sign in** and retains the
+requested path so you can continue there after authentication. If the session
+has expired, sign in again and retry the original page.
+
+### I cannot sign in
+
+- Confirm the email address and password are entered, then submit the form
+  again.
+- If you just created the account, complete the confirmation link in your
+  email before signing in.
+- If you used Google or Apple to create the account, use that provider again.
+- If an authentication error remains, try again after checking your network
+  connection. The form displays the provider's error instead of silently
+  treating the attempt as successful.
+
+## Spots and conditions
 
 ### A spot near me is missing
 
@@ -30,28 +63,82 @@ The spot database is growing. Tap **Suggest a Spot** on the map (long-press
 any location) to submit a new fishing spot. Include the name, water type, and
 access notes.
 
-### The conditions look wrong
+### The conditions look wrong, stale, or incomplete
 
-Condition data refreshes on a schedule (see
-[Safety & conditions](/dontdiefishing/safety-conditions)). If data seems stale:
+The app can show a dash when an individual value is unavailable, and the
+track replay can label a missing risk score **UNKNOWN**. That is missing
+source data, not a GO signal. Forecasts can also show **Forecast unavailable
+right now**.
 
-- Check the "Last updated" timestamp on the spot page
-- USGS gauges occasionally go offline for maintenance
-- Submit a community report with your on-site observation
+If data looks stale or a condition request fails:
+
+1. Check the app's online state and reconnect if the offline banner says
+   **You're offline — showing cached data. Scores may not be current.**
+2. Reload the page or use the page's retry/refresh action.
+3. Remember that gauges and forecast sources can be temporarily unavailable.
+   Community reports supplement official data; they do not replace it.
+
+On the web, the site list can also show **Create a vessel profile in Settings
+to see conditions**. Create a vessel profile, then refresh the conditions.
 
 ### Can I use this for saltwater fishing?
 
 Yes. Surf, pier, jetty, and inshore spots include tide data from NOAA CO-OPS
 and saltwater species profiles.
 
-## Alerts
+## Network and permissions
 
-### I am not getting push notifications
+### The app says it cannot connect
 
-- Ensure notifications are enabled for the app in your phone's Settings
-- Check that the saved spot has alerts toggled on (spot page → bell icon)
-- Alerts only fire on status transitions (e.g., green → yellow), not
-  continuously
+Mobile list screens show **Unable to connect to the network. Please check
+your connection.** when a data load fails and provide **Retry**. Community
+reports also provide retry actions for an initial load or a later refresh.
+Reconnect, select **Retry**, and avoid treating cached or missing conditions as
+current.
+
+The web app shows an offline banner and may display cached data while the
+browser is offline. Reconnect before relying on a score, then reload the page
+to request current data.
+
+### Why cannot I start GPS track recording?
+
+Track recording requires foreground location permission. The mobile app asks
+for background location permission as a second step; background permission
+allows the slower background recording task, while foreground recording still
+works without it. If foreground permission is denied, recording cannot start.
+Grant location access in the device settings and try **Record** again.
+
+### Why are alerts not arriving?
+
+- Ensure notifications are enabled for DontDieFishing in your phone's
+  Settings.
+- Check that the saved spot has alerts toggled on (spot page → bell icon).
+- Alerts fire on status transitions (for example, green to yellow), not
+  continuously.
+
+If device notification permission was denied, enable it in device settings and
+try enabling notifications again from the app.
+
+## Community reports
+
+### How do I report current conditions or a hazard?
+
+Use **Community Reports** on the mobile site detail screen. A report requires
+one condition rating from **1 to 5**:
+
+- **5 — Great**
+- **4 — Good**
+- **3 — Okay**
+- **2 — Rough**
+- **1 — Dangerous**
+
+You can optionally add text for **Wind**, **Waves**, **Visibility**, and
+**Notes**. Reports are recent community observations, not official forecasts.
+The list shows reports from the **last 24 hours** for that site.
+
+If loading or submitting a report fails, the screen shows an error and a
+**Retry** action. A report is not a separate hazard-type form with a required
+description or photo.
 
 ## Contact
 
@@ -59,6 +146,15 @@ For bugs, data corrections, or feature requests:
 [support@dontdiefishing.com](mailto:support@dontdiefishing.com).
 
 <Cards>
+  <Card title="Logbook" icon="book-open" href="/dontdiefishing/logbook">
+    Record catches, trip details, conditions, and photos.
+  </Card>
+  <Card title="Tracks" icon="route" href="/dontdiefishing/tracks">
+    Record GPS sessions on mobile and replay them on the web.
+  </Card>
+  <Card title="Account & billing" icon="credit-card" href="/dontdiefishing/account-billing">
+    Manage your profile, Pro subscription, billing portal, and account data.
+  </Card>
   <Card title="Safety & conditions" icon="shield-check" href="/dontdiefishing/safety-conditions">
     Data sources, hazard categories, and the limitations of the safety information.
   </Card>
