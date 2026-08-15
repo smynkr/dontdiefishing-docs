@@ -37,7 +37,10 @@
                 "icon": "map-pin",
                 "pages": [
                   "dontdiefishing/finding-spots",
-                  "dontdiefishing/safety-conditions"
+                  "dontdiefishing/safety-conditions",
+                  "dontdiefishing/logbook",
+                  "dontdiefishing/tracks",
+                  "dontdiefishing/account-billing"
                 ]
               },
               {
