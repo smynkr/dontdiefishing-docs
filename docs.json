@@ -37,7 +37,9 @@
                 "icon": "map-pin",
                 "pages": [
                   "dontdiefishing/finding-spots",
-                  "dontdiefishing/safety-conditions"
+                  "dontdiefishing/safety-conditions",
+                  "dontdiefishing/mobile-app",
+                  "dontdiefishing/fishable-days"
                 ]
               },
               {

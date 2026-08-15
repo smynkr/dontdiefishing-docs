@@ -1,0 +1,178 @@
+---
+title: "Mobile app"
+description: "Use the DontDieFishing mobile tabs to monitor launch sites, plan trips, record GPS tracks, and manage your vessel and alerts."
+---
+
+The DontDieFishing mobile app keeps the launch-site and trip-planning workflow in
+four bottom tabs:
+
+| Tab | What you can do |
+| --- | --- |
+| **Dashboard** | Review saved-site conditions and scores. |
+| **Sites** | Browse launch sites by region, save them, and open the site map when the map feature is enabled. |
+| **Trips** | Create and monitor trip plans, or record a GPS track. |
+| **Settings** | Manage your account, alert preferences, device push permission, and vessel profiles. |
+
+<Warning>
+  The mobile score is decision support, not a guarantee of safety. Re-check
+  changing conditions and assess the launch site in person before entering the
+  water.
+</Warning>
+
+## Dashboard
+
+Dashboard loads your saved launch sites and fetches a batch of conditions for
+those sites. Each saved-site card can include:
+
+- the site name and region (or site type),
+- the current risk score and **GO**, **CAUTION**, or **NO-GO** status,
+- wind, waves, air temperature, visibility, rain probability, and water
+temperature, and
+- the highest-contributing available signals shown as signal ticks.
+
+Tap a card to open its site detail. If you have not saved a site yet, Dashboard
+shows an empty state that points you to **Sites**. A failed refresh clears the
+widget snapshot rather than presenting an old score as current.
+
+Pull down on the Dashboard list to refresh. The refresh loads the saved-site
+list and then requests the conditions for those sites again.
+
+### iOS widget
+
+On iOS, the authenticated Dashboard can publish a privacy-minimal widget
+snapshot. The widget shows **TODAY'S TOP SITE**, its current status and score
+when available, and an updated label. The snapshot expires and is replaced by
+an explicit empty state so yesterday's score is not presented as current. The
+iOS widget opens the authenticated Dashboard when tapped.
+
+The widget receives the sanitized snapshot from the main app; it does not carry
+Supabase credentials or fetch conditions itself. This is an iOS-only pilot:
+Android and web do not load the Expo Widgets implementation.
+
+## Sites
+
+The **Sites** tab is the launch-site catalog:
+
+1. Choose a region from the horizontal region pills.
+2. Browse the sites in that region.
+3. Tap a site to open its detail, or use the bookmark control to save or unsave
+   it.
+4. Pull down to refresh the catalog and your saved-site state.
+
+A save operation updates the bookmark only after the request succeeds. If it
+fails, the app keeps the prior state and shows an error.
+
+### Feature-gated site map
+
+When the phase-one site-map flag is enabled, the Sites header includes a **Map**
+button. The map is deliberately marker-only:
+
+- it plots the union of curated sites and your saved sites,
+- marker colors come from the available batch scores, with a neutral color when
+  a score is unavailable,
+- tapping a marker opens that launch site's detail, and
+- the basemap is network-free: an inline background has no tile sources or tile
+  URLs.
+
+The screen still fetches the catalog, saved sites, coordinates, and scores while
+building the markers. A map renderer or data-load failure has an explicit error
+state and a retry/back action; network-free refers to the basemap, not to an
+offline catalog cache.
+
+## Site detail
+
+Site detail refreshes the selected launch site's conditions and includes:
+
+- the current **Risk Score**, status, and any veto reason,
+- wind, waves, visibility, water temperature, tide, rain probability, and
+  sunrise/sunset when available,
+- a **Signal Breakdown** with each available signal's raw value, normalized
+  score, and contribution, and
+- pull-to-refresh for the page and its related sections.
+
+### Community Reports
+
+**Community Reports** lets a signed-in user share an observation when it is safe
+to do so. Choose a rating, then optionally describe wind, waves, visibility, and
+other notes. The page lists recent reports from the last 24 hours. These are
+community observations, not official forecasts.
+
+### Fishing regulations
+
+The detail page also loads **Fishing regulations** for the site's region and
+state when references are available. A regulation card can show the species,
+open/closing-soon/closed status, limits, size rules, applicability notes, and
+an **Official rules** link. Reference-only schedules tell you that the current
+season status still needs verification. Regulation data is a reference, not
+permission to fish or retain a catch; verify the applicable official rules.
+
+## Trips
+
+The **Trips** tab lists trip plans with their launch site, planned date and
+optional time, status, selected vessel, and latest score when one is available.
+Use **Plan a Trip** to choose:
+
+- a launch site,
+- a vessel profile,
+- a selectable date, and
+- an optional departure time.
+
+You can edit or cancel a trip. Past trips are view-only. Pull down the trip list
+to refresh trip plans, saved sites, and vessel profiles. If there are no trips,
+the empty state includes a **Plan a Trip** action and explains that planned
+conditions can be monitored for changes.
+
+### GPS track recording
+
+Trips supports two recording paths:
+
+- Tap **Record** on a planned trip to associate the track with that trip.
+- Tap **Record a track (ad-hoc session)** to start a track without a trip plan.
+
+Recording requires location permission. The active control changes to **Stop**
+and shows the current point count. Stopping uploads and finalizes the session;
+when the upload succeeds, the app reports how many points were recorded and
+says the replay is available in the web app under **Recent tracks**. If an
+upload fails, points remain on the device and retry on the next app launch.
+
+## Settings
+
+Settings is split into account, alert, device, and vessel controls.
+
+### Account
+
+The account section shows your display name, email, and current **FREE** or
+**PRO** plan. You can edit or clear the display name and sign out.
+
+### Alerts and push permission
+
+There are two separate controls:
+
+- **Notification Preferences** sets saved-site alert sensitivity for the account:
+  **Minimal** (only GO ↔ NO-GO flips), **Moderate** (status flips plus CAUTION
+  transitions), or **All Changes** (meaningful score changes of 5 or more
+  points).
+- **Device Notifications** controls push permission on the current device.
+  Enable or disable **Fishing alerts** here. If permission is denied, the app
+  directs you to device settings; an account preference alone does not enable
+  push on this device.
+
+### Vessel Profiles
+
+Add, edit, set a default, or delete a vessel profile. Each profile includes a
+name, vessel type (**Power**, **Sail**, **Kayak**, or **Paddle**), optional length
+in feet, and a scoring profile (**Cautious**, **Moderate**, or **Experienced**).
+The default vessel is used when a trip or score does not specify another
+profile. A default vessel must be changed before it can be deleted.
+
+<Cards>
+  <Card title="Getting started" icon="rocket" href="/dontdiefishing/getting-started">
+    Create your account, configure a vessel, save a launch site, and plan a trip.
+  </Card>
+  <Card title="Fishable Days" icon="calendar-clock" href="/dontdiefishing/fishable-days">
+    Compare vessel-specific forecast windows and planned-trip days on the web.
+  </Card>
+  <Card title="Safety & conditions" icon="shield-check" href="/dontdiefishing/safety-conditions">
+    Review score inputs, statuses, and limitations before launch.
+  </Card>
+</Cards>
