@@ -110,13 +110,13 @@ A trip check-in moves through these states:
 
 The monitor only escalates an active, unacknowledged window once. It marks the trip overdue, sends an owner-facing push event, and attempts an email to the shore contact (contact email delivery is environment-gated). If the email send fails, the window is released for a later retry rather than silently treating the escalation as delivered.
 
-If you check in after an overdue escalation, the card confirms that the contact was already notified and asks you to call them. Disabling the check-in clears the contact and return-by details and returns the trip to `none`; enabling it again reopens the latches for a new window.
+If you check in after an overdue escalation, the card reports the delivery outcome—whether the shore contact was notified successfully or the escalation was only attempted—and asks you to call them. Disabling the check-in clears the contact and return-by details and returns the trip to `none`; enabling it again reopens the latches for a new window.
 
 Check-in configuration and acknowledgement are owner-only. A shore contact is the escalation recipient; they cannot edit the plan or acknowledge it on the owner's behalf.
 
 <Cards>
   <Card title="Alerts" icon="mail" href="/dontdiefishing/alerts">
-    Configure sensitivity, push and email channels, and device notification state.
+    Configure sensitivity, push-only saved-site alerts, and device notification state.
   </Card>
   <Card title="Safety & conditions" icon="shield-check" href="/dontdiefishing/safety-conditions">
     Review the data sources and limitations behind readiness and status checks.
