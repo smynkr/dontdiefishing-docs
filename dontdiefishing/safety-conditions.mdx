@@ -1,73 +1,143 @@
 ---
 title: "Safety & conditions"
-description: "Data sources, hazard categories, and the limitations of DontDieFishing's safety information."
+description: "How DontDieFishing collects conditions, calculates a planning score, and handles warnings and missing data."
 ---
 
-Data sources, hazard categories, and the limitations of DontDieFishing's
-safety information.
+DontDieFishing combines current condition inputs into a 0–100 planning score for
+the launch site and vessel profile you select. The score is a planning aid, not
+a safety clearance.
 
 ## Data sources
 
-DontDieFishing aggregates conditions from multiple authoritative sources:
+The conditions aggregator fetches the configured sources in parallel. It records
+the resulting snapshot with a `fetched_at` timestamp; it does not promise a
+single refresh cadence for every source.
 
-| Data                | Source                    | Refresh     |
-| ------------------- | ------------------------- | ----------- |
-| Stream level & flow | USGS NWIS gauges          | 15 min      |
-| Weather & forecasts | NOAA / NWS                | Hourly      |
-| Tide data           | NOAA CO-OPS               | 6 min       |
-| Water temperature   | USGS + community          | Hourly      |
-| Flood warnings      | NWS AHPS                  | Real-time   |
-| Hazard reports      | Community + land managers | As reported |
+| Data used | Source | What the aggregator does |
+| --- | --- | --- |
+| Wind speed and gusts | NWS forecast, with NDBC buoy fallback | Uses the forecast value first, then the buoy value when the forecast field is unavailable. |
+| Wave height, wave period, and swell direction | NDBC buoy | Adds buoy observations when a buoy is configured and returns data. |
+| Visibility, precipitation probability, air temperature, and lightning risk | NWS forecast | Supplies the forecast weather fields used by the snapshot. |
+| Marine warnings | NWS marine alerts | Adds the active warning strings to the snapshot. |
+| Tide height and phase | NOAA CO-OPS tide predictions | Selects the next predicted tide event for the snapshot. |
+| Water temperature | NOAA CO-OPS, with NDBC buoy fallback | Uses the CO-OPS value first, then buoy water temperature. |
+| Tidal current speed | NOAA CO-OPS current predictions | Uses the configured current station and bin when available. |
+| UV index | EPA UV | Adds the UV index for the launch coordinates. |
+| Sunrise and sunset | Sun-times calculation | Computes times from the launch coordinates, date, and resolved timezone. |
+
+The aggregator currently sets `water_quality` to `null`; it is therefore an
+unavailable signal rather than a claim about water quality. A buoy, tide
+station, or current station that is not configured also produces an unavailable
+value.
 
 ## Safety status
 
-The green / yellow / red status is computed from:
+The scorer clamps the final result to 0–100 and maps it to one of three
+statuses:
 
-- **Green** — no active warnings, water within normal range, weather favorable
-- **Yellow** — elevated but not dangerous: rising water, moderate wind,
-  reduced visibility, or a nearby (not spot-specific) advisory
-- **Red** — active danger: flood stage exceeded, lightning within 10 miles,
-  strong current advisory, or a spot-specific hazard report
+| Score | Status | Meaning |
+| --- | --- | --- |
+| 0–39 | **GO** | Lower modeled risk from the available inputs. |
+| 40–59 | **CAUTION** | Elevated modeled risk; review the contributing signals and official guidance. |
+| 60–100 | **NO-GO** | High modeled risk, or a hard veto has stopped the score. |
 
-Status updates automatically as conditions change. You can enable push alerts
-for saved spots to be notified on status transitions.
+The score is not permission to launch. Conditions can change after a snapshot
+is collected, and a GO result does not replace official weather, marine-warning,
+or navigational judgment.
 
-## Hazard categories
+### Vessel-specific thresholds and profiles
 
-- **Current** — strong or unexpected water flow (dam releases, tidal surge)
-- **Flood** — water above safe wading/fishing levels
-- **Weather** — lightning, high wind, extreme cold/heat
-- **Access** — unsafe banks, washed-out roads, closed areas
-- **Water quality** — harmful algae bloom, contamination advisory
-- **Wildlife** — alligator, snake, or large predator activity
+The selected vessel type supplies default thresholds. Values are wind and gust
+in knots, waves in feet, visibility in miles, current in knots, and water
+temperature in °F.
 
-## Limitations
+| Vessel type | Wind / gust | Waves | Visibility | Current | Water temperature | Lightning |
+| --- | --- | --- | --- | --- | --- | --- |
+| Powerboat | 25 / 35 | 6 | 1 | 4 | 45 | Moderate |
+| Sailboat | 30 / 40 | 8 | 1 | 4 | 45 | Moderate |
+| Kayak | 15 / 20 | 2 | 0.5 | 2 | 55 | Low |
+| Paddleboard | 15 / 20 | 2 | 0.5 | 2 | 55 | Low |
+
+You can override threshold values for a vessel with custom thresholds. The
+selected scoring profile—**cautious**, **moderate**, or **experienced**—changes
+the relative weights of the signals. The [canonical scoring
+guide](/dontdiefishing/how-scoring-works) lists those weights and the
+normalization rules.
+
+### Hard vetoes
+
+Veto checks run before weighted scoring. Any of these conditions returns a
+hard NO-GO:
+
+- An active marine warning contains **small craft advisory**, **hurricane**,
+  **tropical storm**, **gale warning**, or **storm warning** (including the
+  hurricane watch/warning phrases).
+- Lightning risk is **high**.
+- Wind speed, gusts, waves, or tidal current are more than 1.5 times the
+  selected vessel threshold.
+- Visibility is less than half the selected visibility threshold.
+- Water temperature is below 75% of the selected water-temperature threshold.
+
+A veto returns a score of `100`, status **NO-GO**, `vetoed: true`, and a reason.
+The veto is returned before signal rows are built, so a vetoed result has no
+weighted signal breakdown.
+
+### Signal breakdown
+
+When no hard veto fires, the score can show these signal rows:
+
+- Wind / gusts
+- Waves / swell
+- Marine warnings
+- Visibility
+- Tidal current
+- Lightning
+- Precipitation
+- Water quality
+- UV index
+- Water temperature
+- Optional travel time
+
+The scorer reports each row's raw value, normalized risk, adjusted weight,
+contribution, and whether the value is available. Tide height and phase,
+sunrise/sunset, air temperature, wave period, and swell direction can be
+presented in the conditions view but are not weighted signal rows in the shared
+scorer.
+
+### Marine-warning callout
+
+Any active string warning is shown in the NWS marine-warning callout. The
+callout says that the warning was reported in the displayed conditions update
+and may have changed. A marine warning does **not** automatically veto every
+score: only the warning phrases listed in the hard-veto rules do. Check current
+official NWS guidance before departure.
+
+## Freshness and unknown values
+
+The web conditions endpoint reuses a cached snapshot only when it is less than
+30 minutes old. When no fresh snapshot exists, it calls the aggregator; if that
+fetch fails, the endpoint returns an error instead of returning a score from an
+unknown fetch.
+
+At signal level, missing values are marked unavailable. Their base weight is
+excluded and redistributed across available signals; the missing value is not a
+measured favorable condition. The shared scorer does not infer a per-signal
+freshness state (`is_stale` is `false` in its returned rows), so treat a missing
+or unverified source as unknown. Read unknown as fail-closed for trip planning:
+do not interpret it as GO, and verify the official source before departure.
 
 <Warning>
-  DontDieFishing is a decision-support tool, not a guarantee of safety.
-  Conditions can change faster than data refreshes. Community reports are
-  unverified observations. Always assess conditions in person before entering
-  the water, and never fish alone in remote areas.
+  DontDieFishing provides planning guidance only. Marine warnings may have
+  changed since the conditions update. Check official NWS guidance and other
+  authoritative information before departure; remain responsible for the launch
+  decision.
 </Warning>
 
-- USGS gauges are point measurements — conditions may differ upstream or
-  downstream of the gauge
-- Weather forecasts are probabilistic, not deterministic
-- Community reports reflect one observer's judgment at one point in time
-- Some spots have no nearby gauge or weather station; these show limited data
-
-## Reporting a hazard
-
-Tap **Report Hazard** on any spot page. Select the hazard type, add a
-description and optional photo, and submit. Reports are reviewed and typically
-appear within one hour. Urgent hazards (immediate danger to life) are flagged
-for priority review.
-
 <Cards>
-  <Card title="Finding spots" icon="map-pin" href="/dontdiefishing/finding-spots">
-    How to search, filter, and evaluate spots.
+  <Card title="How scoring works" icon="chart-line" href="/dontdiefishing/how-scoring-works">
+    Follow the signal, weight, threshold, veto, and status calculations end to end.
   </Card>
-  <Card title="FAQ" icon="circle-help" href="/dontdiefishing/faq">
-    Common questions and fixes.
+  <Card title="Finding spots" icon="map-pin" href="/dontdiefishing/finding-spots">
+    How to search, filter, and evaluate launch sites.
   </Card>
 </Cards>

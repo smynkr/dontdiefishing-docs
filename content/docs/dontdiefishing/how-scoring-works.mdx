@@ -1,0 +1,197 @@
+---
+title: How scoring works
+description: "The DontDieFishing scoring pipeline: conditions, normalization,
+  vessel thresholds, weights, vetoes, and GO, CAUTION, or NO-GO status."
+---
+
+import { MapPin, ShieldCheck } from 'lucide-react';
+
+DontDieFishing turns the available launch-site conditions into a 0–100 planning
+score for a selected vessel. This page is the canonical explanation of the
+shared scorer: what it reads, how it normalizes each signal, how your vessel
+changes the inputs, and when a hard veto forces NO-GO.
+
+## The scoring pipeline
+
+For each conditions snapshot, the scorer follows this order:
+
+1. **Select thresholds.** It starts with the default thresholds for the vessel
+   type, then applies any custom threshold overrides.
+2. **Select weights.** It starts with the chosen cautious, moderate, or
+   experienced profile, then applies any custom weight overrides.
+3. **Check hard vetoes.** A veto is evaluated before weighted scoring. If one
+   fires, the result is immediately `100`, **NO-GO**, with a reason.
+4. **Build signal rows.** Each signal records its raw value, normalized risk,
+   availability, adjusted weight, and contribution.
+5. **Normalize available weights.** Missing signals contribute no weight; the
+   remaining available weights are redistributed proportionally.
+6. **Combine and classify.** Contributions are summed from unrounded values,
+   then the result is rounded, clamped to 0–100, and mapped to GO, CAUTION, or
+   NO-GO.
+
+## Conditions and signals
+
+The web aggregator combines these sources before scoring:
+
+| Signal or field      | Source                                | Scoring behavior                                                                                            |
+| -------------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Wind speed and gusts | NWS forecast, with NDBC buoy fallback | Wind and gust risk are normalized separately; the higher risk is used.                                      |
+| Waves / swell        | NDBC buoy                             | The scorer normalizes wave height. Wave period and swell direction remain raw condition fields.             |
+| Marine warnings      | NWS marine alerts                     | Warning text is normalized by its highest recognized severity.                                              |
+| Visibility           | NWS forecast                          | Lower visibility produces higher normalized risk.                                                           |
+| Tidal current        | NOAA CO-OPS current predictions       | Current speed is normalized against the vessel threshold.                                                   |
+| Lightning            | NWS forecast                          | `none`, `low`, `moderate`, and `high` map to increasing risk.                                               |
+| Precipitation        | NWS forecast                          | Probability is used as a percentage, clamped to 0–100.                                                      |
+| Water quality        | Snapshot field                        | The current aggregator returns `null`, so this row is unavailable unless another snapshot supplies a value. |
+| UV index             | EPA UV                                | UV is normalized against an index threshold of 8.                                                           |
+| Water temperature    | NOAA CO-OPS, with NDBC buoy fallback  | Colder water produces higher normalized risk against the vessel threshold.                                  |
+| Travel time          | Optional scorer input                 | If supplied, risk scales from 0 at 0 minutes to 100 at 120 minutes.                                         |
+
+Tide height and phase, sunrise and sunset, air temperature, wave period, and
+swell direction can be shown as condition details. They are not weighted signal
+rows in the shared scorer.
+
+## Normalization
+
+Every available signal is converted to a 0–100 risk value before weights are
+applied. Lower values represent lower modeled risk.
+
+### Threshold-based signals
+
+Wind speed, gusts, wave height, and tidal current use a piecewise scale:
+
+- 0 at the ideal value (0 for these signals)
+- 70 at the selected vessel threshold
+- 100 at 1.5 times that threshold
+
+Values between those anchors are interpolated. Wind / gusts use the higher of
+the two normalized values. Waves / swell uses wave height in the scorer; period
+and direction are not additional normalized inputs.
+
+Visibility and water temperature use an inverse scale:
+
+- Visibility is 0 at 10 miles, 70 at the selected visibility threshold, and 100
+  at half that threshold.
+- Water temperature is 0 at 70°F, 70 at the selected water-temperature
+  threshold, and 100 at half that threshold.
+
+### Categorical and direct signals
+
+| Signal          | Normalization                                                                                                                                                                  |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Lightning       | `none` = 0, `low` = 30, `moderate` = 70, `high` = 100.                                                                                                                         |
+| Precipitation   | Probability percentage, clamped to 0–100.                                                                                                                                      |
+| Water quality   | `good` = 0, `fair` = 30, `poor` = 70, `advisory` = 100.                                                                                                                        |
+| UV index        | Piecewise scale from 0 at index 0 to 70 at index 8 and 100 at index 12.                                                                                                        |
+| Marine warnings | No warnings = 0; text containing `advisory` = 40, `watch` = 70, or `warning` = 100. Multiple warnings use the highest value; an unrecognized non-empty warning defaults to 40. |
+| Travel time     | Linear scale from 0 at 0 minutes to 100 at 120 minutes, capped at 100.                                                                                                         |
+
+## Vessel personalization
+
+The vessel type controls the default environmental thresholds used by the
+normalizers and veto checks. The defaults are:
+
+| Vessel type | Wind (kts) | Gust (kts) | Waves (ft) | Visibility (mi) | Current (kts) | Water temperature (°F) | Lightning threshold |
+| ----------- | ---------: | ---------: | ---------: | --------------: | ------------: | ---------------------: | ------------------- |
+| Powerboat   |         25 |         35 |          6 |               1 |             4 |                     45 | Moderate            |
+| Sailboat    |         30 |         40 |          8 |               1 |             4 |                     45 | Moderate            |
+| Kayak       |         15 |         20 |          2 |             0.5 |             2 |                     55 | Low                 |
+| Paddleboard |         15 |         20 |          2 |             0.5 |             2 |                     55 | Low                 |
+
+Custom thresholds are applied after these defaults. A vessel also selects one
+of three weight profiles. The values below are the base weights before missing
+signals are removed and the remaining weights are renormalized:
+
+| Signal            | Cautious | Moderate | Experienced |
+| ----------------- | -------: | -------: | ----------: |
+| Wind / gusts      |      22% |      20% |         15% |
+| Waves / swell     |      20% |      18% |         14% |
+| Marine warnings   |      18% |      15% |         12% |
+| Visibility        |      12% |      12% |         12% |
+| Tidal currents    |       8% |      10% |         12% |
+| Lightning         |       8% |       8% |          8% |
+| Precipitation     |       4% |       5% |          7% |
+| Water quality     |       3% |       4% |          5% |
+| UV index          |       2% |       3% |          5% |
+| Water temperature |       2% |       3% |          5% |
+| Travel time       |       1% |       2% |          5% |
+
+Custom weights are applied after the profile defaults. The scorer then sums the
+weights of available signals and divides each available base weight by that sum.
+This keeps the available signals' adjusted weights proportional when a source
+is missing.
+
+## Hard vetoes
+
+The scorer checks these conditions before it computes any weighted signal
+contribution:
+
+- Any marine warning containing **small craft advisory**, **hurricane**,
+  **tropical storm**, **gale warning**, **storm warning**, **hurricane warning**,
+  or **hurricane watch**.
+- Lightning risk equal to **high**.
+- Wind speed greater than 1.5 times the vessel's wind threshold.
+- Gusts greater than 1.5 times the vessel's gust threshold.
+- Wave height greater than 1.5 times the vessel's wave threshold.
+- Visibility less than half the vessel's visibility threshold.
+- Tidal current greater than 1.5 times the vessel's current threshold.
+- Water temperature below 75% of the vessel's water-temperature threshold.
+
+A veto result has:
+
+- `total_score: 100`
+- `status: "nogo"` (shown as **NO-GO**)
+- `vetoed: true`
+- `veto_reason` containing the matching warning or measurement
+- an empty signal list, because the veto returns before signal rows are built
+
+A warning shown in the UI is not automatically a veto. The marine-warning
+callout displays any active string warning, notes that it may have changed, and
+explicitly directs you to check official NWS guidance. Only the warning phrases
+in the veto list force NO-GO.
+
+## Status bands
+
+When no veto fires, the final rounded score is classified as follows:
+
+| Final score | Status      | How to read it                                                             |
+| ----------: | ----------- | -------------------------------------------------------------------------- |
+|        0–39 | **GO**      | Lower modeled risk from the available inputs.                              |
+|       40–59 | **CAUTION** | Elevated modeled risk; inspect the signal breakdown and verify conditions. |
+|      60–100 | **NO-GO**   | High modeled risk.                                                         |
+
+A veto is NO-GO regardless of what a weighted score would have been. The score
+is not a guarantee that a trip is safe, and GO is not an authorization to launch.
+
+## Freshness, missing data, and fail-closed planning
+
+The web conditions endpoint reuses a cached snapshot only when it is less than
+30 minutes old. Without a fresh snapshot it calls the aggregator; if that fetch
+fails, the endpoint returns an error rather than scoring an unknown fetch. The
+aggregator records a `fetched_at` timestamp for each assembled snapshot, but the
+shared scorer does not assign source-specific freshness ages: returned signal
+rows currently have `is_stale: false`.
+
+A missing signal is represented as unavailable. Its normalized value is 0 and
+its adjusted weight is 0; the base weight is redistributed among available
+signals. That is not proof that the missing condition is favorable. Treat a
+missing, unverified, or unavailable input as unknown and fail closed for trip
+planning: do not read an absent score as GO, and verify official weather and
+marine-warning information before departure.
+
+<Callout type="warn">
+  DontDieFishing is planning guidance only. Conditions and marine warnings may
+  change after the displayed update. Check official NWS guidance and other
+  authoritative information before departure, and make the launch decision with
+  current conditions and your own judgment.
+</Callout>
+
+<Cards>
+  <Card icon={<ShieldCheck />} title="Safety & conditions" href="/dontdiefishing/safety-conditions">
+    Review the live data sources, thresholds, vetoes, warning callout, and data limitations.
+  </Card>
+
+  <Card icon={<MapPin />} title="Finding spots" href="/dontdiefishing/finding-spots">
+    Search and compare launch sites before reviewing their conditions.
+  </Card>
+</Cards>
