@@ -33,6 +33,7 @@ const config = {
       { source: '/getting-started', destination: '/dontdiefishing/getting-started' },
       { source: '/finding-spots', destination: '/dontdiefishing/finding-spots' },
       { source: '/safety-conditions', destination: '/dontdiefishing/safety-conditions' },
+      { source: '/how-scoring-works', destination: '/dontdiefishing/how-scoring-works' },
       { source: '/faq', destination: '/dontdiefishing/faq' },
       { source: '/changelog', destination: '/dontdiefishing/changelog' },
     ];

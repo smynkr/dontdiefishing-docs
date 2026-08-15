@@ -91,12 +91,16 @@ Visibility and water temperature use an inverse scale:
 The vessel type controls the default environmental thresholds used by the
 normalizers and veto checks. The defaults are:
 
-| Vessel type | Wind (kts) | Gust (kts) | Waves (ft) | Visibility (mi) | Current (kts) | Water temperature (°F) | Lightning threshold |
-| ----------- | ---------: | ---------: | ---------: | --------------: | ------------: | ---------------------: | ------------------- |
-| Powerboat   |         25 |         35 |          6 |               1 |             4 |                     45 | Moderate            |
-| Sailboat    |         30 |         40 |          8 |               1 |             4 |                     45 | Moderate            |
-| Kayak       |         15 |         20 |          2 |             0.5 |             2 |                     55 | Low                 |
-| Paddleboard |         15 |         20 |          2 |             0.5 |             2 |                     55 | Low                 |
+| Vessel type | Wind (kts) | Gust (kts) | Waves (ft) | Visibility (mi) | Current (kts) | Water temperature (°F) |
+| ----------- | ---------: | ---------: | ---------: | --------------: | ------------: | ---------------------: |
+| Powerboat   |         25 |         35 |          6 |               1 |             4 |                     45 |
+| Sailboat    |         30 |         40 |          8 |               1 |             4 |                     45 |
+| Kayak       |         15 |         20 |          2 |             0.5 |             2 |                     55 |
+| Paddleboard |         15 |         20 |          2 |             0.5 |             2 |                     55 |
+
+The scorer does not read a vessel-specific lightning threshold. `high`
+lightning is a hard veto for every vessel; lower lightning levels remain
+weighted signals according to the normalization table.
 
 Custom thresholds are applied after these defaults. A vessel also selects one
 of three weight profiles. The values below are the base weights before missing
@@ -163,21 +167,30 @@ When no veto fires, the final rounded score is classified as follows:
 A veto is NO-GO regardless of what a weighted score would have been. The score
 is not a guarantee that a trip is safe, and GO is not an authorization to launch.
 
-## Freshness, missing data, and fail-closed planning
+## Freshness, missing data, and degraded fetches
 
 The web conditions endpoint reuses a cached snapshot only when it is less than
-30 minutes old. Without a fresh snapshot it calls the aggregator; if that fetch
-fails, the endpoint returns an error rather than scoring an unknown fetch. The
-aggregator records a `fetched_at` timestamp for each assembled snapshot, but the
-shared scorer does not assign source-specific freshness ages: returned signal
-rows currently have `is_stale: false`.
+30 minutes old. Without a fresh snapshot it calls the aggregator. The NWS
+fetchers currently degrade independently when a request fails: the alerts
+fetcher returns an empty alert list, while the forecast fetcher returns
+`lightning_risk: "none"` and `null` values for the forecast measurements it
+could not obtain. The aggregator passes those fallback values to the scorer
+without an error marker.
 
-A missing signal is represented as unavailable. Its normalized value is 0 and
-its adjusted weight is 0; the base weight is redistributed among available
-signals. That is not proof that the missing condition is favorable. Treat a
-missing, unverified, or unavailable input as unknown and fail closed for trip
-planning: do not read an absent score as GO, and verify official weather and
-marine-warning information before departure.
+That behavior is fail-open, not fail-closed. An empty alert list cannot trigger
+an alert veto, and the fallback lightning value maps to zero modeled risk.
+Unknown alerts or lightning can therefore contribute to a **GO** result. Other
+missing numeric signals are represented as unavailable; their normalized value
+is 0 and their adjusted weight is 0, with the base weight redistributed among
+available signals. A `fetched_at` timestamp does not prove that every source
+was successfully fetched, and returned signal rows currently have
+`is_stale: false`.
+
+This is a product limitation under review. Treat a missing, unverified, or
+degraded input as unknown: verify current conditions directly with authoritative
+NWS and NDBC sources before launch, and make the launch decision with current
+conditions and your own judgment. Do not read an absent or degraded score as
+authorization to launch.
 
 <Callout type="warn">
   DontDieFishing is planning guidance only. Conditions and marine warnings may
