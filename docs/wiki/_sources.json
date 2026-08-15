@@ -40,7 +40,7 @@
   "source_sha256": {
     ".codex/harness-memory.json": "fca2018eb925f14f0d451f85a22fda327a805fad7c2ad9d6e30130a27d7d2cb3",
     "README.md": "ba9c63cf6ed1d114ccfbe1c71174fbf72d966d2c1853d3827681e1d2fc1e927c",
-    "_migration/tools/lib/shared.mjs": "25ac7739def57d5f417577cd44b0727f07be4af806bddb03b6fe0c6e26e8cae5",
+    "_migration/tools/lib/shared.mjs": "306ac8acf66b8ce7bceff4933b169e52ad8881dbfb0de960e586526c1d38996b",
     "app/(home)/page.tsx": "4c03c9068bd6d172fd05d71b5283a5c7d36a45543c54181d56dc272b86cc474c",
     "components/brand/products.ts": "8b2072340665a45f23439b9c773473b4307c5ed9a8add566d2c02cdebe2e16fe",
     "docs.json": "4b799053f3136b911ac7a0d6a787e4c49eedb2b7bc7968d5f9858f2c835f58cf",
