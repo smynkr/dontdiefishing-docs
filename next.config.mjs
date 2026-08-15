@@ -35,6 +35,9 @@ const config = {
       { source: '/safety-conditions', destination: '/dontdiefishing/safety-conditions' },
       { source: '/how-scoring-works', destination: '/dontdiefishing/how-scoring-works' },
       { source: '/faq', destination: '/dontdiefishing/faq' },
+      { source: '/regulations', destination: '/dontdiefishing/regulations' },
+      { source: '/alerts', destination: '/dontdiefishing/alerts' },
+      { source: '/trips-and-safety', destination: '/dontdiefishing/trips-and-safety' },
       { source: '/changelog', destination: '/dontdiefishing/changelog' },
     ];
   },
