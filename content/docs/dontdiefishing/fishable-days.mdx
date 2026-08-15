@@ -76,17 +76,15 @@ the panel says **NO WINDOW DATA**.
 
 The calendar has two related surfaces:
 
-- **Site-by-site 7-day scoring (Pro):** Pro receives a full seven-day response.
-  Week view compares every returned day for every saved launch site, and month
-  view shows the best site for each returned day.
-- **NEXT 30 DAYS summary:** the side panel groups returned days by GO, CAUTION,
-  and NO-GO and shows the count for each status.
+- **Site-by-site 7-day scoring (Pro):** Pro returns seven days. Week view
+  compares every returned day for every saved launch site, and month view
+  shows the best site for each returned day.
+- **NEXT 30 DAYS summary:** the side panel groups the returned days by GO,
+  CAUTION, and NO-GO and counts only the days in the current response.
 
-The current product limits the data response to **one day on Free** and **seven
-days on Pro**. The UI's **NEXT 30 DAYS** heading is a summary surface, but its
-counts are calculated from the days in the current response; the current API
-does not return 30 site-scored forecast days. Treat the 30-day heading as a
-summary label, not as a promise of a 30-day per-site forecast.
+The current product returns **one day on Free** and **seven days on Pro**. The
+**NEXT 30 DAYS** heading is a product label for this summary surface; it does
+not mean that the API returns 30 site-scored forecast days.
 
 When a Free response is limited to today, the page shows an upgrade prompt for
 the seven-day forecast window. The prompt explains that Pro scores the next
@@ -105,10 +103,10 @@ for that date; it does not change the score. Select a scored day and choose
 Free and Pro share the same vessel-specific scoring model. The difference is
 the forecast window:
 
-| Plan     | Forecast access                                                                                                             |
-| -------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **Free** | The current day (one returned day).                                                                                         |
-| **Pro**  | The full seven-day fishable calendar, week-ahead comparison across saved sites, and the next GO day surfaced automatically. |
+| Plan     | Forecast access                                                                                                |
+| -------- | -------------------------------------------------------------------------------------------------------------- |
+| **Free** | One returned day (today).                                                                                      |
+| **Pro**  | Seven returned days, with week-ahead comparison across saved sites and the next GO day surfaced automatically. |
 
 The Pro upgrade card offers yearly and monthly billing choices. Existing Pro
 users see billing-portal and invoice controls instead of an upgrade action.
