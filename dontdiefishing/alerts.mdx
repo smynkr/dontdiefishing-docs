@@ -1,0 +1,88 @@
+---
+title: "Alerts"
+description: "Configure saved-site and trip status alerts, notification sensitivity, and device delivery in DontDieFishing."
+---
+
+Alerts keep watching after you save a launch site or create a trip plan. DontDieFishing evaluates saved sites with your selected vessel profile, records live and forecast observations, and delivers status changes through the channels shown in your account settings.
+
+<Warning>
+  Alerts are planning signals, not a guarantee that conditions are safe. Conditions can change between checks and after an alert. Review the latest conditions, official warnings, and your own limits before you launch.
+</Warning>
+
+## What can trigger an alert
+
+The alert worker evaluates the saved launch sites associated with your account and the default vessel profile. It can create:
+
+- A **live** observation for current site conditions.
+- A **forecast** observation for a future date when forecast data is available.
+- A status event when the site's score crosses the trip or vessel decision boundary.
+
+Pro accounts receive a live observation plus forward forecasts within a seven-day window. Other accounts receive the current-day observation window. A failed or empty live/forecast read is suppressed rather than stored as a fake `NO-GO` observation.
+
+Trip monitoring is separate from saved-site observations. The monitor runs every 30 minutes, and status-change events fan out to Web Push and enabled native Expo push targets; account sensitivity does not apply to these monitored-trip notifications.
+
+## Choose alert sensitivity for saved sites
+
+In account settings, **Alert sensitivity** applies only to saved-site alert events. Monitored-trip notifications are handled separately and do not consult this preference. There is no separate marine-advisory event trigger.
+
+| Setting | What it includes |
+| --- | --- |
+| **Minimal** | Only direct **GO ↔ NO-GO** flips. |
+| **Moderate** (shown as **Standard**) | Any saved-site status change, including **GO ↔ CAUTION** and **CAUTION ↔ NO-GO**. |
+| **All** | Any saved-site status change **or** an absolute score change of at least 5 points. |
+
+The stored values are `minimal`, `moderate` (shown as **Standard**), and `all`. Changing the selection does not take effect until you choose **SAVE PREFERENCE**. If saving fails, the settings page keeps the error visible so you can retry.
+
+## Delivery channels
+
+The settings page displays the current channel indicators:
+
+- **PUSH** — Saved-site status events fan out to Web Push subscriptions and enabled native Expo installations only.
+- **EMAIL** — Saved-site status events do not send email.
+- **SMS** — SMS is not an enabled channel in this settings surface.
+- **MONITOR CADENCE** — The trip monitor runs every 30 minutes; there is no separate hourly or six-hours-before-launch status check.
+
+Push payloads identify the saved site, report **GO**, **CAUTION**, or **NO-GO**, include the current or forecast score, and link back to Fishable Days. Forecast notifications identify the forecast date.
+
+## Enable or disable a device
+
+### Web push
+
+A signed-in browser can register a Web Push subscription. The subscription endpoint must use HTTPS and a supported browser push provider; the service stores it for later delivery. If the browser or subscription is no longer valid, delivery can mark it expired so it is not reused.
+
+Allow notifications for the site in the browser when prompted. If the browser blocks permission, enable it in the browser's site settings and register again.
+
+### Native push
+
+A native installation registers an installation ID, platform (`ios` or `android`), and Expo push token. The device status endpoint reports whether that installation is enabled. Disabling a device removes it from active delivery; a later registration can enable it again.
+
+The native lifecycle is:
+
+1. Register the installation and token.
+2. Read the installation status when the app opens or settings are displayed.
+3. Disable the installation when the user turns device notifications off.
+
+A device setting is independent of account sensitivity: the preference controls which saved-site events qualify, while device registration controls whether that device can receive push delivery.
+
+## Monitor cadence
+
+The trip monitor runs every 30 minutes. When a monitored trip status changes, its event fans out to Web Push subscriptions and enabled native Expo installations; there is no separate hourly or six-hours-before-launch status check.
+
+For each observation, the worker keeps the source (`live` or `forecast`), forecast date, lead days, score, veto state, vessel profile, account tier, and selected sensitivity. Missing provider data is reported as suppressed instead of being converted to an alert that falsely says the site is unsafe.
+
+## Delivery safeguards
+
+The delivery worker processes notifications in bounded batches and records delivery outcomes. A stale or invalid web subscription can be cleaned up. Native delivery uses the same alert queue after web delivery and receipt reconciliation. If a provider is not configured or a delivery phase runs out of its time budget, the cron result reports the skipped or degraded phase rather than pretending every alert was sent.
+
+<Warning>
+  A delivered alert proves that a notification was accepted for delivery, not that you saw it or that conditions remain unchanged. Treat the alert as a prompt to open the app and reassess.
+</Warning>
+
+<Cards>
+  <Card title="Trip plans & safety" icon="shield-check" href="/dontdiefishing/trips-and-safety">
+    Create a plan, monitor readiness, share a float plan, and configure a safety check-in.
+  </Card>
+  <Card title="Safety & conditions" icon="map-pin" href="/dontdiefishing/safety-conditions">
+    Review the condition sources and limitations behind status updates.
+  </Card>
+</Cards>
