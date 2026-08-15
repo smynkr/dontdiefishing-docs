@@ -33,6 +33,8 @@ const config = {
       { source: '/getting-started', destination: '/dontdiefishing/getting-started' },
       { source: '/finding-spots', destination: '/dontdiefishing/finding-spots' },
       { source: '/safety-conditions', destination: '/dontdiefishing/safety-conditions' },
+      { source: '/mobile-app', destination: '/dontdiefishing/mobile-app' },
+      { source: '/fishable-days', destination: '/dontdiefishing/fishable-days' },
       { source: '/logbook', destination: '/dontdiefishing/logbook' },
       { source: '/tracks', destination: '/dontdiefishing/tracks' },
       { source: '/account-billing', destination: '/dontdiefishing/account-billing' },

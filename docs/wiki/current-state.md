@@ -19,9 +19,10 @@ The site brand is DontDieFishing's own (`#1A3A5C` accent, lifebuoy mark in
 `public/logo.svg` / `public/favicon.svg`); it carries no Axiom identity. The
 product index doubles as the landing page: `app/(home)/page.tsx` renders
 it at `/` (a real page, so the logo's soft navigation works), while
-`next.config.mjs` rewrites the clean page URLs (`/getting-started`, `/finding-spots`, `/safety-conditions`,
-`/faq`, `/changelog`) onto the `dontdiefishing/*` routes
-so the address bar stays product-prefix-free.
+`next.config.mjs` rewrites the clean page URLs (`/getting-started`,
+`/finding-spots`, `/safety-conditions`, `/mobile-app`, `/fishable-days`,
+`/faq`, `/changelog`) onto the `dontdiefishing/*` routes so the address bar
+stays product-prefix-free.
 
 Deep pages render source-tree-derived related-guide wayfinding
 (`lib/page-context.ts`), product identity accents, evidence-backed

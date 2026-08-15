@@ -10,6 +10,20 @@ sources: [".codex/harness-memory.json", "README.md", "package.json", "next.confi
 # Durable ledger
 
 
+## 2026-08-15 — Clean route topology
+
+The clean `/mobile-app` and `/fishable-days` routes rewrite to
+`/dontdiefishing/mobile-app` and `/dontdiefishing/fishable-days` in
+`next.config.mjs`; both routes are listed in `docs.json` navigation and covered
+by the repository's link-contract checks.
+
+Re-establish with:
+
+```bash
+npm run test:links
+npm run links:check
+```
+
 ## 2026-08-11 — Harness-memory conformance (audit FAIL → PASS)
 
 - Added `docs/wiki/_schema.md` (schema + routing + capture contract; group_id
@@ -102,7 +116,8 @@ npm run memory:check
 - Brand: DontDieFishing accent `#1A3A5C` (from the live landing capture), custom
   lifebuoy mark (`public/logo.svg`), favicon tile
   (`public/favicon.svg`); no Axiom identity anywhere in the chrome.
-- Clean URLs: `/` and `/getting-started` … `/faq` rewrite onto the
+- Clean URLs: `/`, `/getting-started`, `/finding-spots`, `/safety-conditions`,
+  `/mobile-app`, `/fishable-days`, `/faq`, and `/changelog` rewrite onto the
   `dontdiefishing/*` canonical routes (`next.config.mjs`).
 - DNS `docs.dontdiefishing.com` already pointed at Vercel anycast
   (76.76.21.21); domain attached to the Vercel project during launch.
