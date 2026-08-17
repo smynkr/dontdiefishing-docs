@@ -36,7 +36,7 @@ The web aggregator combines these sources before scoring:
 | Signal or field      | Source                                | Scoring behavior                                                                                            |
 | -------------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | Wind speed and gusts | NWS forecast, with NDBC buoy fallback | Wind and gust risk are normalized separately; the higher risk is used.                                      |
-| Waves / swell        | NDBC buoy                             | The scorer normalizes wave height. Wave period and swell direction remain raw condition fields.             |
+| Waves / swell        | NDBC buoy, with NWS forecast fallback | The scorer normalizes wave height. Wave period and swell direction remain raw condition fields.             |
 | Marine warnings      | NWS marine alerts                     | Warning text is normalized by its highest recognized severity.                                              |
 | Visibility           | NWS forecast                          | Lower visibility produces higher normalized risk.                                                           |
 | Tidal current        | NOAA CO-OPS current predictions       | Current speed is normalized against the vessel threshold.                                                   |
@@ -176,6 +176,12 @@ fetcher returns an empty alert list, while the forecast fetcher returns
 `lightning_risk: "none"` and `null` values for the forecast measurements it
 could not obtain. The aggregator passes those fallback values to the scorer
 without an error marker.
+
+The NDBC buoy fetcher rejects station files whose latest observation is more
+than 3 hours old or whose NDBC timestamp fails to parse. When buoy wave data is
+rejected, the aggregator falls back to NWS forecast grid values for wave height
+and period. If neither source supplies waves, the signal is unavailable and its
+weight is redistributed among available signals.
 
 That behavior is fail-open, not fail-closed. An empty alert list cannot trigger
 an alert veto, and the fallback lightning value maps to zero modeled risk.
