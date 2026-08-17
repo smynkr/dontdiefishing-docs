@@ -16,7 +16,7 @@ single refresh cadence for every source.
 | Data used | Source | What the aggregator does |
 | --- | --- | --- |
 | Wind speed and gusts | NWS forecast, with NDBC buoy fallback | Uses the forecast value first, then the buoy value when the forecast field is unavailable. |
-| Wave height, wave period, and swell direction | NDBC buoy | Adds buoy observations when a buoy is configured and returns data. |
+| Wave height, wave period, and swell direction | NDBC buoy, with NWS forecast fallback | Adds buoy observations when a buoy is configured and returns data; wave height and period fall back to the NWS forecast grid when buoy data is unavailable. |
 | Visibility, precipitation probability, air temperature, and lightning risk | NWS forecast | Supplies the forecast weather fields used by the snapshot. |
 | Marine warnings | NWS marine alerts | Adds the active warning strings to the snapshot. |
 | Tide height and phase | NOAA CO-OPS tide predictions | Selects the next predicted tide event for the snapshot. |
@@ -125,6 +125,11 @@ Individual source fetchers degrade independently: the alerts fetcher returns an
 empty alert list, while the forecast fetcher returns `lightning_risk: "none"`
 and `null` values for forecast measurements it could not obtain. The aggregator
 passes those fallback values to the scorer without an error marker.
+
+The NDBC buoy fetcher rejects station files whose latest observation is more
+than 3 hours old or whose NDBC timestamp fails to parse. When buoy wave data is
+rejected, wave height and period fall back to the NWS forecast grid; if neither
+source supplies waves, the signal is unavailable.
 
 This behavior is **fail-open**, not fail-closed. An empty alert list cannot
 trigger an alert veto, and fallback lightning maps to zero modeled risk.
