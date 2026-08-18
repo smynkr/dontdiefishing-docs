@@ -1,0 +1,128 @@
+---
+title: Trip plans and safety
+description: Create and monitor trip plans, share a float plan, and configure a
+  safety check-in for your return.
+---
+
+import { Mail, ShieldCheck } from 'lucide-react';
+
+A trip plan combines a launch site, vessel profile, departure date, and optional launch time. DontDieFishing keeps checking the plan, shows readiness against your vessel limits, and gives you sharing and check-in controls for the people who need to know where you are going.
+
+<Callout type="warn">
+  Trip plans are planning guidance only. Conditions change, forecasts are probabilistic, and a shared plan is informational. Verify current forecasts, warnings, regulations, and conditions before you launch.
+</Callout>
+
+## Create or edit a trip plan
+
+### Create a plan
+
+1. Open **Plan a trip**.
+2. Choose a launch site. The form uses your saved sites when available and can fall back to curated launch sites.
+3. Choose a vessel profile. The vessel type, scoring profile, and any custom thresholds determine the readiness view.
+4. Select a date and, optionally, a launch time. The date is checked against the selected site's local calendar; the form accepts dates up to two years out.
+5. Review the readiness preview, then choose **CREATE TRIP PLAN**.
+
+The form saves the launch site, vessel, date, and optional time. It loads live conditions and a forecast for the selected site so the readiness view can update while you plan.
+
+### Edit an upcoming plan
+
+Open a plan from the trip list and choose **EDIT**. The edit page loads the existing launch site, vessel, date, and time into the same form; **SAVE TRIP PLAN** sends the updated schedule. Plans with `monitoring`, `go`, or `nogo` status are editable from this page. Expired plans are not eligible for the edit route.
+
+## Review seven-day readiness
+
+The date panel renders seven daily cells beginning at the selected site's earliest available planning date. Each cell shows the local day/date, a forecast risk score when a forecast row is available, and a readiness color. A missing forecast remains `--` rather than borrowing today's score.
+
+Select a day to update the readiness preview. The preview combines:
+
+- A score and `GO`, `CAUTION`, or `NO-GO` status when a score is available.
+- Current signal readouts for wind/gusts, waves/swell, visibility, tidal current, precipitation, and water temperature.
+- A launch-time strip and the typical seven-hour on-water window.
+- Solunar major marks when location coordinates and a date are available.
+
+The seven cells are a readiness view, not a promise that every future date has data. Forecast availability can differ by site and day.
+
+## Understand threshold bars
+
+The form's **ALERT ME WHEN** panel shows the selected vessel's active limits as bars for:
+
+- Wind speed
+- Wind gusts
+- Wave height
+- Visibility
+
+The trip list's monitoring panel summarizes wind sustained, gusts, wave height, and composite risk. The bars visualize the configured thresholds; they are not a second safety score. Choose a vessel profile whose limits reflect the actual craft and your experience.
+
+## Ongoing monitoring and exports
+
+Upcoming plans are monitored until you cast off. The trip list fetches live conditions for active launch sites, deduplicating sites shared by multiple plans. It displays the latest score, status, condition age, and a **LAST CHECK / NEXT** readout. The monitor runs every 30 minutes; when a monitored trip status changes, its event fans out to Web Push subscriptions and enabled native Expo installations. This status-event path does not send email.
+
+Use **EXPORT** to download a CSV of the trip list. The file contains these columns:
+
+| Column       | Value                                           |
+| ------------ | ----------------------------------------------- |
+| `Date`       | Planned departure date.                         |
+| `Time`       | Planned time, or blank when no time was set.    |
+| `Site`       | Launch site name.                               |
+| `Vessel`     | Vessel profile name.                            |
+| `Status`     | Stored trip status.                             |
+| `Last score` | Last recorded score, or blank when none exists. |
+
+Past plans are separated from upcoming plans; the list shows completed history from the last 60 days and labels older history as hidden.
+
+## Share a float plan
+
+A float plan gives a shore contact or friend the trip details without requiring an account.
+
+1. On an active trip card, choose **SHARE**.
+2. Choose **Create share link**. DontDieFishing returns a URL in the form `/float-plan/[token]`.
+3. Choose **Copy link**, then send it to the people who should know your launch details.
+4. When the trip no longer needs to be public, choose **Stop sharing**. Revocation invalidates the link.
+
+Anyone with the link can view the shared launch site, vessel, planned departure, last conditions check, planning score, and current plan status. The public page is informational only and tells viewers to recheck conditions and use their own judgment before launching.
+
+### Float-plan link lifecycle
+
+Float-plan links are capability URLs, not searchable pages:
+
+- The token must be a valid UUID.
+- The page is rendered dynamically so revocation takes effect immediately rather than waiting for a cached page.
+- The page is not indexed and does not leak the token through a referrer.
+- A revoked, unknown, or malformed token returns no float-plan page.
+- A trip can display `MONITORING`, `GO`, `NO-GO`, `EXPIRED`, or `STATUS UNKNOWN` depending on its stored status.
+
+<Callout type="warn">
+  A float plan is not a distress service and does not confirm that someone is watching. Give the link to a real shore contact and use the safety check-in for an expected-return escalation.
+</Callout>
+
+## Configure a safety check-in
+
+The **TRIP CHECK-IN** card is available on an active trip. Turn on **ENABLED**, enter a shore contact email, and set **EXPECTED BACK BY**. Save the check-in to open a fresh safety window.
+
+When you return, choose **I'M BACK — CHECK IN**. That records the acknowledgement and prevents the contact from being alerted for that window.
+
+### Check-in states and escalation
+
+A trip check-in moves through these states:
+
+| State        | Meaning                                                                                                            |
+| ------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `none`       | Check-in is disabled.                                                                                              |
+| `active`     | A shore contact and expected return are configured.                                                                |
+| `checked_in` | You acknowledged the trip with **I'm back**.                                                                       |
+| `overdue`    | The return-by time and two-hour grace period passed without acknowledgement and the monitor claimed an escalation. |
+
+The monitor only escalates an active, unacknowledged window once. It marks the trip overdue, sends an owner-facing push event, and attempts an email to the shore contact (contact email delivery is environment-gated). If the email send fails, the window is released for a later retry rather than silently treating the escalation as delivered.
+
+If you check in after an overdue escalation, the card reports the delivery outcome—whether the shore contact was notified successfully or the escalation was only attempted—and asks you to call them. Disabling the check-in clears the contact and return-by details and returns the trip to `none`; enabling it again reopens the latches for a new window.
+
+Check-in configuration and acknowledgement are owner-only. A shore contact is the escalation recipient; they cannot edit the plan or acknowledge it on the owner's behalf.
+
+<Cards>
+  <Card icon={<Mail />} title="Alerts" href="/dontdiefishing/alerts">
+    Configure sensitivity, push-only saved-site alerts, and device notification state.
+  </Card>
+
+  <Card icon={<ShieldCheck />} title="Safety & conditions" href="/dontdiefishing/safety-conditions">
+    Review the data sources and limitations behind readiness and status checks.
+  </Card>
+</Cards>

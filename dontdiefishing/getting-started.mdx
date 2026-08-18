@@ -1,10 +1,12 @@
 ---
 title: "Getting started"
-description: "Download DontDieFishing, set your location, and find your first safe fishing spot."
+description: "Create an account, configure your vessel and safety profile, save a launch site, and plan a trip you can verify before launch."
 ---
 
-Download DontDieFishing, set your location, and find your first safe fishing
-spot.
+DontDieFishing is built around launch sites and boat planning. Follow this
+sequence: create an account, configure the vessel profile that sets your safety
+thresholds, save a launch site, evaluate its risk score, plan a trip, and
+verify the latest conditions before launch.
 
 <ProductPreview
   src="/screenshots/dontdiefishing.png"
@@ -18,61 +20,119 @@ spot.
   ]}
 />
 
+<Warning>
+  A score is decision support, not a guarantee of safety. Conditions can change
+  faster than the app refreshes, and community reports are observations rather
+  than official forecasts. Assess conditions in person before entering the
+  water.
+</Warning>
+
 ## Install
 
-Download DontDieFishing from the App Store (iOS) or Google Play (Android).
+## 1. Create your account
 
-## Set your location
+Open DontDieFishing and choose **Sign up**. You can use an email and password,
+or continue with Google or Apple. Sign in to an existing account when you
+return.
 
-1. Open the app and allow location access (or enter your city manually).
-2. The map centers on your area with nearby fishing spots pinned.
+After authentication, complete onboarding. The final step saves your vessel
+type and scoring profile to your account and takes you to the Dashboard.
 
-## Browse spots
+## 2. Configure your vessel and safety profile
 
-Each pin on the map is a fishing spot. Pins are color-coded by safety status:
+Onboarding asks two questions:
 
-- **Green** — conditions are favorable, no active hazards
-- **Yellow** — fishable, but check conditions (rising water, wind, etc.)
-- **Red** — hazardous right now (flooding, strong currents, closures)
+- **Vessel type** — choose **Power**, **Sail**, **Kayak**, or **Paddle**. This
+  creates the starting thresholds used to evaluate conditions.
+- **Experience** — choose **Cautious**, **Moderate**, or **Experienced**. This
+  controls how aggressively conditions are scored; you can fine-tune the
+  thresholds later.
 
-Tap a pin to see the spot detail card: species present, water type (river,
-lake, pier, surf), current conditions, and any active hazard warnings.
+To add or refine a profile after onboarding, open **Settings** and add a
+**Vessel Profile**. Give it a name, choose its type, optionally enter its
+length, and select a scoring profile. Mark one vessel as the default when you
+keep more than one profile.
 
-## Save spots
+## 3. Save a launch site
 
-Tap the bookmark icon on any spot to save it. Saved spots appear in your
-**My Spots** tab with condition updates and optional push alerts.
+1. Open **Launch Sites**.
+2. Choose a region and browse the available launch sites.
+3. Select the bookmark control on a site to save it to your account.
 
-## Check before you go
+Saved sites appear on **Dashboard**, where the app loads their current
+conditions. If you have not saved a site yet, Dashboard shows a curated list
+until you add one.
 
-Before heading out, open the spot detail and review:
+## 4. Evaluate the risk score
 
-1. **Water conditions** — level, flow rate, clarity, temperature
-2. **Weather** — wind speed/direction, precipitation, lightning risk
-3. **Hazards** — active warnings for the area
-4. **Access** — road conditions, parking, walk-in distance
+Use Dashboard to compare your saved sites. Each site card can show a composite
+risk score, a status, current conditions, and an hour-by-hour risk proxy. The
+status uses three outcomes:
 
-The app aggregates data from USGS stream gauges, NOAA weather, and
-community-reported hazards. See [Safety & conditions](/dontdiefishing/safety-conditions) for
-data sources and limitations.
+- **GO** — the current score is inside the selected vessel's thresholds.
+- **CAUTION** — conditions are approaching those thresholds.
+- **NO-GO** — conditions are outside the thresholds.
+
+Lower scores represent lower risk in the planning model. Open a site to inspect
+the signal breakdown and the measurements behind the score. If the score is
+missing, check that a vessel profile exists and retry the conditions request.
+
+## 5. Plan the trip
+
+Open **Trip Plans** and choose **Plan a Trip**. Select:
+
+- a saved launch site,
+- the vessel profile for this trip,
+- a date, and
+- an optional departure time.
+
+The trip appears in your trip list and in the Dashboard's next-trip panel.
+Dashboard compares the planned trip with the vessel limits and keeps the trip
+available for a fresh check as the departure approaches.
+
+## 6. Verify before launch
+
+Before leaving, open the planned trip and re-check the current risk score,
+conditions, and the change against your vessel limits. Review the site detail
+for the available signal breakdown, community observations, and fishing
+regulations. Forecast-based results are not a substitute for a final
+in-person check or for the applicable official rules.
+
+## App navigation
+
+The web app sidebar uses these product labels:
+
+| Label | Use it for |
+| --- | --- |
+| **Dashboard** | Review saved-site conditions and the next trip. |
+| **Launch Sites** | Browse and save launch sites. |
+| **Trip Plans** | Create and monitor planned trips. |
+| **Fishable Days** **PRO** | Compare the forecast calendar for your vessel. |
+| **Regulations** | Review fishing-regulation references. |
+| **Logbook** | Record trip notes and catches. |
+| **Settings** | Manage your account, vessel profiles, and alerts. |
 
 <ProcessFlow
   accent="#1A3A5C"
-  caption="From install to a safe day out: the app's safety-first workflow — find, evaluate, save, and check before you go."
+  caption="A safety-first planning loop: configure the vessel, choose the launch site, score the conditions, plan the trip, and verify before launch."
   steps={[
-    { title: "Install", description: "Download from the App Store (iOS) or Google Play (Android)." },
-    { title: "Set your location", description: "Allow location access or enter your city; the map centers on your area." },
-    { title: "Browse spots", description: "Pins are color-coded by live safety status — green, yellow, or red." },
-    { title: "Save spots", description: "Bookmark spots for condition updates and optional push alerts." },
-    { title: "Check before you go", description: "Review water, weather, hazards, and access on the spot detail." },
+    { title: "Create an account", description: "Sign up with email, Google, or Apple, then complete onboarding." },
+    { title: "Configure your profile", description: "Choose a vessel type and scoring profile; manage additional vessels in Settings." },
+    { title: "Save a launch site", description: "Browse Launch Sites by region and bookmark the sites you use." },
+    { title: "Evaluate the risk score", description: "Compare GO, CAUTION, and NO-GO status against your vessel thresholds." },
+    { title: "Plan the trip", description: "Choose a launch site, vessel, date, and optional departure time in Trip Plans." },
+    { title: "Verify before launch", description: "Re-check current conditions, reports, regulations, and the latest score." },
   ]}
 />
 
 <Cards>
-  <Card title="Finding spots" icon="map-pin" href="/dontdiefishing/finding-spots">
-    Search, filter, and evaluate spots in depth.
+  <Card title="Mobile app" icon="ship" href="/dontdiefishing/mobile-app">
+    Preview/TestFlight only: use Dashboard, Sites, Trips, and Settings in the iOS preview; public App Store and Google Play releases are still pending.
+  </Card>
+  <Card title="Fishable Days" icon="calendar-clock" href="/dontdiefishing/fishable-days">
+    Compare vessel-specific forecast windows and planned-trip days.
   </Card>
   <Card title="Safety & conditions" icon="shield-check" href="/dontdiefishing/safety-conditions">
-    Data sources, hazard categories, and limitations.
+    Understand the data, statuses, and limitations behind each score.
   </Card>
 </Cards>

@@ -1,0 +1,129 @@
+---
+title: "Fishable Days"
+description: "Use the vessel-specific Fishable Days calendar to compare launch-site scores, forecast windows, and planned trips."
+---
+
+**Fishable Days** is the web app's forecast calendar for the launch sites
+returned by the API. It scores each returned day against a selected vessel
+profile and uses the same **GO**, **CAUTION**, and **NO-GO** statuses as live
+conditions.
+
+<Warning>
+  Forecast scores are planning guidance. Forward days use wind and weather
+  forecasts only; they are not a substitute for a final conditions check before
+  launching.
+</Warning>
+
+## Before you open the calendar
+
+Fishable Days requires a vessel profile. If your account has no vessel, the page
+shows **NO VESSEL PROFILE** and links to **Settings**. Add a profile before
+trying to score forecast days.
+
+The calendar uses the active vessel from your vessel settings. If no active
+vessel is selected, it falls back to the default vessel and then the first
+available profile. The header identifies the selected profile with
+**SCORED FOR YOUR VESSEL**.
+
+## Saved-site fallback and cap
+
+Fishable Days normally scores your saved launch sites. If the saved-links read
+fails or the saved set is empty, the API resolves its curated launch sites
+instead. In that fallback, rows are labeled **CURATED**, rather than as saved
+sites. The route caps the resolved site list at **12 sites** per response.
+
+## Month and week views
+
+Use the **MONTH** and **WEEK** controls to change the calendar view. The arrows
+move the visible month or seven-day range, and selecting a day updates the
+summary panel.
+
+### Month view
+
+Month view gives a daily overview. Each day can show:
+
+- the best available score across the returned launch sites,
+- its GO, CAUTION, or NO-GO color,
+- a compact wind and rain readout, and
+- a marker when you already have a trip planned for that day.
+
+Select a day to see the selected date's best score, status, and the first
+available **best window** in the launch site's local time zone. The detail panel
+also lists every resolved site returned for that date, sorted from the lowest
+score to the highest score, so you can compare the launch-site candidates behind
+the daily best.
+
+### Week view
+
+Week view is the site-by-site comparison. Rows are the resolved launch sites and
+columns are the seven days in the visible range. Each cell can show that site's
+score, a wind/rain readout, and a **TRIP** tag when the planned trip uses that
+site on that date. Click a cell to inspect the selected day's detail.
+
+## Scores, statuses, and best windows
+
+The calendar uses a lower-is-better risk model. Each launch site/day can have a
+score, status, source, and dominant signal. When conditions are available, the
+detail panel explains the dominant signal and its raw value. A hard vessel
+limit can veto every available window; the panel shows the veto reason when one
+is present.
+
+For forecast days, the page labels the result as forecast conditions and calls
+out that waves, water temperature, and tides are not modeled in that forward
+result. A missing score is shown as unavailable rather than as a favorable
+status.
+
+The best-window readout uses the first available solunar window for the selected
+site and formats it in that site's time zone. If no window data is available,
+the panel says **NO WINDOW DATA**.
+
+## 7-day scoring and the 30-day summary
+
+The calendar has two related surfaces:
+
+- **Site-by-site 7-day scoring (Pro):** Pro returns seven days. Week view
+  compares every returned day for every resolved launch site, and month view
+  shows the best site for each returned day.
+- **NEXT 30 DAYS summary:** the side panel groups the returned days by GO,
+  CAUTION, and NO-GO and counts only the days in the current response.
+
+The current product returns **one day on Free** and **seven days on Pro**. The
+**NEXT 30 DAYS** heading is a product label for this summary surface; it does
+not mean that the API returns 30 site-scored forecast days.
+
+When a Free response is limited to today, the page shows an upgrade prompt for
+the seven-day forecast window. The prompt explains that Pro scores the next
+seven days against the selected vessel and uses the same GO, CAUTION, and
+NO-GO verdicts as live conditions.
+
+## Trip tags and planning
+
+Fishable Days loads your trip plans as optional context. A trip marker in Month
+view or a **TRIP** badge in Week view means that you already scheduled a plan
+for that date; it does not change the score. Select a scored day and choose
+**PLAN THIS DAY** to open the trip form.
+
+## Free and Pro access
+
+Free and Pro share the same vessel-specific scoring model. The difference is
+the forecast window:
+
+| Plan | Forecast access |
+| --- | --- |
+| **Free** | One returned day (today). |
+| **Pro** | Seven returned days, with week-ahead comparison across resolved sites. |
+
+The Pro upgrade card offers yearly and monthly billing choices. Existing Pro
+users see billing-portal and invoice controls instead of an upgrade action.
+
+<Cards>
+  <Card title="Getting started" icon="rocket" href="/dontdiefishing/getting-started">
+    Configure a vessel, save launch sites, and plan a trip before opening the forecast calendar.
+  </Card>
+  <Card title="Mobile app" icon="ship" href="/dontdiefishing/mobile-app">
+    Monitor saved-site scores and trip plans from Dashboard, Sites, Trips, and Settings.
+  </Card>
+  <Card title="Safety & conditions" icon="shield-check" href="/dontdiefishing/safety-conditions">
+    Understand the score inputs and the checks that still belong to you before launch.
+  </Card>
+</Cards>

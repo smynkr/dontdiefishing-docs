@@ -1,3 +1,4 @@
+import { withSentryConfig } from '@sentry/nextjs';
 import { createMDX } from 'fumadocs-mdx/next';
 
 const withMDX = createMDX();
@@ -26,14 +27,25 @@ const config = {
       // Clean standalone URLs: docs.dontdiefishing.com/<page> serves the
       // /dontdiefishing/<page> route. The canonical source keeps its product
       // prefix; the rewrite keeps the pretty URL in the address bar.
-      { source: '/', destination: '/dontdiefishing' },
+      // `/` itself is NOT rewritten — app/(home)/page.tsx renders the
+      // product index there (a rewrite-only `/` 404s on soft navigation,
+      // because the client router does not apply rewrites).
       { source: '/getting-started', destination: '/dontdiefishing/getting-started' },
       { source: '/finding-spots', destination: '/dontdiefishing/finding-spots' },
       { source: '/safety-conditions', destination: '/dontdiefishing/safety-conditions' },
+      { source: '/mobile-app', destination: '/dontdiefishing/mobile-app' },
+      { source: '/fishable-days', destination: '/dontdiefishing/fishable-days' },
+      { source: '/logbook', destination: '/dontdiefishing/logbook' },
+      { source: '/tracks', destination: '/dontdiefishing/tracks' },
+      { source: '/account-billing', destination: '/dontdiefishing/account-billing' },
+      { source: '/how-scoring-works', destination: '/dontdiefishing/how-scoring-works' },
       { source: '/faq', destination: '/dontdiefishing/faq' },
+      { source: '/regulations', destination: '/dontdiefishing/regulations' },
+      { source: '/alerts', destination: '/dontdiefishing/alerts' },
+      { source: '/trips-and-safety', destination: '/dontdiefishing/trips-and-safety' },
       { source: '/changelog', destination: '/dontdiefishing/changelog' },
     ];
   },
 };
 
-export default withMDX(config);
+export default withSentryConfig(withMDX(config), { silent: true });

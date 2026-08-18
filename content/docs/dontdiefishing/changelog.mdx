@@ -3,9 +3,134 @@ title: Changelog
 description: What's new in DontDieFishing documentation.
 ---
 
-import { CircleQuestionMark } from 'lucide-react';
+## August 9–15, 2026
 
-What's new in DontDieFishing documentation.
+66 user-facing changes shipped.
+
+### New features
+
+- split Atlantic/Gulf curated regions into tighter areas ([#185](https://github.com/smynkr/dontdiefishing/pull/185))
+- species profiles, Wikipedia links, catch stats + contrast polish ([#182](https://github.com/smynkr/dontdiefishing/pull/182))
+- enable session replay with capability-content masking ([#177](https://github.com/smynkr/dontdiefishing/pull/177))
+- full-catalog coverage for every launch-site state ([#173](https://github.com/smynkr/dontdiefishing/pull/173))
+- full site redesign per owner design canvases ([#165](https://github.com/smynkr/dontdiefishing/pull/165))
+- rich entry sections with per-user toggles ([#162](https://github.com/smynkr/dontdiefishing/pull/162))
+- dashboard performance + curated-site imagery + DDF-41 store package ([#147](https://github.com/smynkr/dontdiefishing/pull/147))
+- DDF-12 phase 1 — gated MapLibre site map ([#144](https://github.com/smynkr/dontdiefishing/pull/144))
+- ad foundation phase 1 — Pro ad-free gate (DDF-40) ([#143](https://github.com/smynkr/dontdiefishing/pull/143))
+- Sentry error monitoring (DDF-36) ([#141](https://github.com/smynkr/dontdiefishing/pull/141))
+- logbook copy for the shipped polish (DDF-86) ([#140](https://github.com/smynkr/dontdiefishing/pull/140))
+- per-site OG images + Place structured data (DDF-56) ([#139](https://github.com/smynkr/dontdiefishing/pull/139))
+- vessel collection — photos, notes, maintenance, documents (DDF-87/88/89) ([#138](https://github.com/smynkr/dontdiefishing/pull/138))
+- visual entry cards — site banners + condition glyphs (DDF-83) ([#137](https://github.com/smynkr/dontdiefishing/pull/137))
+- edit confirmed entries (DDF-85) ([#135](https://github.com/smynkr/dontdiefishing/pull/135))
+- vessel + trip distance on entries (DDF-84) ([#134](https://github.com/smynkr/dontdiefishing/pull/134))
+- remove disclaimer clutter from landing page, move to trip form ([#126](https://github.com/smynkr/dontdiefishing/pull/126))
+- brand-first redesign, new-feature copy, footer watermark fix ([#118](https://github.com/smynkr/dontdiefishing/pull/118))
+- DDF-70/71/72 — track replay, AIS traffic, rich automated logbook ([#108](https://github.com/smynkr/dontdiefishing/pull/108))
+- tier-2 curated launch sites (86 total, first non-CONUS regions) ([#103](https://github.com/smynkr/dontdiefishing/pull/103))
+- DDF-72 map layout revamp ([#101](https://github.com/smynkr/dontdiefishing/pull/101))
+- expand curated launch sites to 77 (tier 1 + CA coast buildout) ([#102](https://github.com/smynkr/dontdiefishing/pull/102))
+- DDF-68 — Expo SDK 55 → 56 (RN 0.85.3) ([#96](https://github.com/smynkr/dontdiefishing/pull/96))
+- trip check-in safety feature (DDF-61) ([#88](https://github.com/smynkr/dontdiefishing/pull/88))
+- pre-trip brief notification (DDF-60) ([#87](https://github.com/smynkr/dontdiefishing/pull/87))
+- owner-scoped fishing logbook (DDF-62) ([#86](https://github.com/smynkr/dontdiefishing/pull/86))
+- per-day forecast why + species windows (DDF-59) ([#85](https://github.com/smynkr/dontdiefishing/pull/85))
+- Stripe entitlement reconciliation cron + regulation source-staleness badge (hardening backlog) ([#68](https://github.com/smynkr/dontdiefishing/pull/68))
+- cron dead-man heartbeat + VAPID pair assertion (DDF-31) ([#62](https://github.com/smynkr/dontdiefishing/pull/62))
+
+### Updates
+
+- Regulations dashboard integration: nav link, species media, Wikipedia refs, personal catch stats ([#179](https://github.com/smynkr/dontdiefishing/pull/179))
+- durable NWS forecast grid pre-cache ([#172](https://github.com/smynkr/dontdiefishing/pull/172))
+- smooth cross-faded Doppler radar replay ([#84](https://github.com/smynkr/dontdiefishing/pull/84))
+- Landing redesign: the marine-forecast bulletin identity ([#69](https://github.com/smynkr/dontdiefishing/pull/69))
+
+### Fixes
+
+- labeled site-location preview above the readiness panel ([#186](https://github.com/smynkr/dontdiefishing/pull/186))
+- full-width forecast, two-column regulations ([#184](https://github.com/smynkr/dontdiefishing/pull/184))
+- wide uncropped species image + clamped bag column ([#183](https://github.com/smynkr/dontdiefishing/pull/183))
+- explicit anon/authenticated EXECUTE revokes for recheck functions ([#180](https://github.com/smynkr/dontdiefishing/pull/180))
+- port PR #173 gauntlet round 1-3 fixes (post-merge completion) ([#178](https://github.com/smynkr/dontdiefishing/pull/178))
+- consent/recording hygiene — replay stays off until masked capability URLs ship ([#176](https://github.com/smynkr/dontdiefishing/pull/176))
+- reject offsets beyond +/-14:00 ([#174](https://github.com/smynkr/dontdiefishing/pull/174))
+- focus ring on radar replay range input ([#171](https://github.com/smynkr/dontdiefishing/pull/171))
+- single map control surface + Washington/Oregon split ([#170](https://github.com/smynkr/dontdiefishing/pull/170))
+- settled-result wave 1 — no unhandled-rejection window ([#168](https://github.com/smynkr/dontdiefishing/pull/168))
+- redesign live bugs — map overflow, fishable-days latency, promo-code checkout ([#166](https://github.com/smynkr/dontdiefishing/pull/166))
+- review-round hardening for rich sections ([#164](https://github.com/smynkr/dontdiefishing/pull/164))
+- make warm-conditions rotation assertions clock-independent ([#163](https://github.com/smynkr/dontdiefishing/pull/163))
+- map layout + Doppler replay — taller map, sidebar search, replay bottom-left, loop retry ([#133](https://github.com/smynkr/dontdiefishing/pull/133))
+- DDF-54 audit batch + DDF-32 app-shell polish ([#136](https://github.com/smynkr/dontdiefishing/pull/136))
+- photo path-immutability trigger + forward-hardening (post-#119 review rounds) ([#121](https://github.com/smynkr/dontdiefishing/pull/121))
+- DDF-70/71/72 review round 2 — RPC authority, sweep race, recovery, ownership ([#120](https://github.com/smynkr/dontdiefishing/pull/120))
+- DDF-70/71/72 post-merge hardening (photo gates, orphan sweep, retention, AIS wire order, landing) ([#119](https://github.com/smynkr/dontdiefishing/pull/119))
+- DDF-72 photo storage orphan sweep ([#117](https://github.com/smynkr/dontdiefishing/pull/117))
+- register service worker on boot ([#112](https://github.com/smynkr/dontdiefishing/pull/112))
+- 'safety score' phrasing -> 'planning score' ([#111](https://github.com/smynkr/dontdiefishing/pull/111))
+- one popup surface per marker in detail mode ([#110](https://github.com/smynkr/dontdiefishing/pull/110))
+- distinct notification tags for briefs and check-in escalations ([#109](https://github.com/smynkr/dontdiefishing/pull/109))
+- veto copy uses planning voice ([#107](https://github.com/smynkr/dontdiefishing/pull/107))
+- detail-mode NO-GO chips render red ([#106](https://github.com/smynkr/dontdiefishing/pull/106))
+- site markers reflect GO/CAUTION/NO-GO conditions ([#105](https://github.com/smynkr/dontdiefishing/pull/105))
+- map layout rework — sidebar labels, less tall, load-gated radar ([#104](https://github.com/smynkr/dontdiefishing/pull/104))
+- restore DDF-61 review fixes lost in stale PR #88 merge ([#95](https://github.com/smynkr/dontdiefishing/pull/95))
+- Dependabot remediation — advisory-pinned overrides + Next patch (28→12 vulns) ([#90](https://github.com/smynkr/dontdiefishing/pull/90))
+- explicit launch-site client privilege boundary incl. authenticated nws\_timezone refresh (DDF-48) ([#66](https://github.com/smynkr/dontdiefishing/pull/66))
+- DDF-31 review punch list — 020/049 reconciliation, external cron observer, alert levels ([#67](https://github.com/smynkr/dontdiefishing/pull/67))
+- remove root Expo/EAS config shadow, redirect to mobile workspace (DDF-47) ([#64](https://github.com/smynkr/dontdiefishing/pull/64))
+- harden landing commercial surface ([#60](https://github.com/smynkr/dontdiefishing/pull/60))
+
+## July 1 – August 8, 2026
+
+37 user-facing changes shipped.
+
+### New features
+
+- visual polish batch + observability/consent gate ([#52](https://github.com/smynkr/dontdiefishing/pull/52))
+- float-plan sharing — unguessable-link anonymous trip view ([#33](https://github.com/smynkr/dontdiefishing/pull/33))
+- polish batch — live hero links, trip batch-fetch, what's-new changelog, installable PWA icons ([#30](https://github.com/smynkr/dontdiefishing/pull/30))
+- declutter map detail mode — translucent chips, adaptive anchoring, status markers ([#26](https://github.com/smynkr/dontdiefishing/pull/26))
+- complete DDF-5 and DDF-15 through DDF-30 ([#16](https://github.com/smynkr/dontdiefishing/pull/16))
+- add durable monitored trip notification outbox (DDF-30) ([#23](https://github.com/smynkr/dontdiefishing/pull/23))
+- add fail-closed site regulations (DDF-25) ([#18](https://github.com/smynkr/dontdiefishing/pull/18))
+- fishable-days GO/CAUTION/NO-GO calendar per vessel \[DDF-14] ([#14](https://github.com/smynkr/dontdiefishing/pull/14))
+
+### Updates
+
+- DDF-29: Native Expo saved-site push ([#22](https://github.com/smynkr/dontdiefishing/pull/22))
+- \[DDF-28] Add secure mobile social sign-in ([#21](https://github.com/smynkr/dontdiefishing/pull/21))
+- DDF-27: deploy Vercel crons from the configured project root ([#20](https://github.com/smynkr/dontdiefishing/pull/20))
+- DDF-26: editable site-local trip schedules ([#19](https://github.com/smynkr/dontdiefishing/pull/19))
+- DDF-24: add atomic guided onboarding ([#17](https://github.com/smynkr/dontdiefishing/pull/17))
+- First-time agent setup + top-to-bottom web revamp (P0-P4) ([#1](https://github.com/smynkr/dontdiefishing/pull/1))
+
+### Fixes
+
+- UV index stuck at 0 — select current local hour from EPA series ([#53](https://github.com/smynkr/dontdiefishing/pull/53))
+- service\_role least privilege on public tables (defense-in-depth) ([#49](https://github.com/smynkr/dontdiefishing/pull/49))
+- push/subscribe — validate endpoint (https URL) + input hygiene ([#48](https://github.com/smynkr/dontdiefishing/pull/48))
+- rate-limit the expensive conditions routes (cost/DoS) ([#47](https://github.com/smynkr/dontdiefishing/pull/47))
+- stripe checkout — include requested price in the idempotency key ([#46](https://github.com/smynkr/dontdiefishing/pull/46))
+- fishable-alerts cron — isolate per-user + phase errors (poison-pill) ([#45](https://github.com/smynkr/dontdiefishing/pull/45))
+- PWA icons — move 192/512/maskable out of the favicon convention + manifest cache-busting ([#43](https://github.com/smynkr/dontdiefishing/pull/43))
+- polish — staleness note tied to conditions + share-error SR live region ([#42](https://github.com/smynkr/dontdiefishing/pull/42))
+- landing hero — don't cache degraded hero on transient ISR revalidation failure ([#41](https://github.com/smynkr/dontdiefishing/pull/41))
+- trip-card conditions — loading skeleton wins over stale error during refetch ([#40](https://github.com/smynkr/dontdiefishing/pull/40))
+- share-float-plan popover — focus containment + dialog semantics (a11y) ([#38](https://github.com/smynkr/dontdiefishing/pull/38))
+- trip conditions — preserve shown data on a transient refetch failure ([#36](https://github.com/smynkr/dontdiefishing/pull/36))
+- per-page canonical/OG metadata, branded 404, hard 404s on /conditions + landing a11y ([#28](https://github.com/smynkr/dontdiefishing/pull/28))
+- repair all site images (Wikimedia standard-size policy T414805) + release-record corrections ([#25](https://github.com/smynkr/dontdiefishing/pull/25))
+- signal honesty — real NWS gusts, landing claims match reality \[DDF-7] ([#12](https://github.com/smynkr/dontdiefishing/pull/12))
+- finish refactor residue — FlatList, shared styles, TripPlan contract \[DDF-10] ([#11](https://github.com/smynkr/dontdiefishing/pull/11))
+- report author bylines via profiles view \[DDF-6] ([#8](https://github.com/smynkr/dontdiefishing/pull/8))
+- hardening sweep — popup escaping, URL encoding, SW auth-cache \[DDF-4] ([#9](https://github.com/smynkr/dontdiefishing/pull/9))
+- dashboard error state + env fail-fast guards \[DDF-9] ([#6](https://github.com/smynkr/dontdiefishing/pull/6))
+- render site-type badges on cards, consolidate SITE\_TYPE\_LABELS \[DDF-8] ([#7](https://github.com/smynkr/dontdiefishing/pull/7))
+- harden push/send + timing-safe cron secret \[DDF-3] ([#4](https://github.com/smynkr/dontdiefishing/pull/4))
+- restore Vercel deploys — direct @tailwindcss/oxide dep, stop nuking lockfile \[DDF-1] ([#3](https://github.com/smynkr/dontdiefishing/pull/3))
+- install oxide linux native binary to unblock prod build ([#2](https://github.com/smynkr/dontdiefishing/pull/2))
 
 ## 2026-08-10 — Documentation rebuild
 
@@ -16,14 +141,7 @@ What's new in DontDieFishing documentation.
 
 ## 2026-07-31 — Initial documentation launch
 
-- Getting started guide with spot browsing and safety-first workflow
-- Finding spots: search, filters, spot detail, community reports
-- Safety & conditions: data sources (USGS, NOAA, NWS), hazard categories,
-  limitations
-- FAQ covering spots, alerts, and saltwater fishing
-
-<Cards>
-  <Card icon={<CircleQuestionMark />} title="FAQ" href="/dontdiefishing/faq">
-    Common questions and fixes.
-  </Card>
-</Cards>
+- Getting started guide with launch-site browsing and a safety-first workflow
+- Launch Sites: search, filters, site detail, community reports
+- Safety & conditions: live data sources (NDBC buoys, NWS forecasts and alerts, NOAA CO-OPS tides, EPA UV), hazard categories, and fail-open limitations
+- FAQ covering launch sites, alerts, and saltwater fishing

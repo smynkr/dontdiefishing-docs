@@ -6,6 +6,7 @@ export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
       title: <NavTitle />,
+      url: 'https://www.dontdiefishing.com',
     },
     githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
   };
