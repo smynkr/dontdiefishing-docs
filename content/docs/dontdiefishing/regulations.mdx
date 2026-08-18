@@ -55,6 +55,16 @@ Select a jurisdiction, then review one row per listed species. The table provide
 
 On the detail page, a `possession_limit` value is labeled **LISTED LIMIT**. These values are references from the cited rule, not a universal permission to retain a catch. When a status is not current and verified, the catalog does not present stale values as current limits. Closed and verify rows can show `—` in the limit columns; a detail page may retain a clearly labeled last-listed/reference value.
 
+## Species detail pages
+
+Each species row links to a detail page at `/regulations/[state]/[species]` that shows the full regulation record alongside a **species profile card**:
+
+- **Lead image** — a curated Wikimedia thumbnail when one is available for the species.
+- **Wikipedia link** — a direct link to the matched Wikipedia article, or a Wikipedia search fallback when no curated title exists.
+- **Personal catch stats** — when you are signed in, the card shows your total catches for that species with a link to your logbook. The widget renders nothing for anonymous visitors or failed reads, and the page remains statically generated.
+
+The in-app site regulations card and the public conditions page also link species names to these detail pages. The site regulations card footer includes an **ALL \{STATE} REGULATIONS** link to the full state catalog.
+
 ## Normalized season windows
 
 Normalized rules use one of three rule kinds:
