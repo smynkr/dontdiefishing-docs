@@ -361,6 +361,9 @@ function destinationGhEnv() {
 function destinationGitEnv() {
   requireDestinationToken();
   const child = scrubbedChildEnv();
+  for (const key of ["SSH_AUTH_SOCK", "GIT_ASKPASS", "SSH_ASKPASS", "GIT_SSH", "GIT_SSH_COMMAND"]) {
+    if (process.env[key]) child[key] = process.env[key];
+  }
   const token = process.env.GH_TOKEN;
   const encoded = Buffer.from(`x-access-token:${token}`, "utf8").toString("base64");
   child.GIT_CONFIG_COUNT = "1";
