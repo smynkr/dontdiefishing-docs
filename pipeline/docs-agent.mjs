@@ -284,6 +284,11 @@ const SCRUBBED_GITHUB_ENV_KEYS = new Set([
   "GH_TOKEN",
   "GITHUB_TOKEN",
   "DOCS_REPO_PAT",
+  "SSH_AUTH_SOCK",
+  "GIT_ASKPASS",
+  "SSH_ASKPASS",
+  "GIT_SSH",
+  "GIT_SSH_COMMAND",
 ]);
 
 function scrubbedChildEnv() {

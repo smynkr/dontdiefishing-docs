@@ -100,6 +100,7 @@ const credentialKeys = [
   "GIT_CONFIG_KEY_0",
   "GIT_CONFIG_VALUE_0",
   "GIT_CONFIG_PARAMETERS",
+  "SSH_AUTH_SOCK",
 ];
 appendFileSync(
   process.env.DOCS_AGENT_BACKEND_ENV_LOG,
@@ -210,6 +211,7 @@ const credentialKeys = [
   "GIT_CONFIG_KEY_0",
   "GIT_CONFIG_VALUE_0",
   "GIT_CONFIG_PARAMETERS",
+  "SSH_AUTH_SOCK",
 ];
 appendFileSync(
   process.env.DOCS_AGENT_MIGRATION_ENV_LOG,
@@ -282,6 +284,7 @@ console.log(JSON.stringify({ stub: true, destination: dest }));
         GIT_CONFIG_KEY_0: "credential.helper",
         GIT_CONFIG_VALUE_0: "store",
         GIT_CONFIG_PARAMETERS: "'credential.helper=store'",
+        SSH_AUTH_SOCK: "/tmp/ssh-agent.sock",
         DOCS_AGENT_CLAUDE_CMD: backendPath,
         DOCS_AGENT_GH_LOG: ghLogPath,
         DOCS_AGENT_GH_ENV_LOG: ghEnvLogPath,
@@ -537,6 +540,7 @@ test("non-GitHub subprocesses receive a scrubbed child environment", (t) => {
     "GIT_CONFIG_KEY_0",
     "GIT_CONFIG_VALUE_0",
     "GIT_CONFIG_PARAMETERS",
+    "SSH_AUTH_SOCK",
   ];
   const expectedAbsent = Object.fromEntries(forbidden.map((key) => [key, false]));
   const backendEnvs = readFileSync(sandbox.backendEnvLogPath, "utf8")
