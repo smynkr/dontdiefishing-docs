@@ -5,10 +5,41 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { parseSSEPayload } from "../docs-agent.mjs";
+import {
+  buildApiRequestBody,
+  parseSSEPayload,
+  retryAfterDelayMs,
+  validateGlmReasoningEffort,
+} from "../docs-agent.mjs";
 
 const testDir = path.dirname(fileURLToPath(import.meta.url));
 const driverPath = path.resolve(testDir, "..", "docs-agent.mjs");
+
+// Semantic fixture for the reviewed Task 1 provider contract. Standalone
+// repositories intentionally do not compare whole driver files: their source,
+// candidate, and repository paths differ. Normalize only the provider fields
+// that must remain equivalent across copies.
+const TASK_1_PROVIDER_FIXTURE = {
+  defaultModel: "@cf/zai-org/glm-5.3-flash",
+  defaultReasoningEffort: "high",
+  allowedReasoningEfforts: ["low", "medium", "high"],
+  maxTokens: 49152,
+  temperature: 0.2,
+  stream: true,
+  modelSecret: "CLOUDFLARE_WORKERS_AI_TOKEN",
+};
+
+function normalizeProviderFixture(value) {
+  if (Array.isArray(value)) return value.map(normalizeProviderFixture).sort();
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.keys(value)
+        .sort()
+        .map((key) => [key, normalizeProviderFixture(value[key])]),
+    );
+  }
+  return value;
+}
 
 function command(cmd, args, options = {}) {
   const result = spawnSync(cmd, args, { encoding: "utf8", ...options });
@@ -206,6 +237,8 @@ console.log(JSON.stringify({ stub: true, destination: dest }));
           encoding: "utf8",
           env: {
             ...process.env,
+            DOCS_AGENT_SOURCE_TOKEN: "source-token",
+            GH_TOKEN: "destination-token",
             DOCS_AGENT_CLAUDE_CMD: backendPath,
             DOCS_AGENT_GH_LOG: ghLogPath,
             DOCS_AGENT_LOG_DIR: path.join(root, "logs"),
@@ -240,6 +273,93 @@ function committedFiles(docsRepo) {
     .split("\n")
     .filter(Boolean);
 }
+
+test("Task 1 GLM provider contract parity uses a normalized fixture", () => {
+  const source = `const m = await import(${JSON.stringify(driverPath)}); process.stdout.write(m.backendReceiptLabel("glm"));`;
+  const childEnv = { ...process.env };
+  delete childEnv.DOCS_AGENT_GLM_MODEL;
+  delete childEnv.CLOUDFLARE_ACCOUNT_ID;
+  delete childEnv.DOCS_AGENT_GLM_REASONING_EFFORT;
+  childEnv.DOCS_AGENT_GLM_API_BASE = "https://provider.example/v1";
+  childEnv.GLM_API_KEY = "test-key";
+  const result = spawnSync(process.execPath, ["--input-type=module", "--eval", source], {
+    env: childEnv,
+    encoding: "utf8",
+  });
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /model: `@cf\/zai-org\/glm-5\.3-flash`/);
+
+  const backend = {
+    model: TASK_1_PROVIDER_FIXTURE.defaultModel,
+    maxTokens: TASK_1_PROVIDER_FIXTURE.maxTokens,
+    reasoningEffort: TASK_1_PROVIDER_FIXTURE.defaultReasoningEffort,
+    reasoningEffortEnv: "DOCS_AGENT_GLM_REASONING_EFFORT",
+  };
+  const body = buildApiRequestBody(backend, "prompt", true);
+  assert.deepEqual(
+    normalizeProviderFixture({
+      defaultModel: body.model,
+      defaultReasoningEffort: body.reasoning_effort,
+      allowedReasoningEfforts: TASK_1_PROVIDER_FIXTURE.allowedReasoningEfforts,
+      maxTokens: body.max_tokens,
+      temperature: body.temperature,
+      stream: body.stream,
+      modelSecret: TASK_1_PROVIDER_FIXTURE.modelSecret,
+    }),
+    normalizeProviderFixture(TASK_1_PROVIDER_FIXTURE),
+  );
+  assert.deepEqual(body.messages, [{ role: "user", content: "prompt" }]);
+
+  for (const value of ["", "none", "max", "xhigh", "HIGH"]) {
+    assert.match(
+      validateGlmReasoningEffort(backend, true, value),
+      /must be low, medium, or high/,
+      `expected ${JSON.stringify(value)} to be rejected`,
+    );
+  }
+  assert.equal(validateGlmReasoningEffort(backend, true, "low"), null);
+  assert.equal(
+    Object.hasOwn(
+      buildApiRequestBody({ ...backend, model: "@cf/zai-org/glm-5.2" }, "prompt", true),
+      "reasoning_effort",
+    ),
+    false,
+  );
+  assert.equal(
+    Object.hasOwn(buildApiRequestBody(backend, "prompt", false), "reasoning_effort"),
+    false,
+  );
+
+  const template = readFileSync(path.resolve(testDir, "..", "docs-agent.yml"), "utf8");
+  assert.deepEqual(
+    normalizeProviderFixture({
+      sourceToken: /DOCS_AGENT_SOURCE_TOKEN:\s*\$\{\{\s*github\.token\s*\}\}/.test(template),
+      destinationToken: /GH_TOKEN:\s*\$\{\{\s*secrets\.DOCS_REPO_PAT\s*\}\}/.test(template),
+      accountVariable: /CLOUDFLARE_ACCOUNT_ID:\s*\$\{\{\s*vars\.CLOUDFLARE_ACCOUNT_ID\s*\}\}/.test(template),
+      apiBaseVariable: /DOCS_AGENT_GLM_API_BASE:\s*\$\{\{\s*vars\.DOCS_AGENT_GLM_API_BASE\s*\}\}/.test(template),
+      modelVariable: /DOCS_AGENT_GLM_MODEL:\s*\$\{\{\s*vars\.DOCS_AGENT_GLM_MODEL\s*\}\}/.test(template),
+      maxTokensVariable: /DOCS_AGENT_GLM_MAX_TOKENS:\s*\$\{\{\s*vars\.DOCS_AGENT_GLM_MAX_TOKENS\s*\}\}/.test(template),
+      reasoningVariable: /DOCS_AGENT_GLM_REASONING_EFFORT:\s*\$\{\{\s*vars\.DOCS_AGENT_GLM_REASONING_EFFORT\s*\|\|\s*'high'\s*\}\}/.test(template),
+      modelSecret: /GLM_API_KEY:\s*\$\{\{\s*secrets\.CLOUDFLARE_WORKERS_AI_TOKEN\s*\}\}/.test(template),
+      oldModelSecret: /GLM_API_KEY:\s*\$\{\{\s*secrets\.GLM_API_KEY\s*\}\}/.test(template),
+      checkoutCredentialPersistence: /persist-credentials:\s*false/.test(template),
+      stableHostedJob: /name:\s+hosted \(GLM 5\.2 — drafts doc update\)/.test(template),
+    }),
+    normalizeProviderFixture({
+      sourceToken: true,
+      destinationToken: true,
+      accountVariable: true,
+      apiBaseVariable: true,
+      modelVariable: true,
+      maxTokensVariable: true,
+      reasoningVariable: true,
+      modelSecret: true,
+      oldModelSecret: false,
+      checkoutCredentialPersistence: true,
+      stableHostedJob: true,
+    }),
+  );
+});
 
 test("T1: byte-identical file blocks do not create branches, commits, or PRs", async (t) => {
   for (const existingContent of ["# Reference\n", "# Reference without final newline"]) {
@@ -512,6 +632,14 @@ test("SSE payload parsing survives provider quirks and truncation signals", asyn
     assert.equal(parsed.content, "first");
     assert.equal(parsed.finishReason, "stop");
   });
+});
+test("GLM Retry-After parity uses bounded seconds, dates, default, and cap", () => {
+  const headers = (value) => new Headers(value === undefined ? {} : { "Retry-After": value });
+  assert.equal(retryAfterDelayMs(headers("2"), 1_000), 2_000);
+  assert.equal(retryAfterDelayMs(headers(new Date(4_000).toUTCString()), 1_000), 3_000);
+  assert.equal(retryAfterDelayMs(headers("not-a-duration"), 1_000), 250);
+  assert.equal(retryAfterDelayMs(headers(undefined), 1_000), 250);
+  assert.equal(retryAfterDelayMs(headers("99"), 1_000), 5_000);
 });
 
 test("T8: empty and malformed backend output fail without a PR attempt", async (t) => {

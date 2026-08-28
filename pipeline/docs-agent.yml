@@ -1,26 +1,36 @@
-# docs-agent — auto-draft doc updates on merged PRs using Neural Watt GLM 5.2.
+# docs-agent — one bounded hosted GLM-5.3-Flash run, then report provider
+# failures as actionable product issues.
 #
 # TEMPLATE: copy this file to `.github/workflows/docs-agent.yml` in EACH
 # product repo and set the two marked spots for the product. It is configured
-# for the hosted GLM backend (metered API key). The driver itself always runs
-# from the docs repo checkout below — fix the driver there once, and every
-# product repo picks it up on its next run.
+# for the hosted GLM backend (a metered API key). The driver itself always runs
+# from the docs repo checkout below — fix it there once, and every product repo
+# picks it up on its next run.
 #
-# Flow: PR merged → detect user-facing changes → GLM 5.2 drafts MDX against
-# the CANONICAL flat sources → run-migration regenerates content/docs →
-# draft PR opened against smynkr/dontdiefishing-docs (base branch auto-detected).
+# Flow: PR merged → detect user-facing changes → one GLM-5.3-Flash run drafts
+# MDX against the CANONICAL flat sources → run-migration regenerates content/docs
+# → draft PR opened against smynkr/dontdiefishing-docs (base branch
+# auto-detected). This standalone template never configures a fallback backend:
+# provider, payment, authentication, and timeout failures are reported without
+# another metered request. The driver makes exactly one same-provider retry only
+# when its first request receives HTTP 429. `Retry-After` accepts seconds or
+# HTTP-date, defaults missing/invalid values to 250ms, and caps the delay at 5s.
+# Both attempts share one absolute timeout budget.
 #
 # Required repo secrets:
-#   DOCS_REPO_PAT  — PAT with read on THIS product repo (the hosted job fetches
-#                    the PR diff via `gh`) plus Contents R/W + PRs R/W on
-#                    smynkr/dontdiefishing-docs (docs checkout + draft PR). A fine-grained
-#                    PAT must therefore be granted on all product repos; a classic
-#                    `repo`-scope PAT already covers them all.
-#   GLM_API_KEY    — Neural Watt GLM 5.2 metered API key
+#   DOCS_REPO_PAT  — PAT with Contents R/W + PRs R/W on
+#                    smynkr/dontdiefishing-docs (docs checkout + draft PR).
+#                    Source PR reads use the workflow's `${{ github.token }}`
+#                    through DOCS_AGENT_SOURCE_TOKEN.
+#   CLOUDFLARE_WORKERS_AI_TOKEN — account-scoped Workers AI token
 #
 # Required repo variables:
-#   DOCS_AGENT_GLM_API_BASE — e.g. https://api.neuralwatt.com/v1
-#   DOCS_AGENT_GLM_MODEL    — e.g. glm-5.2
+#   CLOUDFLARE_ACCOUNT_ID         — exactly 32 lowercase hexadecimal characters
+#   DOCS_AGENT_GLM_API_BASE      — Cloudflare OpenAI-compatible AI endpoint
+#   DOCS_AGENT_GLM_MODEL         — optional; defaults to @cf/zai-org/glm-5.3-flash
+#   DOCS_AGENT_GLM_MAX_TOKENS    — defaults to 49152
+#   DOCS_AGENT_GLM_REASONING_EFFORT — only exact Cloudflare GLM-5.3-Flash;
+#                                    low, medium, or high; defaults to high
 
 name: docs-agent
 
@@ -96,6 +106,9 @@ jobs:
           repository: smynkr/dontdiefishing-docs
           token: ${{ secrets.DOCS_REPO_PAT }}
           path: dontdiefishing-docs
+          # Never persist the destination credential in the checkout config;
+          # the driver must keep it out of arbitrary scripts and build steps.
+          persist-credentials: false
 
       - uses: actions/setup-node@v4
         with:
@@ -105,21 +118,27 @@ jobs:
 
       # The driver regenerates content/docs via _migration/tools/run-migration.mjs,
       # which needs the docs repo's dependencies (yaml, lucide-react).
+      # Install scripts run with the job's ambient environment and must never
+      # execute against a checkout that carries the destination credential.
       - name: Install docs repo dependencies
         working-directory: dontdiefishing-docs
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Configure git identity
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Run docs-agent with GLM 5.2
+      - name: Run docs-agent with Cloudflare GLM-5.3-Flash
         env:
+          DOCS_AGENT_SOURCE_TOKEN: ${{ github.token }}
           GH_TOKEN: ${{ secrets.DOCS_REPO_PAT }}
-          GLM_API_KEY: ${{ secrets.GLM_API_KEY }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           DOCS_AGENT_GLM_API_BASE: ${{ vars.DOCS_AGENT_GLM_API_BASE }}
           DOCS_AGENT_GLM_MODEL: ${{ vars.DOCS_AGENT_GLM_MODEL }}
+          DOCS_AGENT_GLM_MAX_TOKENS: ${{ vars.DOCS_AGENT_GLM_MAX_TOKENS }}
+          DOCS_AGENT_GLM_REASONING_EFFORT: ${{ vars.DOCS_AGENT_GLM_REASONING_EFFORT || 'high' }}
+          GLM_API_KEY: ${{ secrets.CLOUDFLARE_WORKERS_AI_TOKEN }}
           DOCS_AGENT_LOG_DIR: ${{ github.workspace }}/docs-agent-logs
         run: |
           node dontdiefishing-docs/pipeline/docs-agent.mjs \
