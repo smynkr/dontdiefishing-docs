@@ -1557,6 +1557,7 @@ async function main() {
   // spending the metered backend call, not after it. Dry runs write nothing,
   // so they skip both preflights.
   if (!opts.dryRun) {
+    requireDestinationToken();
     assertRegenerationPrereqs(opts.docsRepoPath);
     assertCleanCheckout(opts.docsRepoPath);
   }
