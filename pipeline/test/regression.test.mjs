@@ -79,15 +79,35 @@ function setupSandbox({
   const docsRepo = path.join(root, "docs");
   const backendOutputPath = path.join(root, "backend-output.txt");
   const ghLogPath = path.join(root, "gh.log");
+  const backendEnvLogPath = path.join(root, "backend-env.jsonl");
+  const migrationEnvLogPath = path.join(root, "migration-env.jsonl");
+  const ghEnvLogPath = path.join(root, "gh-env.log");
+  const prBodyPath = path.join(root, "pr-body.md");
   const backendPath = path.join(binDir, "backend-stub.mjs");
   const ghPath = path.join(binDir, "gh");
-
   mkdirSync(binDir, { recursive: true });
   writeFileSync(backendOutputPath, backendOutput, "utf8");
   writeExecutable(
     backendPath,
     `#!/usr/bin/env node
-import { readFileSync } from "node:fs";
+import { appendFileSync, readFileSync } from "node:fs";
+const credentialKeys = [
+  "DOCS_AGENT_SOURCE_TOKEN",
+  "GH_TOKEN",
+  "GITHUB_TOKEN",
+  "DOCS_REPO_PAT",
+  "GIT_CONFIG_COUNT",
+  "GIT_CONFIG_KEY_0",
+  "GIT_CONFIG_VALUE_0",
+  "GIT_CONFIG_PARAMETERS",
+];
+appendFileSync(
+  process.env.DOCS_AGENT_BACKEND_ENV_LOG,
+  JSON.stringify({
+    args: process.argv.slice(2),
+    present: Object.fromEntries(credentialKeys.map((key) => [key, Object.hasOwn(process.env, key)])),
+  }) + "\\n",
+);
 if (process.argv.includes("--version")) process.exit(0);
 process.stdin.resume();
 process.stdin.on("end", () => process.stdout.write(readFileSync(process.env.DOCS_AGENT_STUB_OUTPUT_FILE, "utf8")));
@@ -97,6 +117,7 @@ process.stdin.on("end", () => process.stdout.write(readFileSync(process.env.DOCS
     ghPath,
     `#!/bin/sh
 printf '%s\\n' "$*" >> "$DOCS_AGENT_GH_LOG"
+printf '%s\\n' "$*|source=\${DOCS_AGENT_SOURCE_TOKEN+x}|gh=\${GH_TOKEN+x}|github=\${GITHUB_TOKEN+x}|docs=\${DOCS_REPO_PAT+x}|git_count=\${GIT_CONFIG_COUNT+x}|git_key=\${GIT_CONFIG_KEY_0+x}|git_value=\${GIT_CONFIG_VALUE_0+x}|git_parameters=\${GIT_CONFIG_PARAMETERS+x}" >> "$DOCS_AGENT_GH_ENV_LOG"
 if [ "$1" = "--version" ]; then
   echo "gh version fake"
   exit 0
@@ -123,6 +144,18 @@ if [ "$1" = "pr" ] && [ "$2" = "list" ]; then
   exit 0
 fi
 if [ "$1" = "pr" ] && [ "$2" = "create" ]; then
+  body_file=""
+  while [ "$#" -gt 0 ]; do
+    if [ "$1" = "--body-file" ]; then
+      body_file="$2"
+      shift 2
+      continue
+    fi
+    shift
+  done
+  if [ -n "$body_file" ]; then
+    cat "$body_file" > "$DOCS_AGENT_STUB_PR_BODY_FILE"
+  fi
   echo "https://example.test/docs/pull/1"
   exit 0
 fi
@@ -167,7 +200,21 @@ exit 1
   writeFileSync(
     path.join(migrationDir, "run-migration.mjs"),
     `#!/usr/bin/env node
-import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, statSync } from "node:fs";
+import { appendFileSync, cpSync, existsSync, mkdirSync, readdirSync, rmSync, statSync } from "node:fs";
+const credentialKeys = [
+  "DOCS_AGENT_SOURCE_TOKEN",
+  "GH_TOKEN",
+  "GITHUB_TOKEN",
+  "DOCS_REPO_PAT",
+  "GIT_CONFIG_COUNT",
+  "GIT_CONFIG_KEY_0",
+  "GIT_CONFIG_VALUE_0",
+  "GIT_CONFIG_PARAMETERS",
+];
+appendFileSync(
+  process.env.DOCS_AGENT_MIGRATION_ENV_LOG,
+  JSON.stringify({ present: Object.fromEntries(credentialKeys.map((key) => [key, Object.hasOwn(process.env, key)])) }) + "\\n",
+);
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -218,9 +265,36 @@ console.log(JSON.stringify({ stub: true, destination: dest }));
     docsRemote,
     docsRepo,
     ghLogPath,
+    ghEnvLogPath,
+    backendEnvLogPath,
+    migrationEnvLogPath,
+    prBodyPath,
     sourceRepo,
     logDir: path.join(root, "logs"),
-    run({ prMode = false } = {}) {
+    run({ prMode = false, backend = "claude", backendEnv = {} } = {}) {
+      const env = {
+        ...process.env,
+        DOCS_AGENT_SOURCE_TOKEN: "source-token",
+        GH_TOKEN: "destination-token",
+        GITHUB_TOKEN: "ambient-github-token",
+        DOCS_REPO_PAT: "ambient-docs-repo-pat",
+        GIT_CONFIG_COUNT: "1",
+        GIT_CONFIG_KEY_0: "credential.helper",
+        GIT_CONFIG_VALUE_0: "store",
+        GIT_CONFIG_PARAMETERS: "'credential.helper=store'",
+        DOCS_AGENT_CLAUDE_CMD: backendPath,
+        DOCS_AGENT_GH_LOG: ghLogPath,
+        DOCS_AGENT_GH_ENV_LOG: ghEnvLogPath,
+        DOCS_AGENT_BACKEND_ENV_LOG: backendEnvLogPath,
+        DOCS_AGENT_MIGRATION_ENV_LOG: migrationEnvLogPath,
+        DOCS_AGENT_STUB_PR_BODY_FILE: prBodyPath,
+        DOCS_AGENT_LOG_DIR: path.join(root, "logs"),
+        DOCS_AGENT_STUB_OUTPUT_FILE: backendOutputPath,
+        DOCS_AGENT_STUB_DEFAULT_BRANCH: defaultBranch,
+        DOCS_AGENT_STUB_FILES_JSON: filesApiFixturePath,
+        PATH: `${binDir}:${process.env.PATH}`,
+        ...backendEnv,
+      };
       return spawnSync(
         process.execPath,
         [
@@ -230,23 +304,12 @@ console.log(JSON.stringify({ stub: true, destination: dest }));
           "--docs-repo", "example/docs",
           "--docs-repo-path", docsRepo,
           "--product", product,
-          "--backend", "claude",
+          "--backend", backend,
         ],
         {
           cwd: sourceRepo,
           encoding: "utf8",
-          env: {
-            ...process.env,
-            DOCS_AGENT_SOURCE_TOKEN: "source-token",
-            GH_TOKEN: "destination-token",
-            DOCS_AGENT_CLAUDE_CMD: backendPath,
-            DOCS_AGENT_GH_LOG: ghLogPath,
-            DOCS_AGENT_LOG_DIR: path.join(root, "logs"),
-            DOCS_AGENT_STUB_OUTPUT_FILE: backendOutputPath,
-            DOCS_AGENT_STUB_DEFAULT_BRANCH: defaultBranch,
-            DOCS_AGENT_STUB_FILES_JSON: filesApiFixturePath,
-            PATH: `${binDir}:${process.env.PATH}`,
-          },
+          env,
         },
       );
     },
@@ -274,12 +337,19 @@ function committedFiles(docsRepo) {
     .filter(Boolean);
 }
 
-test("Task 1 GLM provider contract parity uses a normalized fixture", () => {
-  const source = `const m = await import(${JSON.stringify(driverPath)}); process.stdout.write(m.backendReceiptLabel("glm"));`;
+test("Task 1 GLM provider contract parity reads production config", () => {
+  const source =
+    `const m = await import(${JSON.stringify(driverPath)}); ` +
+    `process.stdout.write(JSON.stringify({ contract: m.getGlmProviderContract(), receipt: m.backendReceiptLabel("glm") }));`;
   const childEnv = { ...process.env };
-  delete childEnv.DOCS_AGENT_GLM_MODEL;
-  delete childEnv.CLOUDFLARE_ACCOUNT_ID;
-  delete childEnv.DOCS_AGENT_GLM_REASONING_EFFORT;
+  for (const key of [
+    "DOCS_AGENT_GLM_MODEL",
+    "CLOUDFLARE_ACCOUNT_ID",
+    "DOCS_AGENT_GLM_REASONING_EFFORT",
+    "DOCS_AGENT_GLM_MAX_TOKENS",
+  ]) {
+    delete childEnv[key];
+  }
   childEnv.DOCS_AGENT_GLM_API_BASE = "https://provider.example/v1";
   childEnv.GLM_API_KEY = "test-key";
   const result = spawnSync(process.execPath, ["--input-type=module", "--eval", source], {
@@ -287,24 +357,28 @@ test("Task 1 GLM provider contract parity uses a normalized fixture", () => {
     encoding: "utf8",
   });
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /model: `@cf\/zai-org\/glm-5\.3-flash`/);
+  const production = JSON.parse(result.stdout);
+  const contract = production.contract;
+  assert.ok(production.receipt.includes(contract.defaultModel));
 
   const backend = {
-    model: TASK_1_PROVIDER_FIXTURE.defaultModel,
-    maxTokens: TASK_1_PROVIDER_FIXTURE.maxTokens,
-    reasoningEffort: TASK_1_PROVIDER_FIXTURE.defaultReasoningEffort,
-    reasoningEffortEnv: "DOCS_AGENT_GLM_REASONING_EFFORT",
+    model: contract.defaultModel,
+    maxTokens: contract.maxTokens,
+    reasoningEffort: contract.defaultReasoningEffort,
+    reasoningEffortEnv: contract.reasoningEffortEnv,
   };
   const body = buildApiRequestBody(backend, "prompt", true);
+  const template = readFileSync(path.resolve(testDir, "..", "docs-agent.yml"), "utf8");
+  const modelSecret = template.match(/GLM_API_KEY:\s*\$\{\{\s*secrets\.([A-Z0-9_]+)\s*\}\}/)?.[1] ?? null;
   assert.deepEqual(
     normalizeProviderFixture({
       defaultModel: body.model,
       defaultReasoningEffort: body.reasoning_effort,
-      allowedReasoningEfforts: TASK_1_PROVIDER_FIXTURE.allowedReasoningEfforts,
+      allowedReasoningEfforts: contract.allowedReasoningEfforts,
       maxTokens: body.max_tokens,
       temperature: body.temperature,
       stream: body.stream,
-      modelSecret: TASK_1_PROVIDER_FIXTURE.modelSecret,
+      modelSecret,
     }),
     normalizeProviderFixture(TASK_1_PROVIDER_FIXTURE),
   );
@@ -317,7 +391,10 @@ test("Task 1 GLM provider contract parity uses a normalized fixture", () => {
       `expected ${JSON.stringify(value)} to be rejected`,
     );
   }
-  assert.equal(validateGlmReasoningEffort(backend, true, "low"), null);
+  assert.equal(
+    validateGlmReasoningEffort(backend, true, contract.allowedReasoningEfforts[0]),
+    null,
+  );
   assert.equal(
     Object.hasOwn(
       buildApiRequestBody({ ...backend, model: "@cf/zai-org/glm-5.2" }, "prompt", true),
@@ -330,7 +407,6 @@ test("Task 1 GLM provider contract parity uses a normalized fixture", () => {
     false,
   );
 
-  const template = readFileSync(path.resolve(testDir, "..", "docs-agent.yml"), "utf8");
   assert.deepEqual(
     normalizeProviderFixture({
       sourceToken: /DOCS_AGENT_SOURCE_TOKEN:\s*\$\{\{\s*github\.token\s*\}\}/.test(template),
@@ -359,6 +435,34 @@ test("Task 1 GLM provider contract parity uses a normalized fixture", () => {
       stableHostedJob: true,
     }),
   );
+});
+test("GLM exact Cloudflare model rejects missing account and stale base before fetch", async (t) => {
+  for (const [name, accountId, expectedError] of [
+    ["missing account with stale generic base", "", /CLOUDFLARE_ACCOUNT_ID must be 32 lowercase hexadecimal characters/],
+    ["valid account with stale generic base", "00000000000000000000000000000000", /DOCS_AGENT_GLM_API_BASE must be exactly the Cloudflare account endpoint/],
+  ]) {
+    await t.test(name, () => {
+      const sandbox = setupSandbox({
+        existingContent: "# Reference\n",
+        backendOutput: fileBlock("# Reference\n\nThis output must never be reached.\n"),
+      });
+      t.after(() => sandbox.cleanup());
+      const result = sandbox.run({
+        backend: "glm",
+        backendEnv: {
+          CLOUDFLARE_ACCOUNT_ID: accountId,
+          DOCS_AGENT_GLM_API_BASE: "https://provider.example/v1",
+          DOCS_AGENT_GLM_MODEL: "@cf/zai-org/glm-5.3-flash",
+          DOCS_AGENT_GLM_REASONING_EFFORT: "high",
+          GLM_API_KEY: "test-key",
+        },
+      });
+
+      assert.notEqual(result.status, 0);
+      assert.match(result.stderr, expectedError);
+      assert.deepEqual(ghCalls(sandbox.ghLogPath), ["--version"]);
+    });
+  }
 });
 
 test("T1: byte-identical file blocks do not create branches, commits, or PRs", async (t) => {
@@ -409,6 +513,48 @@ test("T2: changed content writes the flat source, regenerates content/docs, and 
     "pr create",
   ]);
   assert.match(calls.at(-1), /--base main/);
+  const prBody = readFileSync(sandbox.prBodyPath, "utf8");
+  assert.match(
+    prBody,
+    /Drafted automatically by `docs-agent\.mjs` \(\*\*claude\*\* \(command: `.+ -p --output-format text`\)\)\./,
+  );
+});
+test("non-GitHub subprocesses receive a scrubbed child environment", (t) => {
+  const sandbox = setupSandbox({
+    existingContent: "# Reference\n",
+    backendOutput: fileBlock("# Reference\n\nUpdated behavior.\n"),
+  });
+  t.after(() => sandbox.cleanup());
+  const result = sandbox.run();
+
+  assert.equal(result.status, 0, result.stderr);
+  const forbidden = [
+    "DOCS_AGENT_SOURCE_TOKEN",
+    "GH_TOKEN",
+    "GITHUB_TOKEN",
+    "DOCS_REPO_PAT",
+    "GIT_CONFIG_COUNT",
+    "GIT_CONFIG_KEY_0",
+    "GIT_CONFIG_VALUE_0",
+    "GIT_CONFIG_PARAMETERS",
+  ];
+  const expectedAbsent = Object.fromEntries(forbidden.map((key) => [key, false]));
+  const backendEnvs = readFileSync(sandbox.backendEnvLogPath, "utf8")
+    .trim()
+    .split("\n")
+    .filter(Boolean)
+    .map((line) => JSON.parse(line));
+  assert.deepEqual(backendEnvs.map((entry) => entry.args), [["--version"], ["-p", "--output-format", "text"]]);
+  for (const entry of backendEnvs) assert.deepEqual(entry.present, expectedAbsent);
+
+  const migrationEnv = JSON.parse(readFileSync(sandbox.migrationEnvLogPath, "utf8").trim());
+  assert.deepEqual(migrationEnv.present, expectedAbsent);
+
+  const ghEnvLines = readFileSync(sandbox.ghEnvLogPath, "utf8").trim().split("\n");
+  assert.match(
+    ghEnvLines[0],
+    /^--version\|source=\|gh=\|github=\|docs=\|git_count=\|git_key=\|git_value=\|git_parameters=$/,
+  );
 });
 
 test("T3: base branch is auto-detected from the docs repo, not hardcoded to main", (t) => {
