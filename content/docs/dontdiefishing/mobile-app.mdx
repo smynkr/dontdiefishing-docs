@@ -112,9 +112,14 @@ community observations, not official forecasts.
 The detail page also loads **Fishing regulations** for the site's region and
 state when references are available. A regulation card can show the species,
 open/closing-soon/closed status, limits, size rules, applicability notes, and
-an **Official rules** link. Reference-only schedules tell you that the current
-season status still needs verification. Regulation data is a reference, not
-permission to fish or retain a catch; verify the applicable official rules.
+an **Official rules** link. When the species has a verified field guide, the
+card also shows a **Field guide · Verified** block: an **Identify** section
+followed by any available deep-guide sections labeled **Look-alikes**,
+**Where**, **When**, **Technique**, **Handle**, **Conservation**, and **Rules**,
+with the guide's cited sources listed underneath. Reference-only schedules tell
+you that the current season status still needs verification. Regulation data is
+a reference, not permission to fish or retain a catch; verify the applicable
+official rules.
 
 ## Trips
 
@@ -144,6 +149,13 @@ and shows the current point count. Stopping uploads and finalizes the session;
 when the upload succeeds, the app reports how many points were recorded and
 says the replay is available in the web app under **Recent tracks**. If an
 upload fails, points remain on the device and retry on the next app launch.
+
+<Callout type="warn">
+  Track recording keeps GPS points on your device while a recording is in
+  progress and after a crash, until an upload succeeds. These on-device track
+  buffers currently have no automatic expiry, and signing out does not delete
+  recorded track data.
+</Callout>
 
 ## Settings
 
