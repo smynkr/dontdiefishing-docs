@@ -81,7 +81,13 @@ Select **LOG A CATCH HERE** in the conditions panel to open the logbook. Record 
 
 ## GPX export
 
-GPX export is **disabled** in the product. The replay surface shows an unavailable **EXPORT GPX** control; it cannot start a download.
+Finalized tracks can be exported as GPX 1.1. Select **EXPORT GPX** in the conditions panel to download a `.gpx` file named `ddf-track-<date>-<id>.gpx`.
+
+- Only **finalized** tracks can be exported. A track that is still recording shows **FINALIZE TO EXPORT** until the session is stopped and saved.
+- While the export runs, the control shows **EXPORTING…**; a status line then reports **GPX READY** or **GPX EXPORT FAILED** so you can retry a failed download.
+- Exports are capped at the 20,000-point session limit.
+- The track schema stores no elevation, so the GPX output contains no `<ele>` values; recorded speed over ground is emitted as a DontDieFishing GPX extension in knots.
+- GeoJSON export is not offered.
 
 <Cards>
   <Card title="Logbook" icon="book-open" href="/dontdiefishing/logbook">
