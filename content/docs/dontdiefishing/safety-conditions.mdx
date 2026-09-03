@@ -117,12 +117,39 @@ and may have changed. A marine warning does **not** automatically veto every
 score: only the warning phrases listed in the hard-veto rules do. Check current
 official NWS guidance before departure.
 
+## Trusted verdict card
+
+The dashboard, the Sites detail view, and the public conditions pages lead with
+a single decision surface: the trusted verdict card. It combines the planning
+score and status, the top contributing signals, the freshness of the underlying
+snapshot, the source families behind the reading (NOAA, NWS, EPA), a confidence
+label, and a suggested next action.
+
+- **Freshness** is classified as **FRESH** (15 minutes or newer), **AGING**
+  (16–30 minutes), **STALE** (older than 30 minutes), or **NO DATA**.
+- **Confidence** describes signal completeness — how many of the scored
+  signals were available. It is a data-completeness label, not a probability
+  that the verdict is correct.
+- The **next action** suggests **RECHECK**, **VERIFY**, or **RETRY** based on
+  freshness and any refresh error.
+- A failed conditions refresh keeps the last labeled result visible and shows
+  a **RETRY** control rather than presenting the failure as a fresh verdict.
+
+Public conditions pages always score against a fixed reference profile, labeled
+**PUBLIC REFERENCE · MODERATE POWERBOAT**. They never imply that a visitor's
+own vessel was detected. Signed-in users see scores for the vessel selected in
+the header; switching vessels refreshes the dashboard and Sites scores for that
+vessel. An explicitly selected vessel is resolved only within your own account
+— it never silently falls back to your default vessel.
+
 ## Freshness and unknown values
 
 The web conditions endpoint reuses a cached snapshot only when it is less than
-30 minutes old. Without a fresh snapshot it calls the aggregator. If that
-aggregate-level fetch fails, the endpoint returns an error instead of a score
-from an unknown fetch.
+30 minutes old. Without a fresh snapshot it calls the aggregator. The snapshot
+timestamp is also validated locally: a missing, malformed, or future
+`fetched_at` fails closed to a **NO DATA** freshness classification, and no
+planning score is presented for that reading. If the aggregate-level fetch
+fails, the endpoint returns an error instead of a score from an unknown fetch.
 
 Individual source fetchers degrade independently: the alerts fetcher returns an
 empty alert list, while the forecast fetcher returns `lightning_risk: "none"`

@@ -167,12 +167,18 @@ is not a guarantee that a trip is safe, and GO is not an authorization to launch
 ## Freshness, missing data, and degraded fetches
 
 The web conditions endpoint reuses a cached snapshot only when it is less than
-30 minutes old. Without a fresh snapshot it calls the aggregator. The NWS
-fetchers currently degrade independently when a request fails: the alerts
-fetcher returns an empty alert list, while the forecast fetcher returns
-`lightning_risk: "none"` and `null` values for the forecast measurements it
-could not obtain. The aggregator passes those fallback values to the scorer
-without an error marker.
+30 minutes old. Without a fresh snapshot it calls the aggregator. The snapshot
+timestamp is validated locally as well: a missing, malformed, or future
+`fetched_at` fails closed to a **NO DATA** freshness classification, and the
+endpoint returns no score for that reading instead of running the scorer on an
+untrusted snapshot. Decision surfaces classify each snapshot as **FRESH**
+(15 minutes or newer), **AGING** (16–30 minutes), **STALE**, or **NO DATA**,
+and label confidence as signal completeness — how many scored signals were
+available — never as a probability. The NWS fetchers currently degrade
+independently when a request fails: the alerts fetcher returns an empty alert
+list, while the forecast fetcher returns `lightning_risk: "none"` and `null`
+values for the forecast measurements it could not obtain. The aggregator passes
+those fallback values to the scorer without an error marker.
 
 That behavior is fail-open, not fail-closed. An empty alert list cannot trigger
 an alert veto, and the fallback lightning value maps to zero modeled risk.
