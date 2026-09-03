@@ -32,6 +32,9 @@ Dashboard loads your saved launch sites and fetches a batch of conditions for
 those sites. Each saved-site card can include:
 
 - the site name and region (or site type),
+- a freshness line showing how old the conditions snapshot is (for example,
+**FRESH · 5 MIN AGO**), or **FRESHNESS UNAVAILABLE** when the snapshot time
+cannot be classified,
 - the current risk score and **GO**, **CAUTION**, or **NO-GO** status,
 - wind, waves, air temperature, visibility, rain probability, and water
 temperature, and
@@ -91,6 +94,9 @@ offline catalog cache.
 Site detail refreshes the selected launch site's conditions and includes:
 
 - the current **Risk Score**, status, and any veto reason,
+- a freshness line showing how old the conditions snapshot is (for example,
+**FRESH · 5 MIN AGO**), or **FRESHNESS UNAVAILABLE** when the snapshot time
+cannot be classified,
 - wind, waves, visibility, water temperature, tide, rain probability, and
   sunrise/sunset when available,
 - a **Signal Breakdown** with each available signal's raw value, normalized
@@ -101,8 +107,13 @@ Site detail refreshes the selected launch site's conditions and includes:
 
 **Community Reports** lets a signed-in user share an observation when it is safe
 to do so. Choose a rating, then optionally describe wind, waves, visibility, and
-other notes. The page lists recent reports from the last 24 hours. These are
-community observations, not official forecasts.
+other notes. The page lists recent reports whose timestamps still fall inside
+the trust window; the window is measured against the server's clock, not your
+device clock, and reports that age out of it are hidden.
+
+Each report's byline shows how long ago it was posted together with a trust
+label (for example, `3h ago · UNVERIFIED · AGING`) so you can see how the
+observation is aging. These are community observations, not official forecasts.
 
 ### Fishing regulations
 
