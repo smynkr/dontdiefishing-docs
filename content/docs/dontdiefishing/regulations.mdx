@@ -6,7 +6,7 @@ description: Browse cited saltwater fishing regulation references, season
 
 import { MapPin, ShieldCheck } from 'lucide-react';
 
-The **/regulations** catalog is a reference view for selected saltwater recreational fishing rules. It normalizes cited source rows so you can compare season windows, status, and limits without replacing the rules published by the relevant authority.
+The **/regulations** catalog is a reference view for selected saltwater recreational fishing rules. It normalizes cited source rows so you can compare season windows, status, and limits without replacing the rules published by the relevant authority. `/regulations` itself is a by-state index: each jurisdiction opens its own catalog page, so no state's listing is presented at the hub URL.
 
 <Callout type="warn">
   This catalog is reference information, not permission to fish or retain a catch. Rules can vary by location, method, vessel, species identification, and emergency closure. Verify the applicable official rules before you go.
@@ -48,7 +48,7 @@ Each state view also links to its configured source and shows the source's updat
 
 Select a jurisdiction, then review one row per listed species. The table provides:
 
-- **Listed season windows** — a month-by-month view of the normalized schedule.
+- **Listed season windows** — a month-by-month view of the normalized schedule. When a scheduled rule's season windows are not machine-readable, the month grid is replaced by a **WINDOWS UNVERIFIED · SEE NOTES** strip that points you to the listing's notes and cited source instead of rendering empty months. Year-round and closed rules always render their classified month grid.
 - **Bag** — for an **OPEN** or **CLOSING SOON** row, the catalog first shows the rule's `possession_limit` when present; otherwise it shows the active season window's `bag_limit`.
 - **Min size** — the listed minimum size in inches.
 - **Listing** — the current status badge described below.
