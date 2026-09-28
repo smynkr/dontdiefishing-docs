@@ -48,5 +48,21 @@ memory surfaces with `npm run memory:generate`; never hand-edit
 
 ## Linux CI runner
 
-Existing Linux GitHub Actions jobs use the runner selector `[self-hosted, axiom-cloudflare-ubuntu-2404]`. They require an isolated Cloudflare Ubuntu 24.04 runner to be provisioned, registered with both labels, and online. Repository workflows do not provision the runner.
+Existing Linux GitHub Actions jobs use the runner selector
+`[self-hosted, axiom-cloudflare-ubuntu-2404]`. They require an isolated, ephemeral
+one-job Cloudflare microVM running Ubuntu 24.04 amd64, with the Docker daemon
+inside the VM and Actions runner 2.337.0. Register it with both labels and keep
+it online; do not use a persistent/shared runner.
+
+The image must provide `git`, `gh`, and Python 3.12. `node pipeline/recap.mjs`
+calls `gh api search/issues` using the workflow's existing `DOCS_AGENT_PAT` as
+`GH_TOKEN` for app-repository reads, then runs
+`node _migration/tools/run-migration.mjs` and `npm run memory:generate`
+(which invokes `python3`; recap does not set up Python). Both jobs install
+Node 22/npm with `actions/setup-node@v4` (this package requires Node >=22.18);
+`harness-memory` installs Python 3.12 with `actions/setup-python@v5`. The
+recap job's conditional `npm ci` needs npm-registry access. GitHub Actions
+downloads, GitHub API/repository access, and the existing token-backed
+checkout/write path must work. These workflows do not provision the runner or
+credentials.
 
