@@ -801,8 +801,28 @@ function redactApiKeys(value, backend) {
 
 const API_SERVING = new Map();
 const QUOTA_SIGNAL = /\b(1113|1308|1310)\b|insufficient balance|usage limit|quota/i;
-// An explicit provider error object in the SSE body (not JSON-escaped model text).
-const STREAM_ERROR_OBJECT = /(?<!\\)"error"\s*:\s*\{/;
+const TRANSIENT_PROVIDER_SIGNAL = /\b(timeout|timed out|overloaded|unavailable|internal server error|server error|rate limit)\b/i;
+
+// Classify explicit provider error objects carried in SSE `data:` events. Only
+// the parsed error object is inspected, never model content or reasoning text.
+// Returns null when the stream carries no error object.
+export function classifySseProviderError(sseText) {
+  for (const line of String(sseText).split(/\r?\n/)) {
+    const m = /^data:\s*(\{.*\})\s*$/.exec(line);
+    if (!m) continue;
+    let event;
+    try { event = JSON.parse(m[1]); } catch { continue; }
+    const error = event && typeof event === "object" ? event.error : null;
+    if (!error || typeof error !== "object") continue;
+    const body = JSON.stringify(error);
+    const status = Number(error.status ?? error.http_status ?? error.code);
+    if (Number.isInteger(status) && status >= 400 && status <= 599) {
+      return { fallbackEligible: isFallbackEligibleStatus(status, body) };
+    }
+    return { fallbackEligible: QUOTA_SIGNAL.test(body) || TRANSIENT_PROVIDER_SIGNAL.test(body) };
+  }
+  return null;
+}
 
 export function isFallbackEligibleStatus(status, body) {
   // Auth, timeout, rate-limit and 5xx are transient/host-specific. Other 4xx
@@ -847,6 +867,9 @@ async function requestApiBackend(backendName, backend, prompt, timeoutMs, deadli
       stderr: `API backend "${backendName}" exhausted its ${timeoutMs}ms timeout budget`,
       timedOut: true, fallbackEligible: true,
     });
+    try { new URL(backend.apiBase); } catch {
+      return { code: -1, signal: null, stdout: "", stderr: `API backend "${backendName}" has an invalid API base`, timedOut: false, fallbackEligible: false };
+    }
     for (let attempt = 0; attempt < requestAttempts; attempt += 1) {
       const remainingTimeoutMs = deadline - Date.now();
       if (remainingTimeoutMs <= 0) return timeoutResult();
@@ -900,7 +923,7 @@ async function requestApiBackend(backendName, backend, prompt, timeoutMs, deadli
           stderr: "stream ended without finish_reason or [DONE] — the provider closed early, so the response is truncated. Retry the run; if this persists, check the aggregator.",
           // An explicit provider error object is a request failure, not a
           // dropped stream; only a quota error of that kind may fall back.
-          timedOut: false, fallbackEligible: !STREAM_ERROR_OBJECT.test(sseText) || QUOTA_SIGNAL.test(sseText),
+          timedOut: false, fallbackEligible: classifySseProviderError(sseText)?.fallbackEligible ?? true,
         };
       }
 
@@ -925,10 +948,11 @@ async function requestApiBackend(backendName, backend, prompt, timeoutMs, deadli
           timedOut: false,
         };
       }
-      // Only a payload with neither content nor reasoning is a provider error;
-      // reasoning that merely mentions "quota" is not a quota failure.
-      if (!content && reasoningChars === 0 && QUOTA_SIGNAL.test(sseText)) {
-        return { code: -1, signal: null, stdout: "", stderr: "provider quota or usage limit", timedOut: false, fallbackEligible: true };
+      // Only an explicit provider error object (never content or reasoning
+      // text) can make an empty stream fallback-eligible.
+      const sseProviderError = !content && reasoningChars === 0 ? classifySseProviderError(sseText) : null;
+      if (sseProviderError) {
+        return { code: -1, signal: null, stdout: "", stderr: "provider error event in stream", timedOut: false, fallbackEligible: sseProviderError.fallbackEligible };
       }
       if (!content && reasoningChars > 0) {
         return {
