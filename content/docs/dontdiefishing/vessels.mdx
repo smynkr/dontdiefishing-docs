@@ -1,0 +1,82 @@
+---
+title: Vessels
+description: Manage your boats — photos, notes, maintenance logs, and document
+  lockers in DontDieFishing settings.
+---
+
+import { Compass, ShieldCheck } from 'lucide-react';
+
+Manage your boats — photos, notes, maintenance logs, and document lockers in
+DontDieFishing settings.
+
+## Your vessel list
+
+Open **Settings → Vessels** to see every boat in your account. Each vessel
+shows its name, type, length, and scoring profile. The default vessel is
+marked and listed first.
+
+From the vessel list you can:
+
+- **Add** a new vessel with its name, type, length, and scoring profile
+- **Edit** an existing vessel's details
+- **Set a default** vessel for scoring and trip planning
+- **Delete** a vessel and all its associated data
+
+Tap **Collection** on any vessel to expand its collection panel — photo,
+notes, maintenance log, and document locker.
+
+## Boat photo
+
+Add a photo to identify your vessel at a glance. Thumbnails appear on the
+vessel list next to each vessel's name.
+
+- **Add or replace** — upload a JPEG, PNG, WebP, or HEIC image up to 10 MB
+- **Remove** — deletes the photo from private storage
+
+<Callout type="info">
+  Photos are stored in private, owner-scoped storage and served via
+  short-lived signed URLs — never public object links.
+</Callout>
+
+## Notes
+
+Free-form notes per vessel for the details that matter on the water:
+electronics, quirks, rigging, what to bring. Up to 4,000 characters.
+
+## Maintenance log
+
+Track service and repair history per vessel. Each entry records:
+
+- **Kind** — service, repair, inspection, upgrade, or other
+- **Title** — short description (up to 120 characters)
+- **Date** — when the work was performed
+- **Cost** — optional, in dollars
+- **Notes** — optional details (up to 2,000 characters)
+
+Entries can be added or deleted from the log.
+
+## Document locker
+
+Store reference files per vessel — guides, blueprints, registration,
+plans, and more.
+
+- Up to **20 files** per vessel
+- Up to **20 MB** per file
+- Accepted types: PDF, Word, Excel, PNG, JPEG, WebP
+- Files open in a new tab via a short-lived signed URL
+- Delete removes both the file and its metadata
+
+<Callout type="warn">
+  Documents are stored in private, owner-scoped storage. Only you can
+  access your vessel files — there are no public object URLs.
+</Callout>
+
+<Cards>
+  <Card icon={<Compass />} title="Getting started" href="/dontdiefishing/getting-started">
+    Install, set your location, and find your first safe spot.
+  </Card>
+
+  <Card icon={<ShieldCheck />} title="Safety & conditions" href="/dontdiefishing/safety-conditions">
+    Data sources, hazard categories, and limitations.
+  </Card>
+</Cards>
