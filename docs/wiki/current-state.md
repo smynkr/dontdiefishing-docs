@@ -1,10 +1,10 @@
 ---
 title: Current state
 category: current-state
-updated: 2026-08-11
+updated: 2026-10-09
 summary: Current repository-owned topology and content boundary
 nav_order: 20
-sources: ["README.md", "package.json", "next.config.mjs", "docs.json", "_migration/tools/lib/shared.mjs", "app/(home)/page.tsx", "dontdiefishing/index.mdx"]
+sources: ["README.md", "package.json", "next.config.mjs", "docs.json", "_migration/tools/lib/shared.mjs", "app/(home)/page.tsx", "dontdiefishing/index.mdx", "dontdiefishing/getting-started.mdx", "dontdiefishing/finding-spots.mdx", "dontdiefishing/safety-conditions.mdx", "dontdiefishing/mobile-app.mdx", "dontdiefishing/fishable-days.mdx", "dontdiefishing/how-scoring-works.mdx", "dontdiefishing/account-billing.mdx", "dontdiefishing/regulations.mdx", "dontdiefishing/alerts.mdx", "dontdiefishing/trips-and-safety.mdx", "dontdiefishing/logbook.mdx", "dontdiefishing/tracks.mdx", "dontdiefishing/faq.mdx"]
 ---
 
 # Current state
@@ -30,9 +30,10 @@ Deep pages render source-tree-derived related-guide wayfinding
 Contract tests assert navigation parity, per-page metadata, and unique
 product accents (`npm run test:links`).
 
-The docs-agent automation lives in the DontDieFishing product repo
-(`MenuMakeover`): merged PRs draft MDX against `dontdiefishing/**` and open draft
-PRs into this repository (see `pipeline/docs-agent.yml`).
+The audited product source is `smynkr/dontdiefishing`, not MenuMakeover.
+Source-linked guides distinguish implemented capability from deployed services,
+native release availability, and device validation. A repository workflow or
+notification transport does not establish successful live delivery.
 
 Re-establish repository facts with:
 
@@ -44,6 +45,30 @@ npm run types:check
 npm run build
 npm run memory:check
 ```
+
+## Source-audited documentation contract
+
+The product guides cover vessel-specific launch-site planning, source freshness
+and missing-data limits, conditional scoring, Fishable Days, regulations, alerts,
+float plans/check-ins, account/billing, logbook, and tracks. The native-app guide
+separates its implemented tabs and GPS permissions from unverified public release
+and device-delivery evidence.
+
+Recorded GPS tracks and their points are owner-scoped; other accounts cannot
+read them. The FAQ documents this boundary.
+Saved/custom launch-site records are
+also owner-scoped, but a float-plan capability link separately exposes site
+details and plan fields to anyone holding it; the FAQ and Finding spots guide
+distinguish that link from public-catalog visibility.
+
+NWS grid wave values are forecasts, not buoy observations. A missing buoy
+reading does not mean seas are calm.
+
+Forecasts, status colors, conditional scores, automated regulation checks, and
+check-in notifications are not safety, legal-compliance, or rescue guarantees.
+Blocked authority fetches remain fail-closed; users must check the cited authority
+directly rather than infer freshness from successful web or map loading.
+
 
 ## Related
 

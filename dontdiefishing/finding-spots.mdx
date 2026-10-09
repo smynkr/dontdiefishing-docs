@@ -1,68 +1,90 @@
 ---
 title: "Finding spots"
-description: "How to search, filter, and evaluate fishing spots in DontDieFishing."
+description: "Browse curated launch sites by region, save sites, add a private launch point, and review conditions, forecasts, tides, reports, and rules."
 ---
 
-How to search, filter, and evaluate fishing spots in DontDieFishing.
+The signed-in web app calls its catalog **Launch Sites**. It contains curated
+launch sites, not a crowdsourced index of every fishing spot. Choose a region,
+compare its sites on the map and in the site rail, and open a detail to review
+available information.
 
-## Search and filters
+## Browse the web catalog
 
-Use the search bar or filter panel to narrow spots:
+The region sidebar groups the catalog; choosing a region frames the map on that
+region, and selecting a site opens its detail inline. A site detail can show:
 
-- **Species** — bass, trout, catfish, salmon, panfish, surf species, etc.
-- **Water type** — river, lake, pond, pier, jetty, surf, creek
-- **Distance** — radius from your location (1–200 miles)
-- **Safety status** — show only green (safe) spots, or include yellow
-- **Access** — boat launch, shore access, wheelchair-accessible, walk-in only
+- the site name, type, region, and vessel-specific current-condition verdict;
+- signal values, freshness, and available-data confidence;
+- an NWS weather forecast, where available;
+- tide/daylight context for configured station and site data;
+- cited fishing-regulation references for a supported jurisdiction;
+- **PLAN TRIP**, **NAVIGATE** (opens the destination in an external map service),
+  and **SAVE** / **SAVED** controls; and
+- recent community reports, when available.
 
-## Spot detail
+Status-colored markers and site-rail counts reflect available conditions data;
+a missing score is not a favorable status. The site detail is not a navigation
+chart or a route-planning service.
 
-Every spot page shows:
+## Location and map layers
 
-### Conditions panel
+Web browsing does not request browser geolocation. The web app's security policy
+disables browser geolocation; the map uses the selected region's configured
+center and zoom, not your device location. If you want a different area, choose
+another region or manually place a custom site (below). There is no browser
+permission prompt or GPS-based "near me" fallback for this map.
 
-- Water level and trend (rising / falling / stable)
-- Flow rate (cfs) for rivers and streams
-- Water temperature
-- Visibility / clarity
-- Last updated timestamp
+The web map can expose weather-radar replay and optional depth and marine
+protected-area overlays when the source and feature are available. A layer is
+context only: radar or overlay failure does not establish that a site is safe,
+and the map is not a nautical chart, navigation tool, or substitute for an
+official chart or warning.
 
-### Weather panel
+## Saved and custom sites: what is private
 
-- Current conditions and 24-hour forecast
-- Wind speed and direction
-- Lightning risk index
-- Precipitation probability
+Saving a curated site adds it to your account's saved list; it does not publish
+your location or change the public catalog. The web map also supports **Pin**
+mode: click an empty map point, give it a name, select a type (boat ramp, marina,
+beach, or dock), and optionally choose a covered U.S. state. A custom site is an
+owner-scoped, non-curated launch-site record and is automatically saved to the
+creating account. That record is not a public catalog submission, and other
+users cannot browse it. A float-plan link for a trip at that site is a separate
+capability: it shares the launch-site details and plan details with anyone
+holding the link. Do not post the link publicly; revoke it when no longer
+needed. See [Trip plans and safety](/dontdiefishing/trips-and-safety). The
+current creation limit is 50 saved sites per account, including custom sites.
 
-### Hazard warnings
+A custom site's chosen state controls whether supported regulation references
+can appear. Leaving the state unset is appropriate for an offshore or
+non-U.S. location, but it does not create a jurisdiction-specific rules check.
 
-- Active warnings (flood stage, strong current, debris, algae bloom)
-- Seasonal closures (spawning season, dam operations)
-- Community-reported hazards with timestamps
+## Mobile Sites and its optional map
 
-### Species and access
+The mobile **Sites** tab browses by region and can save curated sites. Its Map
+button appears only in builds where the phase-one map feature is enabled. The
+map plots curated and saved sites, colors a marker only when a batch score is
+available, and opens a site's detail when selected. Its background is
+network-free, but the site list and scores still require data; it is not an
+offline site database, chart, or navigation instrument. The mobile site map
+also does not request phone location.
 
-- Fish species commonly caught at this spot
-- Best seasons and times of day
-- Access notes: parking, walk-in distance, boat launch, fees
+## Reports, species, and regulations
 
-## Community reports
+A signed-in user can submit a site-detail **Community Report** with a 1–5
+condition rating and optional notes about wind, waves, or visibility. The
+recent list is for that site and covers the last 24 hours. Reports are
+attributed observations, not verified sensor readings, an official forecast,
+or an emergency channel.
 
-Signed-in users can submit condition reports:
+The separate public **Regulations** catalog provides selected saltwater
+references, species search, status filters, and cited source links. Some species
+pages include sourced field-guide details; those are educational references,
+not a species identification guarantee, legal size limit, or gear
+recommendation. Check the current official rule and any local closure before
+fishing or retaining a catch. **VERIFY** means the app cannot establish the
+current status; it does not mean open.
 
-- Water clarity and level observations
-- Fish activity (biting, surface activity)
-- Hazard sightings (debris, erosion, dangerous access)
-- Access issues (locked gates, construction, flooding)
-
-Reports are timestamped and attributed. Community reports supplement — but do
-not replace — official data sources.
-
-<Cards>
-  <Card title="Get started" icon="compass" href="/dontdiefishing/getting-started">
-    Download DontDieFishing, set your location, and find your first safe spot.
-  </Card>
-  <Card title="Safety & conditions" icon="shield-check" href="/dontdiefishing/safety-conditions">
-    Data sources, hazard categories, and the limitations of the safety information.
-  </Card>
-</Cards>
+See [Safety & conditions](/dontdiefishing/safety-conditions),
+[Fishable Days](/dontdiefishing/fishable-days),
+[Fishing regulations](/dontdiefishing/regulations), and
+[Getting started](/dontdiefishing/getting-started).

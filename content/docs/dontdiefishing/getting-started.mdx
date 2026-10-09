@@ -1,129 +1,105 @@
 ---
 title: Getting started
-description: Create an account, configure your vessel and safety profile, save a
-  launch site, and plan a trip you can verify before launch.
+description: Create an account, configure a vessel profile, browse or save a
+  launch site, and plan a trip you can recheck before departure.
 ---
 
-import { CalendarClock, ShieldCheck, Ship } from 'lucide-react';
-
-DontDieFishing is built around launch sites and boat planning. Follow this
-sequence: create an account, configure the vessel profile that sets your safety
-thresholds, save a launch site, evaluate its risk score, plan a trip, and
-verify the latest conditions before launch.
+Use the web app to configure the craft you plan to use, browse Launch Sites,
+review available conditions, and keep a trip plan ready for another check before
+you go.
 
 <Callout type="warn">
-  A score is decision support, not a guarantee of safety. Conditions can change
-  faster than the app refreshes, and community reports are observations rather
-  than official forecasts. Assess conditions in person before entering the
-  water.
+  A planning score is not a guarantee of safety or permission to launch.
+  Forecasts are uncertain, condition sources can be incomplete, and the app does
+  not replace official warnings, local closures, or your own assessment.
 </Callout>
 
-## 1. Create your account
+## 1. Create an account
 
-Open DontDieFishing and choose **Sign up**. You can use an email and password,
-or continue with Google or Apple. Sign in to an existing account when you
-return.
+Choose **Sign up** to register with email and password. Google sign-in is
+available; Apple sign-in is shown only when the web provider is configured as
+available. Email confirmation may be required. Protected app pages require an
+authenticated session.
 
-After authentication, complete onboarding. The final step saves your vessel
-type and scoring profile to your account and takes you to the Dashboard.
+## 2. Configure a vessel profile
 
-## 2. Configure your vessel and safety profile
+Onboarding asks for a vessel type and scoring profile. Available vessel types
+are **Power**, **Sail**, **Kayak**, and **Paddle**; profiles are **Cautious**,
+**Moderate**, and **Experienced**. These choices set starting thresholds and
+weights. Add or edit profiles in **Settings**, choose a default, and configure
+custom thresholds or weights if needed.
 
-Onboarding asks two questions:
+If a conditions panel says a vessel profile is required, add one in Settings and
+retry. A score is personalized only to the vessel shown with that result.
 
-- **Vessel type** — choose **Power**, **Sail**, **Kayak**, or **Paddle**. This
-  creates the starting thresholds used to evaluate conditions.
-- **Experience** — choose **Cautious**, **Moderate**, or **Experienced**. This
-  controls how aggressively conditions are scored; you can fine-tune the
-  thresholds later.
+## 3. Choose and save a launch site
 
-To add or refine a profile after onboarding, open **Settings** and add a
-**Vessel Profile**. Give it a name, choose its type, optionally enter its
-length, and select a scoring profile. Mark one vessel as the default when you
-keep more than one profile.
+1. Open **Launch Sites** and choose a region.
+2. Compare the curated sites in its map and site rail.
+3. Open a site to review available details; select **SAVE** to add it to your
+   account, or **PLAN TRIP** to start a plan.
+4. Use **NAVIGATE** to open the destination in an external map service.
 
-## 3. Save a launch site
+The web map is region-based and does not request browser geolocation. Change
+regions to browse elsewhere. You can also use web-map **Pin** mode to add a
+custom, owner-scoped launch site; it is saved to your account and is not a
+public submission. See [Finding spots](/dontdiefishing/finding-spots).
 
-1. Open **Launch Sites**.
-2. Choose a region and browse the available launch sites.
-3. Select the bookmark control on a site to save it to your account.
+## 4. Check current conditions
 
-Saved sites appear on **Dashboard**, where the app loads their current
-conditions. If you have not saved a site yet, Dashboard shows a curated list
-until you add one.
+Open a site detail or Dashboard and review the selected vessel, status, score,
+condition age, available-signal count, and evidence. A missing score, unavailable
+source, or stale label means you should verify conditions directly; it is not a
+favorable result. A **GO** score is not authorization to launch.
 
-## 4. Evaluate the risk score
-
-Use Dashboard to compare your saved sites. Each site card can show a composite
-risk score, a status, current conditions, and an hour-by-hour risk proxy. The
-status uses three outcomes:
-
-- **GO** — the current score is inside the selected vessel's thresholds.
-- **CAUTION** — conditions are approaching those thresholds.
-- **NO-GO** — conditions are outside the thresholds.
-
-Lower scores represent lower risk in the planning model. Open a site to inspect
-the signal breakdown and the measurements behind the score. If the score is
-missing, check that a vessel profile exists and retry the conditions request.
+Tide and daylight/solunar information are contextual planning details, not a
+substitute for current observations. Follow official NWS, NOAA, and other cited
+authority links where shown.
 
 ## 5. Plan the trip
 
-Open **Trip Plans** and choose **Plan a Trip**. Select:
+Open **Trips** and choose **Plan a Trip**. Select a launch site, vessel profile,
+date, and optional departure time. Review the readiness preview and create the
+plan. Reopen it as departure approaches to check the latest result, forecast
+availability, and your selected vessel's limits.
 
-- a saved launch site,
-- the vessel profile for this trip,
-- a date, and
-- an optional departure time.
+A planned date does not guarantee a forecast will be available. Missing forecast
+intervals remain unavailable rather than borrowing another day's score.
 
-The trip appears in your trip list and in the Dashboard's next-trip panel.
-Dashboard compares the planned trip with the vessel limits and keeps the trip
-available for a fresh check as the departure approaches.
+## 6. Verify before departure
 
-## 6. Verify before launch
+Before leaving, check current official weather and marine warnings, relevant
+closures and regulations, and conditions at the site. The regulation catalog is
+a selected reference subset; read the cited authority's current rule and
+emergency order. A float-plan link is informational, not a distress service or
+confirmation that someone is monitoring the trip.
 
-Before leaving, open the planned trip and re-check the current risk score,
-conditions, and the change against your vessel limits. Review the site detail
-for the available signal breakdown, community observations, and fishing
-regulations. Forecast-based results are not a substitute for a final
-in-person check or for the applicable official rules.
+## Location and mobile release status
 
-## App navigation
+Browsing launch sites and maps does not require device location access. The
+mobile Sites map also uses site/catalog data rather than GPS. When starting a
+mobile GPS track, foreground permission is required; background permission is
+optional, so foreground-only recording can continue if background access is
+declined. If foreground permission is denied, recording cannot start. See
+[GPS tracks](/dontdiefishing/tracks).
 
-The web app sidebar uses these product labels:
-
-| Label                     | Use it for                                        |
-| ------------------------- | ------------------------------------------------- |
-| **Dashboard**             | Review saved-site conditions and the next trip.   |
-| **Launch Sites**          | Browse and save launch sites.                     |
-| **Trip Plans**            | Create and monitor planned trips.                 |
-| **Fishable Days** **PRO** | Compare the forecast calendar for your vessel.    |
-| **Regulations**           | Review fishing-regulation references.             |
-| **Logbook**               | Record trip notes and catches.                    |
-| **Settings**              | Manage your account, vessel profiles, and alerts. |
+The source release record says there is no public App Store or Google Play build
+yet. Mobile pages describe features present in repository code, not a verified
+store release or physical-device availability. See [Mobile app](/dontdiefishing/mobile-app).
 
 <ProcessFlow
   accent="#1A3A5C"
-  caption="A safety-first planning loop: configure the vessel, choose the launch site, score the conditions, plan the trip, and verify before launch."
+  caption="Configure the vessel, choose a launch site, review the evidence, plan, then verify current official conditions before departure."
   steps={[
-  { title: "Create an account", description: "Sign up with email, Google, or Apple, then complete onboarding." },
-  { title: "Configure your profile", description: "Choose a vessel type and scoring profile; manage additional vessels in Settings." },
-  { title: "Save a launch site", description: "Browse Launch Sites by region and bookmark the sites you use." },
-  { title: "Evaluate the risk score", description: "Compare GO, CAUTION, and NO-GO status against your vessel thresholds." },
-  { title: "Plan the trip", description: "Choose a launch site, vessel, date, and optional departure time in Trip Plans." },
-  { title: "Verify before launch", description: "Re-check current conditions, reports, regulations, and the latest score." },
+  { title: "Create an account", description: "Sign up with email and password, or use an available Google or Apple sign-in option." },
+  { title: "Configure a vessel", description: "Choose a vessel type and scoring profile; refine thresholds in Settings if needed." },
+  { title: "Choose a launch site", description: "Browse by region, open a site, and save the places you use." },
+  { title: "Review conditions", description: "Check the vessel-specific score, freshness, available signals, and source links." },
+  { title: "Plan the trip", description: "Select a site, vessel, date, and optional departure time." },
+  { title: "Verify before departure", description: "Recheck current official warnings, closures, rules, and on-site conditions." },
 ]}
 />
 
-<Cards>
-  <Card icon={<Ship />} title="Mobile app" href="/dontdiefishing/mobile-app">
-    Preview/TestFlight only: use Dashboard, Sites, Trips, and Settings in the iOS preview; public App Store and Google Play releases are still pending.
-  </Card>
-
-  <Card icon={<CalendarClock />} title="Fishable Days" href="/dontdiefishing/fishable-days">
-    Compare vessel-specific forecast windows and planned-trip days.
-  </Card>
-
-  <Card icon={<ShieldCheck />} title="Safety & conditions" href="/dontdiefishing/safety-conditions">
-    Understand the data, statuses, and limitations behind each score.
-  </Card>
-</Cards>
+See [Safety & conditions](/dontdiefishing/safety-conditions),
+[Trip plans and safety](/dontdiefishing/trips-and-safety), and
+[Fishable Days](/dontdiefishing/fishable-days).

@@ -1,167 +1,137 @@
 ---
 title: "FAQ & troubleshooting"
-description: "Common questions and fixes for DontDieFishing."
+description: "Answers about DontDieFishing accounts, launch sites, conditions, forecasts, regulations, location permissions, alerts, and tracks."
 ---
 
-Common questions and fixes for DontDieFishing.
+Common questions about the DontDieFishing web app and mobile functionality
+present in source code.
 
-## General
+## Plans and accounts
 
 ### Is DontDieFishing free?
 
-Core features — spot browsing, conditions, and hazard warnings — are free.
-The current Pro card lists:
-
-- A full 7-day fishable calendar
-- Week-ahead comparison across saved sites
-- The next-GO day surfaced automatically
-
-The current Pro card does **not** list offline maps, extended forecasts, or
-unlimited saved spots as Pro perks.
-
-### Where does the data come from?
-
-See [Safety & conditions](/dontdiefishing/safety-conditions) for the full
-data-source table. Primary sources include USGS, NOAA, and NWS services.
-
-### Is my location shared with other users?
-
-When GPS track recording is enabled, the mobile app records location points and
-uploads them in batches to your account before the track is finalized. Tracks
-and their points are owner-scoped, so other users cannot read your position.
-
-## Authentication
+The current source lists Free access to core launch-site, condition, and trip
+screens. Pro adds a seven-day Fishable Days response, week-ahead comparison, and
+a next-GO-day summary. The app currently lists $4.99/month or $39.99/year; the
+current checkout display is authoritative and can change.
 
 ### How do I create an account?
 
-On the web, select **Sign up** and enter an email address and password, or
-continue with Google or Apple. Email sign-up sends you to the sign-in page
-with a reminder to check your email and confirm the account.
+Use **Sign up** with email and password or an available provider. Google is
+available; Apple sign-in is shown only when its provider is configured. Email
+confirmation may be required before the first sign-in. Protected app pages
+require an authenticated session.
 
-### Why am I sent to Sign in?
+### Is there a public mobile app?
 
-The app pages require an authenticated session. If you open a protected page
-without a session, DontDieFishing sends you to **Sign in** and retains the
-requested path so you can continue there after authentication. If the session
-has expired, sign in again and retry the original page.
+The repository's release status says no public App Store or Google Play build
+has reached users. Source code for mobile screens is not proof of store
+availability. Use the web app unless current official store listings confirm a
+release.
 
-### I cannot sign in
+## Launch sites, location, and privacy
 
-- Confirm the email address and password are entered, then submit the form
-  again.
-- If you just created the account, complete the confirmation link in your
-  email before signing in.
-- If you used Google or Apple to create the account, use that provider again.
-- If an authentication error remains, try again after checking your network
-  connection. The form displays the provider's error instead of silently
-  treating the attempt as successful.
+### Do I need to share my location to browse sites?
 
-## Spots and conditions
+No. Browse Launch Sites by region. The web map uses the selected region's map
+view and its security policy disables browser geolocation. The optional mobile
+site map also uses site/catalog data rather than phone GPS. Neither browsing
+flow asks for your location, so denying browser or device location access does
+not require a location-permission fallback to continue browsing.
 
-### A spot near me is missing
+### What happens if I deny location permission?
 
-The spot database is growing. Tap **Suggest a Spot** on the map (long-press
-any location) to submit a new fishing spot. Include the name, water type, and
-access notes.
+Mobile GPS track recording requires foreground location permission. Background
+access is optional: if you deny it, foreground recording can continue, but the
+background task cannot. If foreground access is denied, track recording cannot
+start; grant it in device settings before trying again. See [GPS tracks](/dontdiefishing/tracks).
 
-### The conditions look wrong, stale, or incomplete
+### Are saved or custom sites public?
 
-The app can show a dash when an individual value is unavailable, and the
-track replay can label a missing risk score **UNKNOWN**. That is missing
-source data, not a GO signal. Forecasts can also show **Forecast unavailable
-right now**.
+Saving a curated site changes only your account's saved list. A custom launch
+site that you place on the web map is owner-scoped, non-curated, and automatically
+saved to the creating account; it is not a public suggestion or a shared map
+submission. A float-plan link explicitly shares that trip's launch site and plan
+details with anyone holding the link. Do not post the link publicly; revoke it
+when no longer needed. See [Finding spots](/dontdiefishing/finding-spots) and
+[Trip plans and safety](/dontdiefishing/trips-and-safety).
 
-If data looks stale or a condition request fails:
+### Can other users read recorded GPS tracks?
 
-1. Check the app's online state and reconnect if the offline banner says
-   **You're offline — showing cached data. Scores may not be current.**
-2. Reload the page or use the page's retry/refresh action.
-3. Remember that gauges and forecast sources can be temporarily unavailable.
-   Community reports supplement official data; they do not replace it.
+Other users cannot read your recorded tracks or their GPS points; access is
+scoped to the owning account. See [GPS tracks](/dontdiefishing/tracks).
 
-On the web, the site list can also show **Create a vessel profile in Settings
-to see conditions**. Create a vessel profile, then refresh the conditions.
+### Does the app recommend tackle or fishing gear?
 
-### Can I use this for saltwater fishing?
+No fishing-tackle recommendation catalog is documented in the current app
+routes. The web app has vessel profiles and personal vessel records such as
+notes, maintenance, photos, and documents; those are not tackle advice.
 
-Yes. Surf, pier, jetty, and inshore spots include tide data from NOAA CO-OPS
-and saltwater species profiles.
+## Scores, forecasts, and regulations
 
-## Network and permissions
+### Why is a score missing, stale, or incomplete?
 
-### The app says it cannot connect
+A dash or **NO DATA** can mean that no timestamped trusted snapshot is available.
+**STALE** means the last result is more than 30 minutes old. Some sources can be
+unavailable even when the snapshot has a timestamp. Reconnect, refresh or retry,
+check the age and available-signal count, and verify directly with NWS or NOAA.
+Never read a missing value as safe.
 
-Mobile list screens show **Unable to connect to the network. Please check
-your connection.** when a data load fails and provide **Retry**. Community
-reports also provide retry actions for an initial load or a later refresh.
-Reconnect, select **Retry**, and avoid treating cached or missing conditions as
-current.
+### Are forecasts guarantees? Does GO mean I can launch?
 
-The web app shows an offline banner and may display cached data while the
-browser is offline. Reconnect before relying on a score, then reload the page
-to request current data.
+No. Forecasts are probabilistic and future scores omit some live marine inputs,
+including active warnings, waves, tides, currents, water temperature, and UV.
+**GO** is a modeled result from available inputs, not a safety clearance. Check
+current official warnings and conditions immediately before departure.
 
-### Why cannot I start GPS track recording?
+### Does a regulation status prove a closure or open season?
 
-Track recording requires foreground location permission. The mobile app asks
-for background location permission as a second step; background permission
-allows the slower background recording task, while foreground recording still
-works without it. If foreground permission is denied, recording cannot start.
-Grant location access in the device settings and try **Record** again.
+No. The catalog contains selected cited saltwater-rule references. **VERIFY**
+means the app cannot establish current status; it is neither OPEN nor CLOSED.
+Even **OPEN** or **CLOSED** can be superseded by an emergency order or local
+restriction. Follow the linked authority before fishing or keeping a catch.
+
+### What do tides show?
+
+Tide height/phase is based on NOAA CO-OPS predictions where a station and site
+timezone are configured; current predictions may be unavailable. It is not a
+measured local water level. Future Fishable Days scores do not include tides or
+tidal current.
+
+## Reports and alerts
+
+### Are Community Reports official hazard reports?
+
+No. The site-detail form accepts a 1–5 condition rating with optional wind,
+waves, visibility, or notes; it lists recent reports from the last 24 hours.
+These are attributed user observations, not verified sensor data, official
+forecasts, or an emergency-response channel.
 
 ### Why are alerts not arriving?
 
-**Web push:** Allow browser notifications for DontDieFishing in the web app,
-then:
+Web Push requires a signed-in browser with HTTPS notification permission and an
+active subscription. Saved-site events are transition-based, not continuous.
+Monitored trips are checked every 30 minutes and can create a separate status
+event. Do not assume a push was seen or that its conditions remain current.
+Native push code is not verified for a public store release; saved-site alerts
+do not use email or SMS.
 
-- Check that the saved spot has alerts toggled on (spot page → bell icon).
-- Alerts fire on status transitions (for example, green to yellow), not
-  continuously.
+## Network and replay
 
-**Native mobile push is not active.** Native delivery is pending DDF-39 and
-device verification; changing phone notification permissions cannot make
-native alerts arrive.
+### The app says it cannot connect
 
-## Community reports
+Reconnect and use the page's **Retry** or refresh action. The offline web app
+may display cached content; verify that condition age is current before relying
+on it. A failed data request is not a GO result.
 
-### How do I report current conditions or a hazard?
+### Why can't I export a GPS track?
 
-Use **Community Reports** on the mobile site detail screen. A report requires
-one condition rating from **1 to 5**:
-
-- **5 — Great**
-- **4 — Good**
-- **3 — Okay**
-- **2 — Rough**
-- **1 — Dangerous**
-
-You can optionally add text for **Wind**, **Waves**, **Visibility**, and
-**Notes**. Reports are recent community observations, not official forecasts.
-The list shows reports from the **last 24 hours** for that site.
-
-If loading or submitting a report fails, the screen shows an error and a
-**Retry** action. A report is not a separate hazard-type form with a required
-description or photo.
+Only a finalized track can be exported. Finish recording, wait for finalization,
+then choose **EXPORT GPX** on the web replay. The file is capped at 20,000
+points. Mobile recording depends on foreground location permission and the
+mobile app's release status.
 
 ## Contact
 
-For bugs, data corrections, or feature requests:
+For product bugs, data corrections, or feature requests, contact
 [support@dontdiefishing.com](mailto:support@dontdiefishing.com).
-
-<Cards>
-  <Card title="Logbook" icon="book-open" href="/dontdiefishing/logbook">
-    Record catches, trip details, conditions, and photos.
-  </Card>
-  <Card title="Tracks" icon="route" href="/dontdiefishing/tracks">
-    Record GPS sessions on mobile and replay them on the web.
-  </Card>
-  <Card title="Account & billing" icon="credit-card" href="/dontdiefishing/account-billing">
-    Manage your profile, Pro subscription, billing portal, and account data.
-  </Card>
-  <Card title="Safety & conditions" icon="shield-check" href="/dontdiefishing/safety-conditions">
-    Data sources, hazard categories, and the limitations of the safety information.
-  </Card>
-  <Card title="Changelog" icon="history" href="/dontdiefishing/changelog">
-    What's new in DontDieFishing documentation.
-  </Card>
-</Cards>

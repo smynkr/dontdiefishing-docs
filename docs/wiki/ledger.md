@@ -1,13 +1,59 @@
 ---
 title: Durable ledger
 category: current-state
-updated: 2026-08-11
+updated: 2026-10-09
 summary: Dated durable facts and their source anchors
 nav_order: 130
-sources: [".codex/harness-memory.json", "README.md", "package.json", "next.config.mjs", "docs.json", "_migration/tools/lib/shared.mjs", "components/brand/products.ts", "public/logo.svg"]
+sources: [".codex/harness-memory.json", "README.md", "package.json", "next.config.mjs", "docs.json", "_migration/tools/lib/shared.mjs", "components/brand/products.ts", "public/logo.svg", "dontdiefishing/index.mdx", "dontdiefishing/getting-started.mdx", "dontdiefishing/finding-spots.mdx", "dontdiefishing/safety-conditions.mdx", "dontdiefishing/mobile-app.mdx", "dontdiefishing/fishable-days.mdx", "dontdiefishing/how-scoring-works.mdx", "dontdiefishing/account-billing.mdx", "dontdiefishing/regulations.mdx", "dontdiefishing/alerts.mdx", "dontdiefishing/trips-and-safety.mdx", "dontdiefishing/logbook.mdx", "dontdiefishing/tracks.mdx", "dontdiefishing/faq.mdx"]
 ---
 
 # Durable ledger
+
+## 2026-10-09 — Source-backed product and safety coverage
+
+Audited the product default at
+[`d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f`](https://github.com/smynkr/dontdiefishing/tree/d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f)
+against the existing canonical product guides. The updated guides document real
+planning inputs and degradation, vessel-specific scoring, curated/private sites,
+Fishable Days, regulations and authority checks, alerts and capability-link float
+plans, account/billing, logbook, and track recording/replay/export.
+
+The old generic sensor/river-safety pipeline claims were not the source contract.
+Native-app code and notification transports are not evidence of a public store
+release, working native sign-in, device delivery, or rescue response. GPS denial
+does not prevent ordinary map browsing; foreground location is required to record
+a track. Forecast and regulation source gaps remain explicit, not fabricated.
+
+The guides carry immutable source links and consumer-visible limitations.
+This records the audit candidate's content, not a new product deployment.
+
+Recorded GPS tracks and their points are owner-scoped by product RLS; other
+accounts cannot read them. The FAQ states this privacy boundary. The audited
+product source is
+[`supabase/migrations/20260811110000_trip_tracks.sql`](https://github.com/smynkr/dontdiefishing/blob/d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f/supabase/migrations/20260811110000_trip_tracks.sql).
+
+Saved/custom launch-site records are owner-scoped, but a float-plan bearer link
+is a separate capability that exposes the selected site's details and trip-plan
+fields to anyone holding the link. The audited product source is
+[`supabase/migrations/20260804120000_float_plan_sharing.sql`](https://github.com/smynkr/dontdiefishing/blob/d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f/supabase/migrations/20260804120000_float_plan_sharing.sql).
+
+NWS grid wave values are forecasts, not buoy observations; a missing buoy
+reading is not evidence that conditions are calm. The source code is
+[`apps/web/src/lib/fetchers/nws-forecast.ts`](https://github.com/smynkr/dontdiefishing/blob/d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f/apps/web/src/lib/fetchers/nws-forecast.ts).
+
+`dontdiefishing/changelog.mdx` is intentionally excluded from this ledger's
+`sources`: it is a dated editorial release chronology, not evidence for current
+product behavior.
+
+Re-establish with:
+
+```bash
+node _migration/tools/run-migration.mjs
+npm run types:check
+npm run build
+npm run memory:generate
+npm run memory:check
+```
 
 
 ## 2026-08-15 — Clean route topology
