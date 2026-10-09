@@ -4,7 +4,7 @@ category: current-state
 updated: 2026-10-09
 summary: Current repository-owned topology and content boundary
 nav_order: 20
-sources: ["README.md", "package.json", "next.config.mjs", "docs.json", "_migration/tools/lib/shared.mjs", "app/(home)/page.tsx", "dontdiefishing/index.mdx", "dontdiefishing/getting-started.mdx", "dontdiefishing/finding-spots.mdx", "dontdiefishing/safety-conditions.mdx", "dontdiefishing/mobile-app.mdx", "dontdiefishing/fishable-days.mdx", "dontdiefishing/how-scoring-works.mdx", "dontdiefishing/account-billing.mdx", "dontdiefishing/regulations.mdx", "dontdiefishing/alerts.mdx", "dontdiefishing/trips-and-safety.mdx", "dontdiefishing/logbook.mdx", "dontdiefishing/tracks.mdx"]
+sources: ["README.md", "package.json", "next.config.mjs", "docs.json", "_migration/tools/lib/shared.mjs", "app/(home)/page.tsx", "dontdiefishing/index.mdx", "dontdiefishing/getting-started.mdx", "dontdiefishing/finding-spots.mdx", "dontdiefishing/safety-conditions.mdx", "dontdiefishing/mobile-app.mdx", "dontdiefishing/fishable-days.mdx", "dontdiefishing/how-scoring-works.mdx", "dontdiefishing/account-billing.mdx", "dontdiefishing/regulations.mdx", "dontdiefishing/alerts.mdx", "dontdiefishing/trips-and-safety.mdx", "dontdiefishing/logbook.mdx", "dontdiefishing/tracks.mdx", "dontdiefishing/faq.mdx"]
 ---
 
 # Current state
@@ -53,6 +53,9 @@ and missing-data limits, conditional scoring, Fishable Days, regulations, alerts
 float plans/check-ins, account/billing, logbook, and tracks. The native-app guide
 separates its implemented tabs and GPS permissions from unverified public release
 and device-delivery evidence.
+
+Recorded GPS tracks and their points are owner-scoped; other accounts cannot
+read them. The FAQ states this privacy boundary.
 
 Forecasts, status colors, conditional scores, automated regulation checks, and
 check-in notifications are not safety, legal-compliance, or rescue guarantees.

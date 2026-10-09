@@ -30,6 +30,10 @@
       "current-state",
       "ledger"
     ],
+    "dontdiefishing/faq.mdx": [
+      "current-state",
+      "ledger"
+    ],
     "dontdiefishing/finding-spots.mdx": [
       "current-state",
       "ledger"
@@ -95,6 +99,7 @@
     "docs.json": "d6c682c0f1336926c4e8360e59063f01e6ba3401740cb27adb35d4e67b2991aa",
     "dontdiefishing/account-billing.mdx": "d1b77f7338d92db67e4ca28a5e93ad93c6b804ee7c5225c6079f68d11a4186c8",
     "dontdiefishing/alerts.mdx": "7d46ba30f0805bef34091a54808eac36858c5ec9b5b5d4980e3e9770aa581408",
+    "dontdiefishing/faq.mdx": "faa7c65bd5ab0803d2f4d57dfbd1c14fa8b021c1026f431af1635b420ae9e58b",
     "dontdiefishing/finding-spots.mdx": "daf7a8c7f66ef1e686a356e640a317d9831d04b59035e401690c0c5ae7bb3d5d",
     "dontdiefishing/fishable-days.mdx": "176bfb5353a03ca585cfc932abe4a6b6e4ad28fe56e48e2893d0d7483df63e8f",
     "dontdiefishing/getting-started.mdx": "8c952d5d2b2e7c53dac9cf7edc73ddf6ede5a43bd80cfed8c7b0ee8577bec66b",

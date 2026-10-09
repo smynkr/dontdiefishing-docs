@@ -4,7 +4,7 @@ category: current-state
 updated: 2026-10-09
 summary: Dated durable facts and their source anchors
 nav_order: 130
-sources: [".codex/harness-memory.json", "README.md", "package.json", "next.config.mjs", "docs.json", "_migration/tools/lib/shared.mjs", "components/brand/products.ts", "public/logo.svg", "dontdiefishing/index.mdx", "dontdiefishing/getting-started.mdx", "dontdiefishing/finding-spots.mdx", "dontdiefishing/safety-conditions.mdx", "dontdiefishing/mobile-app.mdx", "dontdiefishing/fishable-days.mdx", "dontdiefishing/how-scoring-works.mdx", "dontdiefishing/account-billing.mdx", "dontdiefishing/regulations.mdx", "dontdiefishing/alerts.mdx", "dontdiefishing/trips-and-safety.mdx", "dontdiefishing/logbook.mdx", "dontdiefishing/tracks.mdx"]
+sources: [".codex/harness-memory.json", "README.md", "package.json", "next.config.mjs", "docs.json", "_migration/tools/lib/shared.mjs", "components/brand/products.ts", "public/logo.svg", "dontdiefishing/index.mdx", "dontdiefishing/getting-started.mdx", "dontdiefishing/finding-spots.mdx", "dontdiefishing/safety-conditions.mdx", "dontdiefishing/mobile-app.mdx", "dontdiefishing/fishable-days.mdx", "dontdiefishing/how-scoring-works.mdx", "dontdiefishing/account-billing.mdx", "dontdiefishing/regulations.mdx", "dontdiefishing/alerts.mdx", "dontdiefishing/trips-and-safety.mdx", "dontdiefishing/logbook.mdx", "dontdiefishing/tracks.mdx", "dontdiefishing/faq.mdx"]
 ---
 
 # Durable ledger
@@ -26,6 +26,15 @@ a track. Forecast and regulation source gaps remain explicit, not fabricated.
 
 The guides carry immutable source links and consumer-visible limitations.
 This records the audit candidate's content, not a new product deployment.
+
+Recorded GPS tracks and their points are owner-scoped by product RLS; other
+accounts cannot read them. The FAQ states this privacy boundary. The audited
+product source is
+[`supabase/migrations/20260811110000_trip_tracks.sql`](https://github.com/smynkr/dontdiefishing/blob/d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f/supabase/migrations/20260811110000_trip_tracks.sql).
+
+`dontdiefishing/changelog.mdx` is intentionally excluded from this ledger's
+`sources`: it is a dated editorial release chronology, not evidence for current
+product behavior.
 
 Re-establish with:
 
