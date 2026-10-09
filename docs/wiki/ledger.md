@@ -32,6 +32,15 @@ accounts cannot read them. The FAQ states this privacy boundary. The audited
 product source is
 [`supabase/migrations/20260811110000_trip_tracks.sql`](https://github.com/smynkr/dontdiefishing/blob/d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f/supabase/migrations/20260811110000_trip_tracks.sql).
 
+Saved/custom launch-site records are owner-scoped, but a float-plan bearer link
+is a separate capability that exposes the selected site's details and trip-plan
+fields to anyone holding the link. The audited product source is
+[`supabase/migrations/20260804120000_float_plan_sharing.sql`](https://github.com/smynkr/dontdiefishing/blob/d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f/supabase/migrations/20260804120000_float_plan_sharing.sql).
+
+NWS grid wave values are forecasts, not buoy observations; a missing buoy
+reading is not evidence that conditions are calm. The source code is
+[`apps/web/src/lib/fetchers/nws-forecast.ts`](https://github.com/smynkr/dontdiefishing/blob/d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f/apps/web/src/lib/fetchers/nws-forecast.ts).
+
 `dontdiefishing/changelog.mdx` is intentionally excluded from this ledger's
 `sources`: it is a dated editorial release chronology, not evidence for current
 product behavior.

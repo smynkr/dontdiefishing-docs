@@ -55,7 +55,14 @@ separates its implemented tabs and GPS permissions from unverified public releas
 and device-delivery evidence.
 
 Recorded GPS tracks and their points are owner-scoped; other accounts cannot
-read them. The FAQ states this privacy boundary.
+read them. The FAQ documents this boundary.
+Saved/custom launch-site records are
+also owner-scoped, but a float-plan capability link separately exposes site
+details and plan fields to anyone holding it; the FAQ and Finding spots guide
+distinguish that link from public-catalog visibility.
+
+NWS grid wave values are forecasts, not buoy observations. A missing buoy
+reading does not mean seas are calm.
 
 Forecasts, status colors, conditional scores, automated regulation checks, and
 check-in notifications are not safety, legal-compliance, or rescue guarantees.
