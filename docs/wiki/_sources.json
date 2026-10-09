@@ -22,8 +22,57 @@
       "current-state",
       "ledger"
     ],
+    "dontdiefishing/account-billing.mdx": [
+      "current-state",
+      "ledger"
+    ],
+    "dontdiefishing/alerts.mdx": [
+      "current-state",
+      "ledger"
+    ],
+    "dontdiefishing/finding-spots.mdx": [
+      "current-state",
+      "ledger"
+    ],
+    "dontdiefishing/fishable-days.mdx": [
+      "current-state",
+      "ledger"
+    ],
+    "dontdiefishing/getting-started.mdx": [
+      "current-state",
+      "ledger"
+    ],
+    "dontdiefishing/how-scoring-works.mdx": [
+      "current-state",
+      "ledger"
+    ],
     "dontdiefishing/index.mdx": [
-      "current-state"
+      "current-state",
+      "ledger"
+    ],
+    "dontdiefishing/logbook.mdx": [
+      "current-state",
+      "ledger"
+    ],
+    "dontdiefishing/mobile-app.mdx": [
+      "current-state",
+      "ledger"
+    ],
+    "dontdiefishing/regulations.mdx": [
+      "current-state",
+      "ledger"
+    ],
+    "dontdiefishing/safety-conditions.mdx": [
+      "current-state",
+      "ledger"
+    ],
+    "dontdiefishing/tracks.mdx": [
+      "current-state",
+      "ledger"
+    ],
+    "dontdiefishing/trips-and-safety.mdx": [
+      "current-state",
+      "ledger"
     ],
     "next.config.mjs": [
       "current-state",
@@ -39,12 +88,24 @@
   },
   "source_sha256": {
     ".codex/harness-memory.json": "fca2018eb925f14f0d451f85a22fda327a805fad7c2ad9d6e30130a27d7d2cb3",
-    "README.md": "ba9c63cf6ed1d114ccfbe1c71174fbf72d966d2c1853d3827681e1d2fc1e927c",
+    "README.md": "7f4a20e79d3005fb43fd8ad542254661e27541dd0bb2babac83c5b14076d2f4a",
     "_migration/tools/lib/shared.mjs": "306ac8acf66b8ce7bceff4933b169e52ad8881dbfb0de960e586526c1d38996b",
     "app/(home)/page.tsx": "4c03c9068bd6d172fd05d71b5283a5c7d36a45543c54181d56dc272b86cc474c",
     "components/brand/products.ts": "8b2072340665a45f23439b9c773473b4307c5ed9a8add566d2c02cdebe2e16fe",
     "docs.json": "d6c682c0f1336926c4e8360e59063f01e6ba3401740cb27adb35d4e67b2991aa",
-    "dontdiefishing/index.mdx": "fc4d97c549b298bb149278561876d74be344f8fa8df81af369d1403f59efb64c",
+    "dontdiefishing/account-billing.mdx": "d1b77f7338d92db67e4ca28a5e93ad93c6b804ee7c5225c6079f68d11a4186c8",
+    "dontdiefishing/alerts.mdx": "7d46ba30f0805bef34091a54808eac36858c5ec9b5b5d4980e3e9770aa581408",
+    "dontdiefishing/finding-spots.mdx": "daf7a8c7f66ef1e686a356e640a317d9831d04b59035e401690c0c5ae7bb3d5d",
+    "dontdiefishing/fishable-days.mdx": "176bfb5353a03ca585cfc932abe4a6b6e4ad28fe56e48e2893d0d7483df63e8f",
+    "dontdiefishing/getting-started.mdx": "8c952d5d2b2e7c53dac9cf7edc73ddf6ede5a43bd80cfed8c7b0ee8577bec66b",
+    "dontdiefishing/how-scoring-works.mdx": "000f4953c4a96a64828e2e61b166dccc5ac32ccb20505688a22aadf9d5957097",
+    "dontdiefishing/index.mdx": "efe07f0df02f5a58a1de8c73ea8e08c8bdab891e7db6e76f17b239635e4073e2",
+    "dontdiefishing/logbook.mdx": "4733f112a61dccbe21ccaf67d43fa5527416e3dd3cbc785d6bf9ff287101524e",
+    "dontdiefishing/mobile-app.mdx": "90373cbafa1c687501eb9205643efea275a2d91449348cc13749d20442940710",
+    "dontdiefishing/regulations.mdx": "2a603c03a75be0bf78df3392267edc21f4c6d66317493b52b99ff3a120d7688e",
+    "dontdiefishing/safety-conditions.mdx": "c7680d247aaba41d9d1223986a947a78027c4a2b824ef66d6ff1b87254f0f084",
+    "dontdiefishing/tracks.mdx": "903ba14c4ed5ab65f1351b0bd26a3369e113bb0bbfb5c36a07cc43b4643b04d8",
+    "dontdiefishing/trips-and-safety.mdx": "f28aa4e0a569c0515d8099b9363bbf3a525dcf2d3c9a2e16df1fb05adb03f3a1",
     "next.config.mjs": "36bb54665470074ec6e8af31b3bf24894ac801049041fb52f130361ce4dd8610",
     "package.json": "e3faaf669b7f9b476e0210916434c5c4fd8dd829c316376321127e713943757a",
     "public/logo.svg": "b1e0a58ed1f20974b24cd945719e49f0122a2fc04a8fe58db76c5df96fc07ef1"

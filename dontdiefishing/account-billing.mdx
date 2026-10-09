@@ -1,80 +1,77 @@
 ---
 title: "Account & billing"
-description: "Manage your DontDieFishing profile, sign-in, Pro subscription, billing portal, and account data."
+description: "Manage DontDieFishing sign-in, vessel profiles, Pro access, billing, account details, and vessel records."
 ---
 
-Use **Settings** to manage your profile, subscription, notifications, vessels, analytics consent, and account data.
+Use **Settings** in the authenticated web app to manage your account, vessel
+profiles, alert preferences, and subscription. The available sign-in providers
+and the terms shown at checkout are the source of truth for your session and
+purchase.
 
-## Sign in and create an account
+## Sign in and profile
 
-On the web, you can:
+Create an account with email and password or sign in with a provider offered on
+the page. Google sign-in is available; Apple is shown only when the provider is
+configured as available. Email confirmation may be required after registration.
+Protected app pages return unauthenticated visitors to Sign in and preserve the
+requested path for after authentication.
 
-- Create an account with an email address and password.
-- Sign in with an email address and password.
-- Continue with Google or Apple.
+Settings shows your email as read-only and lets you edit or clear your display
+name. A failed save displays an error; sign in again if the session has expired.
 
-Email sign-up sends you to the sign-in page with a reminder to check your email and confirm the account. The web app protects the dashboard, trips, sites, settings, and other app pages; an unauthenticated visit is sent to **Sign in** and the requested path is retained for the redirect after authentication.
+## Vessel profiles and records
 
-## Profile settings
+A vessel profile identifies the craft used for scoring and trip planning. Choose
+**Power**, **Sail**, **Kayak**, or **Paddle**, set its **Cautious**,
+**Moderate**, or **Experienced** scoring profile, and optionally set its length
+and custom thresholds or weights. You can add, edit, set a default, or remove a
+profile; change the default before deleting the current default vessel.
 
-The **Account** section in Settings lets you edit your **Display name** and save it. Your current email is shown as a read-only field. The page notes that email changes go through a confirmation link rather than being edited inline.
-
-Saving the display name updates your profile and refreshes the page. If the session is no longer available, Settings asks you to sign in again; a failed profile update leaves an error so you can retry.
+The web vessel collection also includes personal vessel records: one vessel
+photo (up to 10 MB), notes, maintenance entries (service, repair, inspection,
+upgrade, or other), and uploaded documents up to 20 MB in supported PDF, Office,
+and image formats. These are vessel records, not a shared fishing-tackle or
+recommended-gear catalog.
 
 ## Free and Pro
 
-The Free tier includes the core app experience. The current Pro card lists these Pro perks:
+Free includes core account, launch-site, condition, and trip-planning screens.
+Pro adds the full seven-day Fishable Days response, week-ahead comparisons across
+resolved sites, and the next-GO-day summary. The source currently lists these
+billing options:
 
-- Everything in Free
-- Full 7-day fishable calendar
-- Week-ahead comparison across saved sites
-- Next-GO day surfaced automatically
-
-The subscription card offers two billing intervals:
-
-| Interval | Price shown in the product |
+| Interval | Displayed price |
 | --- | --- |
-| Yearly | $39.99/yr (shown as $3.33/mo equivalent; save ~33%) |
 | Monthly | $4.99/mo |
+| Yearly | $39.99/yr ($3.33/mo equivalent; about 33% savings) |
 
-The Free card labels the offer **CANCEL ANYTIME**. The exact price and availability shown in the product are the source of truth for checkout.
+Prices, taxes, promotions, and availability can change; the checkout page is the
+current offer. Mobile source currently has no in-app subscription purchase.
 
-## Start Pro checkout
+## Checkout, renewal, and cancellation
 
-From Settings, choose **YEARLY** or **MONTHLY**. The web app sends the selected interval to its authenticated checkout endpoint, then redirects you to the returned Stripe Checkout URL. Checkout accepts valid promotion codes configured in Stripe.
+From web Settings, choose the monthly or yearly option to start Stripe Checkout.
+An active Pro account cannot start another Pro checkout; use **Billing Portal**
+to manage billing. The portal may expose invoices and the cancellation or
+renewal controls available for your subscription. If the portal cannot be
+opened, Settings shows an error so you can retry. A current checkout display is
+not a promise of future price or availability.
 
-An account with an active Pro subscription cannot start a second Pro checkout. Use the billing portal instead. If checkout cannot be prepared, Settings shows an error and keeps you on the account page.
+## Request account deletion
 
-## Renewal and billing portal
-
-For an active Pro subscription, Settings reads the subscription expiry value and shows **RENEWS** with the date when one is available. The entitlement is reconciled from the customer's Stripe subscription state; a customer with no active configured Pro subscription is treated as Free.
-
-Active Pro accounts have two actions:
-
-- **BILLING PORTAL** opens a Stripe billing portal session and returns to Settings.
-- **INVOICES** uses the same billing-portal action, where the product exposes billing documents.
-
-If no Stripe subscription is bound to the account, the portal endpoint reports that no subscription was found. If the portal cannot be opened, Settings shows an error so you can retry.
-
-## Delete your account
-
-The Settings **Danger zone** explains the impact before you request deletion:
-
-- Trips are removed.
-- Tracks are removed.
-- Logbook entries are removed.
-- Float plan links stop working immediately.
-
-The **DELETE ACCOUNT** control links to the product's Contact page. Use that contact path to request account deletion; the Settings page does not delete the account inline.
+Settings explains that deleting an account removes trips, tracks, and logbook
+entries and ends float-plan links. The **DELETE ACCOUNT** action opens the
+product Contact path; Settings does not delete the account inline. Use that
+contact path to request deletion.
 
 <Cards>
-  <Card title="FAQ & troubleshooting" icon="circle-help" href="/dontdiefishing/faq">
-    Fix authentication, permissions, network, and stale-data problems.
-  </Card>
   <Card title="Logbook" icon="book-open" href="/dontdiefishing/logbook">
-    Record catches and manage trip details.
+    Record catches, trip details, conditions, and photos.
   </Card>
-  <Card title="Tracks" icon="route" href="/dontdiefishing/tracks">
-    Replay mobile GPS sessions and inspect their metrics.
+  <Card title="GPS tracks" icon="route" href="/dontdiefishing/tracks">
+    Record a mobile GPS session and review it on the web.
+  </Card>
+  <Card title="FAQ & troubleshooting" icon="circle-help" href="/dontdiefishing/faq">
+    Fix sign-in, data, network, location-permission, and alert issues.
   </Card>
 </Cards>

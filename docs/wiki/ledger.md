@@ -1,13 +1,41 @@
 ---
 title: Durable ledger
 category: current-state
-updated: 2026-08-11
+updated: 2026-10-09
 summary: Dated durable facts and their source anchors
 nav_order: 130
-sources: [".codex/harness-memory.json", "README.md", "package.json", "next.config.mjs", "docs.json", "_migration/tools/lib/shared.mjs", "components/brand/products.ts", "public/logo.svg"]
+sources: [".codex/harness-memory.json", "README.md", "package.json", "next.config.mjs", "docs.json", "_migration/tools/lib/shared.mjs", "components/brand/products.ts", "public/logo.svg", "dontdiefishing/index.mdx", "dontdiefishing/getting-started.mdx", "dontdiefishing/finding-spots.mdx", "dontdiefishing/safety-conditions.mdx", "dontdiefishing/mobile-app.mdx", "dontdiefishing/fishable-days.mdx", "dontdiefishing/how-scoring-works.mdx", "dontdiefishing/account-billing.mdx", "dontdiefishing/regulations.mdx", "dontdiefishing/alerts.mdx", "dontdiefishing/trips-and-safety.mdx", "dontdiefishing/logbook.mdx", "dontdiefishing/tracks.mdx"]
 ---
 
 # Durable ledger
+
+## 2026-10-09 — Source-backed product and safety coverage
+
+Audited the product default at
+[`d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f`](https://github.com/smynkr/dontdiefishing/tree/d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f)
+against the existing canonical product guides. The updated guides document real
+planning inputs and degradation, vessel-specific scoring, curated/private sites,
+Fishable Days, regulations and authority checks, alerts and capability-link float
+plans, account/billing, logbook, and track recording/replay/export.
+
+The old generic sensor/river-safety pipeline claims were not the source contract.
+Native-app code and notification transports are not evidence of a public store
+release, working native sign-in, device delivery, or rescue response. GPS denial
+does not prevent ordinary map browsing; foreground location is required to record
+a track. Forecast and regulation source gaps remain explicit, not fabricated.
+
+The guides carry immutable source links and consumer-visible limitations.
+This records the audit candidate's content, not a new product deployment.
+
+Re-establish with:
+
+```bash
+node _migration/tools/run-migration.mjs
+npm run types:check
+npm run build
+npm run memory:generate
+npm run memory:check
+```
 
 
 ## 2026-08-15 — Clean route topology

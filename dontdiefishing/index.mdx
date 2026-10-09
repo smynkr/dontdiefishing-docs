@@ -1,48 +1,76 @@
 ---
 title: "DontDieFishing"
-description: "Find safe fishing spots with real-time water conditions, weather, and hazard data — so you come home."
+description: "Plan trips from curated launch sites with vessel-aware conditions, forecast context, tides, and cited fishing-rule references."
 ---
 
-import { BellRing, CircleHelp, Compass, History, MapPin, ShieldCheck } from 'lucide-react';
+import { CalendarClock, CircleHelp, Compass, Gavel, MapPin, ShieldCheck } from 'lucide-react';
 
-DontDieFishing is a boating and fishing safety app that finds you safe spots
-with real-time water conditions, weather, and hazard data. Every spot on the
-map is color-coded by current safety status, and saved spots can push you an
-alert the moment conditions turn.
+DontDieFishing helps boaters and anglers plan from curated launch sites. Browse
+sites by region, save the places you use, review current conditions against a
+vessel profile, and keep a trip plan ready for another check before departure.
 
 <Warning>
-  DontDieFishing is a decision-support tool, not a guarantee of safety.
-  Conditions can change faster than data refreshes, and community reports are
-  unverified observations. Always assess conditions in person before entering
-  the water.
+  A **GO** score is planning guidance, never a safety clearance or guarantee.
+  Forecasts are probabilistic and conditions can change between checks. A
+  missing or stale input is not evidence of safety. Check current official
+  weather and marine warnings, applicable closures and fishing rules, and the
+  conditions at the launch site before you go.
 </Warning>
 
 <ProductPreview
   src="/screenshots/dontdiefishing.png"
-  alt="DontDieFishing landing page: boating conditions and trip planning with safety-first spot finding"
+  alt="DontDieFishing web interface for launch-site conditions and trip planning"
   accent="#1A3A5C"
-  caption="Every spot pin is color-coded by live safety status — green, yellow, or red — with water, weather, and hazard data behind it."
+  caption="Interface preview only: displayed values are not a live conditions report or a navigational chart."
   highlights={[
-    { text: "Find safe spots with live water conditions from USGS, NOAA, and NWS.", icon: MapPin },
-    { text: "Green / yellow / red safety status that updates as conditions change.", icon: ShieldCheck },
-    { text: "Push alerts for saved spots on status transitions.", icon: BellRing },
+    { text: "Browse curated and saved launch sites by region; compare conditions for a selected vessel profile.", icon: MapPin },
+    { text: "Review a lower-is-better GO / CAUTION / NO-GO planning score with freshness and signal completeness context.", icon: ShieldCheck },
+    { text: "Plan trips, review a limited forecast window, and check the applicable official rules before launch.", icon: CalendarClock },
   ]}
 />
 
+## What the planner covers
+
+- **Launch Sites** — browse the curated catalog by region, save sites, and open
+  site detail. The web map is region-based; it does not use your device's
+  location. The optional mobile map is a marker-only site view, not a marine
+  chart or navigation aid.
+- **Conditions** — where sources are available, the current view combines NWS
+  weather and warnings, NOAA buoy and tide data, and EPA UV data. A vessel
+  profile affects thresholds and score weights. Freshness labels and the
+  available-signal count describe the snapshot; confidence is not a probability.
+- **Fishable Days** — compare the current day and a limited forward forecast
+  window. Free returns one day; Pro returns up to seven. Future-day scores omit
+  marine warnings, waves, tides, currents, and other unforecast signals.
+- **Trip planning** — create a launch-site and vessel-specific plan, recheck its
+  readiness, and optionally share a float plan or configure a return check-in.
+- **Fishing-rule references** — selected saltwater listings show a season status
+  and citations when current source evidence is available. They are not a
+  complete rulebook and do not grant permission to fish or keep a catch.
+
+The source repository also contains a mobile app. Its current code includes a
+feature-gated site map and GPS track recording, but the repository's release
+record says no public App Store or Google Play build has reached users. See
+[Mobile app](/dontdiefishing/mobile-app) for that release boundary and the
+implemented mobile flows.
+
 <Cards>
   <Card icon={<Compass />} title="Get started" href="/dontdiefishing/getting-started">
-    Install, set your location, and find your first safe spot.
+    Create an account, set a vessel profile, choose a launch site, and plan a trip.
   </Card>
   <Card icon={<MapPin />} title="Finding spots" href="/dontdiefishing/finding-spots">
-    Search, filter, and evaluate spots — conditions, weather, hazards, access.
+    Browse the Launch Sites catalog, region map, and site detail.
   </Card>
   <Card icon={<ShieldCheck />} title="Safety & conditions" href="/dontdiefishing/safety-conditions">
-    Data sources, hazard categories, and limitations.
+    Review the sources, freshness labels, score limits, and official-warning guidance.
   </Card>
-  <Card icon={<CircleHelp />} title="FAQ" href="/dontdiefishing/faq">
-    Common questions and fixes.
+  <Card icon={<CalendarClock />} title="Fishable Days" href="/dontdiefishing/fishable-days">
+    Compare vessel-specific current and forecast days without treating forecasts as promises.
   </Card>
-  <Card icon={<History />} title="Changelog" href="/dontdiefishing/changelog">
-    What's new in DontDieFishing documentation.
+  <Card icon={<Gavel />} title="Fishing regulations" href="/dontdiefishing/regulations">
+    Read selected, cited saltwater rules and verify them with the responsible authority.
+  </Card>
+  <Card icon={<CircleHelp />} title="FAQ & troubleshooting" href="/dontdiefishing/faq">
+    Find answers about location permission, conditions, reports, plans, and access.
   </Card>
 </Cards>

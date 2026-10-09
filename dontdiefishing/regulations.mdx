@@ -1,104 +1,86 @@
 ---
 title: "Fishing regulations"
-description: "Browse cited saltwater fishing regulation references, season windows, limits, and official source links by jurisdiction."
+description: "Read selected, cited saltwater fishing-rule references, season status, limits, species field-guide notes, and official source links."
 ---
 
-The **/regulations** catalog is a reference view for selected saltwater recreational fishing rules. It normalizes cited source rows so you can compare season windows, status, and limits without replacing the rules published by the relevant authority.
+The public **Regulations** catalog is a selected reference for saltwater
+recreational fishing rules in supported jurisdictions. It normalizes cited
+source rows so you can review listed season windows, statuses, and limits. It is
+not a complete rulebook for every state, freshwater fishery, location, method,
+or emergency closure.
 
 <Warning>
-  This catalog is reference information, not permission to fish or retain a catch. Rules can vary by location, method, vessel, species identification, and emergency closure. Verify the applicable official rules before you go.
+  A catalog label is not permission to fish or retain a catch. Rules can vary by
+  location, method, vessel, species identification, and emergency order. Check
+  the linked authority's current rule immediately before fishing or keeping a
+  catch.
 </Warning>
 
-## Supported jurisdictions
+## Browse the catalog
 
-The catalog currently has 23 supported jurisdictions. It is a selected reference subset, not a complete rulebook for every U.S. state or territory.
+Choose a jurisdiction, then search its listed species. The web catalog can
+search species name, slug, applicability notes, authority, and possession-limit
+text. Status controls filter **OPEN NOW**, **CLOSING SOON**, **CLOSED**,
+**YEAR-ROUND**, or all listed entries. Site detail may show a smaller set of
+jurisdiction-specific regulation cards and an **Official rules** link.
 
-| Jurisdiction | Code | Official source |
-| --- | --- | --- |
-| Alaska | AK | [ADF&G sport fishing regulations](https://www.adfg.alaska.gov/index.cfm?adfg=fishingSportFishingInfo.main) |
-| Alabama | AL | [Alabama Marine Resources regulations](https://www.outdooralabama.com/saltwater-fishing/saltwater-regulations) |
-| California | CA | [CDFW ocean sport fishing regulations](https://wildlife.ca.gov/Fishing/Ocean/Regulations/Fishing-Map) |
-| Connecticut | CT | [CT DEEP marine sport fishing](https://portal.ct.gov/DEEP/Fishing/Saltwater-Fishing) |
-| Florida | FL | [FWC saltwater fishing regulations](https://myfwc.com/fishing/saltwater/recreational/) |
-| Georgia | GA | [GA Coastal Resources Division regulations](https://coastalgadnr.org/recfishingregs) |
-| Hawaii | HI | [DLNR Division of Aquatic Resources regulations](https://dlnr.hawaii.gov/dar/fishing/fishing-regulations/) |
-| Louisiana | LA | [LDWF recreational fishing regulations](https://www.wlf.louisiana.gov/page/recreational-fishing-regulations) |
-| Maine | ME | [Maine DMR recreational fishing](https://www.maine.gov/dmr/recreational-fishing) |
-| Maryland | MD | [MD DNR recreational fishing regulations](https://dnr.maryland.gov/fisheries/Pages/regulations/recreational-fishing.aspx) |
-| Massachusetts | MA | [Massachusetts recreational saltwater fishing regulations](https://www.mass.gov/info-details/recreational-saltwater-fishing-regulations) |
-| Mississippi | MS | [Mississippi DMR regulations](https://dmr.ms.gov/recreational-catch-limits/) |
-| North Carolina | NC | [NC size and bag limits](https://www.deq.nc.gov/about/divisions/marine-fisheries/rules-proclamations-and-size-and-bag-limits) |
-| New Hampshire | NH | [NH Fish and Game marine fishing](https://www.wildlife.state.nh.us/fishing/marine.html) |
-| New Jersey | NJ | [NJ DEP Fish & Wildlife marine fishing](https://dep.nj.gov/njfw/fishing/marine/) |
-| New York | NY | [NY DEC saltwater fishing regulations](https://www.dec.ny.gov/things-to-do/saltwater-fishing/regulations) |
-| Oregon | OR | [ODFW marine zone regulations](https://myodfw.com/recreation-report/fishing-report/marine-zone) |
-| Puerto Rico | PR | [DRNA Reglamento de Pesca 7949](https://www.drna.pr.gov/reglamentos-es/reglamento-num-7949/) |
-| Rhode Island | RI | [RI DEM marine fisheries](https://dem.ri.gov/fishing/marine-fisheries) |
-| South Carolina | SC | [SCDNR marine sport fishing](https://www.dnr.sc.gov/marine/sportfishing.html) |
-| Texas | TX | [TPWD saltwater regulations](https://tpwd.texas.gov/regulations/outdoor-annual/fishing/saltwater-fishing) |
-| Virginia | VA | [VMRC recreational saltwater rules](https://mrc.virginia.gov/regulations/swrecfishingrules.shtm) |
-| Washington | WA | [WDFW fishing regulations](https://wdfw.wa.gov/fishing/regulations) |
+State pages also expose curated launch-site cards when available; **ALL SITES**
+opens the launch-site directory. A species page may include its profile,
+regulation references, and sourced field-guide content. The catalog does not
+provide a fishing-tackle or gear-recommendation feature.
 
-Each state view also links to its configured source and shows the source's update and check timestamps. Follow the source link for the authority's current details, proclamations, emergency orders, and local qualifications.
+## What a regulation listing means
 
-## Read the catalog
+A normalized record can include season windows, possession-limit text, bag
+limit, minimum or maximum size, applicability notes, authority, citation, source
+URL, source update/check dates, and effective year. The catalog uses the
+jurisdiction and launch site's local timezone to evaluate the current season.
+The displayed limit and size fields refer to the cited rule, not an estimate of
+your catch.
 
-Select a jurisdiction, then review one row per listed species. The table provides:
-
-- **Listed season windows** — a month-by-month view of the normalized schedule.
-- **Bag** — for an **OPEN** or **CLOSING SOON** row, the catalog first shows the rule's `possession_limit` when present; otherwise it shows the active season window's `bag_limit`.
-- **Min size** — the listed minimum size in inches.
-- **Listing** — the current status badge described below.
-
-On the detail page, a `possession_limit` value is labeled **LISTED LIMIT**. These values are references from the cited rule, not a universal permission to retain a catch. When a status is not current and verified, the catalog does not present stale values as current limits. Closed and verify rows can show `—` in the limit columns; a detail page may retain a clearly labeled last-listed/reference value.
-
-## Normalized season windows
-
-Normalized rules use one of three rule kinds:
-
-- `year_round` — the rule is listed as open year-round and has no season-window rows.
-- `scheduled` — the rule has one or more season windows.
-- `closed` — the rule is explicitly closed and has an empty season-window list.
-
-A scheduled window has a `start` and `end` month/day in `MM-DD` form. A window may cross the end of the calendar year, such as a season that starts in the fall and ends the following year. A window can also carry an optional non-negative integer `bag_limit`; a value of `0` represents no retention for that window.
-
-The normalized record can also include:
-
-- Minimum and maximum size in inches. A maximum can be inclusive (`maximum`) or exclusive (`less than`).
-- A possession-limit note and applicability notes.
-- The authority and citation used for the row.
-- The source URL, source-updated date, source-checked timestamp, effective year, and whether the row is federal.
-
-Overlapping windows, malformed windows, or a rule whose window shape does not match its rule kind cannot safely select one limit. Those rows fail closed to **VERIFY**.
-
-## Status badges
-
-The status evaluator uses the launch site's IANA time zone and the current effective year. **CLOSING SOON** uses a seven-day closing window by default.
-
-| Badge | Meaning |
+| Status | Meaning |
 | --- | --- |
-| **OPEN** | A current, provenance-backed rule has an active year-round or scheduled window with retention available. Current bag and minimum-size values can be shown. |
-| **CLOSING SOON** | The active scheduled window closes within seven calendar days. Current values can be shown, but check the linked authority before you go. |
-| **CLOSED** | The rule is explicitly closed, no scheduled window is active, or the active window has a `bag_limit` of `0`. |
-| **VERIFY** | The app cannot safely authorize a current status: the row is reference-only, provenance is incomplete, the source check is stale, the effective year does not match, the time zone is invalid, or the rule is invalid/ambiguous. |
+| **OPEN** | A current, provenance-backed rule has an active year-round or scheduled window. |
+| **CLOSING SOON** | An active scheduled window closes within seven calendar days. |
+| **CLOSED** | The cited rule explicitly closes the species, no scheduled window is active, or the active window's bag limit is zero. |
+| **VERIFY** | Current status cannot be established safely because evidence is missing, stale, mismatched, malformed, or ambiguous. |
 
-**VERIFY is not the same as CLOSED.** It means the catalog does not have enough current, unambiguous evidence to label the rule open or closed.
+**VERIFY is not the same as CLOSED, and neither status proves that a separate
+emergency closure does not exist.** When current status cannot be verified, the
+catalog withholds current-looking limits; a page may retain a clearly labeled
+last-listed reference value.
 
-## Source freshness and official links
+Rules are evaluated against the effective year and site-local calendar. An
+incomplete citation, invalid timezone, stale source check, wrong year, invalid
+schedule, or overlapping season windows fails closed to **VERIFY**. A source
+check older than seven days cannot authorize a current badge. A PDF or state web
+page can itself be superseded; use the official source link for current rules,
+emergency actions, and local qualifications.
 
-A source check is fresh for seven days. Missing, invalid, future, or older-than-seven-day checks cannot authorize a current schedule badge. The catalog highlights stale sources and tells you that statuses may not reflect the latest official rules.
+Some agency and CDN source pages can block automated checks. In that case the
+app fails closed rather than inventing a source check or freshness date. A
+**VERIFY** result means you must use the linked authority directly.
 
-Use the **SOURCE** link in each state or species view to open the configured public authority page. The source bar shows the latest available **UPDATED** and **CHECKED** values and the jurisdiction-specific disclaimer. Those disclaimers explain when a public page is only an informational summary—for example, when statutes, administrative code, proclamations, or emergency orders remain authoritative.
+## Species field guides are not fishing rules
 
-<Warning>
-  Always verify the current official regulations immediately before fishing or retaining a catch. DontDieFishing provides cited listings and status guidance; it does not grant permission and cannot account for every local or emergency rule.
-</Warning>
+Species pages can show a one-line description, habitat, scientific name, and a
+sourced typical-size note. A smaller set of guides has passed a deeper content
+review; those entries may also show identification, field marks, lookalikes,
+habitat/depth, seasonality, techniques, handling/release, conservation context,
+and regulation pointers with citations. Candidate or draft deep sections are
+withheld instead of being presented as verified. Mobile's guide API likewise
+returns verified entries only.
 
-<Cards>
-  <Card title="Finding spots" icon="map-pin" href="/dontdiefishing/finding-spots">
-    Search launch sites and review conditions, access, and hazards.
-  </Card>
-  <Card title="Safety & conditions" icon="shield-check" href="/dontdiefishing/safety-conditions">
-    Understand the condition signals and their limitations.
-  </Card>
-</Cards>
+Species guide size is not a record-size promise, and a field guide is not a
+substitute for a current agency rule or an authoritative identification. Follow
+its citations. The app has no fishing-tackle or recommended-gear catalog.
+
+## Closures and safety are separate
+
+The fishing-regulation catalog is separate from the conditions score and from
+NWS marine warnings. A regulation closure does not automatically become a
+GO/NO-GO score veto, and a GO score does not establish legal access. Check
+current agency orders, local access rules, and safety warnings independently.
+
+See [Finding spots](/dontdiefishing/finding-spots) for launch-site details and
+[Safety & conditions](/dontdiefishing/safety-conditions) for score limitations.
