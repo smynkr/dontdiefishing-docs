@@ -97,6 +97,15 @@ contribute; the remaining available weights are redistributed proportionally.
 Therefore the same physical conditions can produce a different score for a
 different vessel, profile, or available signal set.
 
+An empty marine-warning list is an exception to missing-input handling: it is
+always treated as available and normalizes to zero, even when a warning fetch
+failed. The forecast failure fallback can also report `"none"` for lightning.
+With all numeric conditions unavailable and only those defaults remaining, the
+scorer can return **0 / GO**, not **NO DATA**. Snapshot freshness is determined
+separately and can still be **FRESH**. Read the [missing-source
+warning](/dontdiefishing/safety-conditions#freshness-and-confidence); an apparently
+favorable score is not evidence that the missing hazards were absent.
+
 ## Hard vetoes
 
 Veto checks run before weighted scoring. A matching veto returns `100`,

@@ -1,7 +1,7 @@
 ---
 title: Current state
 category: current-state
-updated: 2026-10-09
+updated: 2026-10-10
 summary: Current repository-owned topology and content boundary
 nav_order: 20
 sources: ["README.md", "package.json", "next.config.mjs", "docs.json", "_migration/tools/lib/shared.mjs", "app/(home)/page.tsx", "dontdiefishing/index.mdx", "dontdiefishing/getting-started.mdx", "dontdiefishing/finding-spots.mdx", "dontdiefishing/safety-conditions.mdx", "dontdiefishing/mobile-app.mdx", "dontdiefishing/fishable-days.mdx", "dontdiefishing/how-scoring-works.mdx", "dontdiefishing/account-billing.mdx", "dontdiefishing/regulations.mdx", "dontdiefishing/alerts.mdx", "dontdiefishing/trips-and-safety.mdx", "dontdiefishing/logbook.mdx", "dontdiefishing/tracks.mdx", "dontdiefishing/faq.mdx"]
@@ -63,6 +63,27 @@ distinguish that link from public-catalog visibility.
 
 NWS grid wave values are forecasts, not buoy observations. A missing buoy
 reading does not mean seas are calm.
+
+At product source revision
+[`d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f`](https://github.com/smynkr/dontdiefishing/tree/d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f),
+an individual NWS marine-alert request returns an empty list on a non-OK response
+or exception
+([`nws-alerts.ts`](https://github.com/smynkr/dontdiefishing/blob/d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f/apps/web/src/lib/fetchers/nws-alerts.ts#L21-L45)).
+The NWS forecast failure fallback supplies null numeric fields and
+`lightning_risk: "none"`
+([`nws-forecast.ts`](https://github.com/smynkr/dontdiefishing/blob/d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f/apps/web/src/lib/fetchers/nws-forecast.ts#L391-L509)).
+The aggregate stamps its own `fetched_at` value while building the snapshot
+([`aggregate.ts`](https://github.com/smynkr/dontdiefishing/blob/d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f/apps/web/src/lib/fetchers/aggregate.ts#L96-L116)).
+The shared scorer always counts an empty marine-warning list as available, and
+normalizes it to zero
+([`score.ts`](https://github.com/smynkr/dontdiefishing/blob/d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f/packages/shared/src/scoring/score.ts#L89-L94),
+[`normalize.ts`](https://github.com/smynkr/dontdiefishing/blob/d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f/packages/shared/src/scoring/normalize.ts#L63-L65)).
+With every numeric input missing and only the empty-warning and `none` lightning
+defaults present, the source smoke returned **0 / GO** with two of eleven signals
+available. A fresh aggregate timestamp and this favorable result do not prove
+that warning retrieval succeeded or that hazards are absent; users must verify
+official warnings and current conditions. This follow-up documents existing
+source behavior; no scoring code changed.
 
 Forecasts, status colors, conditional scores, automated regulation checks, and
 check-in notifications are not safety, legal-compliance, or rescue guarantees.
