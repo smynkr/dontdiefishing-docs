@@ -102,6 +102,17 @@ unknown hazard. Treat a missing, stale, degraded, or incomplete input as
 unknown, check official NWS/NOAA sources, and make the decision using current
 conditions and your own judgment.
 
+<Warning>
+  An individual warning fetch can fail and return an empty list, which the scorer
+  still treats as an available zero-risk marine-warning signal. The forecast
+  failure fallback can likewise supply `"none"` for lightning. If numeric
+  conditions are missing and only these zero-valued defaults remain, the current
+  scorer can return **0 / GO**. The aggregate can timestamp that result as fresh;
+  the separate **LOW** completeness label does not withhold the favorable score.
+  Neither a fresh timestamp nor an empty warning list proves that hazards were
+  checked successfully. Verify official conditions and warnings independently.
+</Warning>
+
 ## Forecasts and tides
 
 The site-detail weather card shows up to seven NWS daily forecast rows when

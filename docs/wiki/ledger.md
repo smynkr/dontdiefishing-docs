@@ -1,13 +1,40 @@
 ---
 title: Durable ledger
 category: current-state
-updated: 2026-10-09
+updated: 2026-10-10
 summary: Dated durable facts and their source anchors
 nav_order: 130
 sources: [".codex/harness-memory.json", "README.md", "package.json", "next.config.mjs", "docs.json", "_migration/tools/lib/shared.mjs", "components/brand/products.ts", "public/logo.svg", "dontdiefishing/index.mdx", "dontdiefishing/getting-started.mdx", "dontdiefishing/finding-spots.mdx", "dontdiefishing/safety-conditions.mdx", "dontdiefishing/mobile-app.mdx", "dontdiefishing/fishable-days.mdx", "dontdiefishing/how-scoring-works.mdx", "dontdiefishing/account-billing.mdx", "dontdiefishing/regulations.mdx", "dontdiefishing/alerts.mdx", "dontdiefishing/trips-and-safety.mdx", "dontdiefishing/logbook.mdx", "dontdiefishing/tracks.mdx", "dontdiefishing/faq.mdx"]
 ---
 
 # Durable ledger
+
+
+## 2026-10-10 — Fresh timestamps can coexist with 0 / GO source fallbacks
+
+At audited product source revision
+[`d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f`](https://github.com/smynkr/dontdiefishing/tree/d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f),
+`fetchMarineAlerts` returns `[]` for non-OK responses and exceptions
+([source](https://github.com/smynkr/dontdiefishing/blob/d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f/apps/web/src/lib/fetchers/nws-alerts.ts#L21-L45)).
+`fetchForecast` falls back to null numeric fields and `lightning_risk: "none"`
+([source](https://github.com/smynkr/dontdiefishing/blob/d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f/apps/web/src/lib/fetchers/nws-forecast.ts#L391-L509)).
+`fetchConditions` aggregates these results and stamps `fetched_at` when it
+builds the snapshot
+([source](https://github.com/smynkr/dontdiefishing/blob/d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f/apps/web/src/lib/fetchers/aggregate.ts#L96-L116)).
+The scorer always marks an empty marine-warning list available, and normalizes
+it to zero
+([score](https://github.com/smynkr/dontdiefishing/blob/d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f/packages/shared/src/scoring/score.ts#L89-L94),
+[normalizer](https://github.com/smynkr/dontdiefishing/blob/d9f5ca05ed42eae25d1d94cfd5ea10f4b0d12d9f/packages/shared/src/scoring/normalize.ts#L63-L65)).
+The source-level degraded-input exercise returned 0 / GO with two of eleven
+signals available when all numeric inputs were null and only these defaults
+remained. A fresh timestamp and favorable score therefore do not prove warning
+retrieval succeeded or hazards were absent. The standalone safety and scoring
+guides now direct readers to verify official warnings and conditions
+independently. The application/scoring code is unchanged.
+
+Re-establish with the pinned product sources above and a `scoreConditions`
+exercise using null numeric fields, `marine_warnings: []`, and
+`lightning_risk: "none"`; the docs repository's content checks are listed below.
 
 ## 2026-10-09 — Source-backed product and safety coverage
 
