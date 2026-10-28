@@ -1,12 +1,19 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { chmodSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import {
+  getBackendConfig,
+  backendReceiptLabel,
+  VALID_GLM_REASONING_EFFORTS,
   buildApiRequestBody,
+  fallbackReasoningEffort,
+  isFallbackEligibleStatus,
+  runApiBackend,
   parseSSEPayload,
   retryAfterDelayMs,
   validateGlmReasoningEffort,
@@ -20,13 +27,13 @@ const driverPath = path.resolve(testDir, "..", "docs-agent.mjs");
 // candidate, and repository paths differ. Normalize only the provider fields
 // that must remain equivalent across copies.
 const TASK_1_PROVIDER_FIXTURE = {
-  defaultModel: "@cf/zai-org/glm-5.3-flash",
+  defaultModel: "glm-5.3-flash",
   defaultReasoningEffort: "high",
-  allowedReasoningEfforts: ["low", "medium", "high"],
+  allowedReasoningEfforts: ["low", "medium", "high", "max"],
   maxTokens: 49152,
   temperature: 0.2,
   stream: true,
-  modelSecret: "CLOUDFLARE_WORKERS_AI_TOKEN",
+  modelSecret: "ZAI_API_KEY",
 };
 
 function normalizeProviderFixture(value) {
@@ -92,6 +99,8 @@ function setupSandbox({
     `#!/usr/bin/env node
 import { appendFileSync, readFileSync } from "node:fs";
 const credentialKeys = [
+  "GLM_API_KEY",
+  "GLM_FALLBACK_API_KEY",
   "DOCS_AGENT_SOURCE_TOKEN",
   "GH_TOKEN",
   "GITHUB_TOKEN",
@@ -203,6 +212,8 @@ exit 1
     `#!/usr/bin/env node
 import { appendFileSync, cpSync, existsSync, mkdirSync, readdirSync, rmSync, statSync } from "node:fs";
 const credentialKeys = [
+  "GLM_API_KEY",
+  "GLM_FALLBACK_API_KEY",
   "DOCS_AGENT_SOURCE_TOKEN",
   "GH_TOKEN",
   "GITHUB_TOKEN",
@@ -279,6 +290,8 @@ console.log(JSON.stringify({ stub: true, destination: dest }));
         DOCS_AGENT_SOURCE_TOKEN: "source-token",
         GH_TOKEN: "destination-token",
         GITHUB_TOKEN: "ambient-github-token",
+        GLM_API_KEY: "k-p2",
+        GLM_FALLBACK_API_KEY: "k-f2",
         DOCS_REPO_PAT: "ambient-docs-repo-pat",
         GIT_CONFIG_COUNT: "1",
         GIT_CONFIG_KEY_0: "credential.helper",
@@ -340,132 +353,78 @@ function committedFiles(docsRepo) {
     .filter(Boolean);
 }
 
-test("Task 1 GLM provider contract parity reads production config", () => {
-  const source =
-    `const m = await import(${JSON.stringify(driverPath)}); ` +
-    `process.stdout.write(JSON.stringify({ contract: m.getGlmProviderContract(), receipt: m.backendReceiptLabel("glm") }));`;
-  const childEnv = { ...process.env };
-  for (const key of [
-    "DOCS_AGENT_GLM_MODEL",
-    "CLOUDFLARE_ACCOUNT_ID",
-    "DOCS_AGENT_GLM_REASONING_EFFORT",
-    "DOCS_AGENT_GLM_MAX_TOKENS",
-  ]) {
-    delete childEnv[key];
-  }
-  childEnv.DOCS_AGENT_GLM_API_BASE = "https://provider.example/v1";
-  childEnv.GLM_API_KEY = "test-key";
-  const result = spawnSync(process.execPath, ["--input-type=module", "--eval", source], {
-    env: childEnv,
-    encoding: "utf8",
-  });
-  assert.equal(result.status, 0, result.stderr);
-  const production = JSON.parse(result.stdout);
-  const contract = production.contract;
-  assert.ok(production.receipt.includes(contract.defaultModel));
+function runBackendProbe(env) {
+  const probe = spawnSync(process.execPath, ["--input-type=module", "--eval", `
+    const m = await import(${JSON.stringify(driverPath)});
+    let fetchCalled = false;
+    globalThis.fetch = async () => { fetchCalled = true; throw new Error("fetch should not run"); };
+    process.exit = code => { throw new Error(\`process.exit(\${code})\`); };
+    let error = null;
+    try { await m.runBackend("glm", "probe", 1000); } catch (err) { error = err.message; }
+    console.log(JSON.stringify({ error, fetchCalled }));
+  `], { env, encoding: "utf8" });
+  assert.equal(probe.status, 0, probe.stderr);
+  return { ...JSON.parse(probe.stdout), stderr: probe.stderr };
+}
 
-  const backend = {
-    model: contract.defaultModel,
-    maxTokens: contract.maxTokens,
-    reasoningEffort: contract.defaultReasoningEffort,
-    reasoningEffortEnv: contract.reasoningEffortEnv,
-  };
-  const body = buildApiRequestBody(backend, "prompt", true);
-  const template = readFileSync(path.resolve(testDir, "..", "docs-agent.yml"), "utf8");
-  const modelSecret = template.match(/GLM_API_KEY:\s*\$\{\{\s*secrets\.([A-Z0-9_]+)\s*\}\}/)?.[1] ?? null;
-  assert.deepEqual(
-    normalizeProviderFixture({
-      defaultModel: body.model,
-      defaultReasoningEffort: body.reasoning_effort,
-      allowedReasoningEfforts: contract.allowedReasoningEfforts,
-      maxTokens: body.max_tokens,
-      temperature: body.temperature,
-      stream: body.stream,
-      modelSecret,
-    }),
-    normalizeProviderFixture(TASK_1_PROVIDER_FIXTURE),
-  );
-  assert.deepEqual(body.messages, [{ role: "user", content: "prompt" }]);
-
-  for (const value of ["", "none", "max", "xhigh", "HIGH"]) {
-    assert.match(
-      validateGlmReasoningEffort(backend, true, value),
-      /must be low, medium, or high/,
-      `expected ${JSON.stringify(value)} to be rejected`,
-    );
-  }
-  assert.equal(
-    validateGlmReasoningEffort(backend, true, contract.allowedReasoningEfforts[0]),
-    null,
-  );
-  assert.equal(
-    Object.hasOwn(
-      buildApiRequestBody({ ...backend, model: "@cf/zai-org/glm-5.2" }, "prompt", true),
-      "reasoning_effort",
-    ),
-    false,
-  );
-  assert.equal(
-    Object.hasOwn(buildApiRequestBody(backend, "prompt", false), "reasoning_effort"),
-    false,
-  );
-
-  assert.deepEqual(
-    normalizeProviderFixture({
-      sourceToken: /DOCS_AGENT_SOURCE_TOKEN:\s*\$\{\{\s*github\.token\s*\}\}/.test(template),
-      destinationToken: /GH_TOKEN:\s*\$\{\{\s*secrets\.DOCS_REPO_PAT\s*\}\}/.test(template),
-      accountVariable: /CLOUDFLARE_ACCOUNT_ID:\s*\$\{\{\s*vars\.CLOUDFLARE_ACCOUNT_ID\s*\}\}/.test(template),
-      apiBaseVariable: /DOCS_AGENT_GLM_API_BASE:\s*\$\{\{\s*vars\.DOCS_AGENT_GLM_API_BASE\s*\}\}/.test(template),
-      modelVariable: /DOCS_AGENT_GLM_MODEL:\s*\$\{\{\s*vars\.DOCS_AGENT_GLM_MODEL\s*\}\}/.test(template),
-      maxTokensVariable: /DOCS_AGENT_GLM_MAX_TOKENS:\s*\$\{\{\s*vars\.DOCS_AGENT_GLM_MAX_TOKENS\s*\}\}/.test(template),
-      reasoningVariable: /DOCS_AGENT_GLM_REASONING_EFFORT:\s*\$\{\{\s*vars\.DOCS_AGENT_GLM_REASONING_EFFORT\s*\|\|\s*'high'\s*\}\}/.test(template),
-      modelSecret: /GLM_API_KEY:\s*\$\{\{\s*secrets\.CLOUDFLARE_WORKERS_AI_TOKEN\s*\}\}/.test(template),
-      oldModelSecret: /GLM_API_KEY:\s*\$\{\{\s*secrets\.GLM_API_KEY\s*\}\}/.test(template),
-      checkoutCredentialPersistence: /persist-credentials:\s*false/.test(template),
-      stableHostedJob: /name:\s+hosted \(GLM 5\.2 — drafts doc update\)/.test(template),
-    }),
-    normalizeProviderFixture({
-      sourceToken: true,
-      destinationToken: true,
-      accountVariable: true,
-      apiBaseVariable: true,
-      modelVariable: true,
-      maxTokensVariable: true,
-      reasoningVariable: true,
-      modelSecret: true,
-      oldModelSecret: false,
-      checkoutCredentialPersistence: true,
-      stableHostedJob: true,
-    }),
-  );
+test("GLM defaults resolve to z.ai, high effort, and glm-5.3-flash", () => {
+  const env = { ...process.env };
+  for (const key of ["DOCS_AGENT_GLM_API_BASE", "DOCS_AGENT_GLM_MODEL", "DOCS_AGENT_GLM_REASONING_EFFORT"]) delete env[key];
+  const probe = spawnSync(process.execPath, ["--input-type=module", "--eval", `
+    const m = await import(${JSON.stringify(driverPath)});
+    const { apiBase, model, reasoningEffort } = m.getBackendConfig("glm");
+    console.log(JSON.stringify({ apiBase, model, reasoningEffort, body: m.buildApiRequestBody({ model, reasoningEffort, maxTokens: 49152 }, "prompt"), receipt: m.backendReceiptLabel("glm") }));
+  `], { env, encoding: "utf8" });
+  assert.equal(probe.status, 0, probe.stderr);
+  const result = JSON.parse(probe.stdout);
+  assert.equal(result.apiBase, "https://api.z.ai/api/coding/paas/v4");
+  assert.equal(result.model, "glm-5.3-flash");
+  assert.equal(result.reasoningEffort, "high");
+  assert.equal(result.body.reasoning_effort, "high");
+  assert.match(result.receipt, /glm-5\.3-flash.*api\.z\.ai/);
 });
-test("GLM exact Cloudflare model rejects missing account and stale base before fetch", async (t) => {
-  for (const [name, accountId, expectedError] of [
-    ["missing account with stale generic base", "", /CLOUDFLARE_ACCOUNT_ID must be 32 lowercase hexadecimal characters/],
-    ["valid account with stale generic base", "00000000000000000000000000000000", /DOCS_AGENT_GLM_API_BASE must be exactly the Cloudflare account endpoint/],
-  ]) {
-    await t.test(name, () => {
-      const sandbox = setupSandbox({
-        existingContent: "# Reference\n",
-        backendOutput: fileBlock("# Reference\n\nThis output must never be reached.\n"),
-      });
-      t.after(() => sandbox.cleanup());
-      const result = sandbox.run({
-        backend: "glm",
-        backendEnv: {
-          CLOUDFLARE_ACCOUNT_ID: accountId,
-          DOCS_AGENT_GLM_API_BASE: "https://provider.example/v1",
-          DOCS_AGENT_GLM_MODEL: "@cf/zai-org/glm-5.3-flash",
-          DOCS_AGENT_GLM_REASONING_EFFORT: "high",
-          GLM_API_KEY: "test-key",
-        },
-      });
 
-      assert.notEqual(result.status, 0);
-      assert.match(result.stderr, expectedError);
-      assert.deepEqual(ghCalls(sandbox.ghLogPath), ["--version"]);
-    });
+test("generic custom base/model and garbage retired account ID are accepted", () => {
+  const probe = spawnSync(process.execPath, ["--input-type=module", "--eval", `
+    const m = await import(${JSON.stringify(driverPath)});
+    const backend = m.getBackendConfig("glm");
+    console.log(JSON.stringify({ apiBase: backend.apiBase, body: m.buildApiRequestBody(backend, "prompt"), error: m.validateGlmReasoningEffort(backend) }));
+  `], { env: { ...process.env, DOCS_AGENT_GLM_API_BASE: "https://example.test/v1///", DOCS_AGENT_GLM_MODEL: "custom-model", DOCS_AGENT_GLM_REASONING_EFFORT: "max", CLOUDFLARE_ACCOUNT_ID: "garbage" }, encoding: "utf8" });
+  assert.equal(probe.status, 0, probe.stderr);
+  const result = JSON.parse(probe.stdout);
+  assert.equal(result.apiBase, "https://example.test/v1");
+  assert.equal(result.body.model, "custom-model");
+  assert.equal(result.body.reasoning_effort, "max");
+  assert.equal(result.error, null);
+});
+
+test("invalid GLM effort fails before fetching", () => {
+  const result = runBackendProbe({ ...process.env, GLM_API_KEY: "k-t1", DOCS_AGENT_GLM_REASONING_EFFORT: "extreme" });
+  assert.equal(result.fetchCalled, false);
+  assert.match(result.stderr, /DOCS_AGENT_GLM_REASONING_EFFORT must be low, medium, high, or max/);
+  for (const reasoningEffort of VALID_GLM_REASONING_EFFORTS) assert.equal(validateGlmReasoningEffort({ reasoningEffort }), null);
+});
+
+test("GLM effort is always sent and DeepSeek wire format has no effort", () => {
+  for (const reasoningEffort of ["high", "max"]) {
+    assert.equal(buildApiRequestBody({ model: "glm-5.3-flash", maxTokens: 49152, reasoningEffort }, "prompt").reasoning_effort, reasoningEffort);
   }
+  assert.equal(Object.hasOwn(buildApiRequestBody({ model: "deepseek-v4-flash", maxTokens: 49152 }, "prompt"), "reasoning_effort"), false);
+  assert.equal(retryAfterDelayMs(new Headers({ "Retry-After": "99" })), 5000);
+});
+
+test("workflow maps z.ai subscription and optional OpenRouter fallback", () => {
+  const template = readFileSync(path.resolve(testDir, "..", "docs-agent.yml"), "utf8").replace(/[ \t]+/g, " ");
+  for (const expected of [
+    "DOCS_AGENT_GLM_API_BASE: ${{ vars.DOCS_AGENT_GLM_API_BASE }}",
+    "DOCS_AGENT_GLM_MODEL: ${{ vars.DOCS_AGENT_GLM_MODEL }}",
+    "DOCS_AGENT_GLM_MAX_TOKENS: ${{ vars.DOCS_AGENT_GLM_MAX_TOKENS }}",
+    "DOCS_AGENT_GLM_REASONING_EFFORT: ${{ vars.DOCS_AGENT_GLM_REASONING_EFFORT || 'high' }}",
+    "GLM_API_KEY: ${{ secrets.ZAI_API_KEY }}",
+    "DOCS_AGENT_GLM_FALLBACK_API_BASE: ${{ vars.DOCS_AGENT_GLM_FALLBACK_API_BASE }}",
+    "DOCS_AGENT_GLM_FALLBACK_MODEL: ${{ vars.DOCS_AGENT_GLM_FALLBACK_MODEL }}",
+    "GLM_FALLBACK_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}",
+  ]) assert.ok(template.includes(expected), `workflow is missing ${expected}`);
 });
 
 test("T1: byte-identical file blocks do not create branches, commits, or PRs", async (t) => {
@@ -532,7 +491,9 @@ test("non-GitHub subprocesses receive a scrubbed child environment", (t) => {
 
   assert.equal(result.status, 0, result.stderr);
   const forbidden = [
-    "DOCS_AGENT_SOURCE_TOKEN",
+    "GLM_API_KEY",
+  "GLM_FALLBACK_API_KEY",
+  "DOCS_AGENT_SOURCE_TOKEN",
     "GH_TOKEN",
     "GITHUB_TOKEN",
     "DOCS_REPO_PAT",
@@ -807,4 +768,261 @@ test("T8: empty and malformed backend output fail without a PR attempt", async (
       assert.deepEqual(ghCalls(sandbox.ghLogPath), ["--version"]);
     });
   }
+});
+
+test("fallback effort mapping and deterministic status exclusions", () => {
+  assert.equal(fallbackReasoningEffort("https://openrouter.ai/api/v1", "max"), "xhigh");
+  assert.equal(fallbackReasoningEffort("https://example.test/v1", "max"), "max");
+  assert.equal(fallbackReasoningEffort("https://openrouter.ai.example.test/v1", "max"), "max");
+  assert.equal(fallbackReasoningEffort("https://openrouter.ai/api/v1", "high"), "high");
+  for (const status of [401, 403, 408, 429, 500, 503, 599]) assert.equal(isFallbackEligibleStatus(status, "failure"), true);
+  for (const status of [400, 422]) assert.equal(isFallbackEligibleStatus(status, "quota 1113"), false);
+  for (const status of [402, 404, 418]) assert.equal(isFallbackEligibleStatus(status, "quota 1113"), true);
+  for (const status of [402, 404, 409, 418]) assert.equal(isFallbackEligibleStatus(status, "failure"), false);
+  for (const body of ["1113", "1308", "1310", "insufficient balance", "usage limit", "quota exceeded"]) assert.equal(isFallbackEligibleStatus(200, body), true);
+});
+
+test("GLM fallback uses one request, pinned effort, and the serving receipt", async (t) => {
+  const cases = [
+    ["503 then fallback", [503], true, true],
+    ["400 surfaces without fallback", [400], true, false],
+    ["429 twice then fallback", [429, 429], true, true],
+    ["503 without configuration", [503], false, false],
+    ["401 then fallback", [401], true, true],
+    ["403 then fallback", [403], true, true],
+    ["408 then fallback", [408], true, true],
+    ["409 surfaces without fallback", [409], true, false],
+  ];
+  for (const [name, statuses, enabled, succeeds] of cases) await t.test(name, async () => {
+    const requests = [];
+    const server = createServer((req, res) => {
+      let raw = "";
+      req.setEncoding("utf8");
+      req.on("data", chunk => raw += chunk);
+      req.on("end", () => {
+        requests.push({ path: req.url, body: JSON.parse(raw), authorization: req.headers.authorization });
+        const status = statuses[requests.length - 1] || 200;
+        if (status !== 200) { res.writeHead(status, { "Retry-After": "0" }); res.end("provider failure"); return; }
+        res.writeHead(200, { "Content-Type": "text/event-stream" });
+        res.end('data: {"choices":[{"delta":{"content":"answer"},"finish_reason":"stop"}]}\n\ndata: [DONE]\n');
+      });
+    });
+    await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
+    const base = `http://127.0.0.1:${server.address().port}`;
+    const backend = { type: "api", apiBase: `${base}/primary`, model: "primary-model", apiKey: "k-p2", maxTokens: 100, reasoningEffort: "max", ...(enabled ? { fallbackApiBase: `${base}/fallback`, fallbackModel: "fallback-model", fallbackApiKey: "k-f2" } : {}) };
+    try {
+      const result = await runApiBackend("glm", backend, "same prompt", 1000);
+      assert.equal(result.code === 0, succeeds);
+      assert.equal(requests.length, statuses.length + (succeeds ? 1 : 0));
+      if (succeeds) {
+        assert.equal(requests.at(-1).path, "/fallback/chat/completions");
+        assert.equal(requests.at(-1).authorization, "Bearer k-f2");
+        assert.equal(requests.at(-1).body.model, "fallback-model");
+        assert.equal(requests.at(-1).body.reasoning_effort, "max");
+        assert.deepEqual({ ...requests.at(-1).body, model: "primary-model" }, requests[0].body);
+        assert.equal(result.servedBy, "127.0.0.1");
+        assert.equal(result.model, "fallback-model");
+        assert.match(backendReceiptLabel("glm"), /model: `fallback-model`.*served_by: `127\.0\.0\.1`/);
+      } else assert.match(result.stderr, new RegExp(`HTTP ${statuses.at(-1)}`));
+    } finally { await new Promise(resolve => server.close(resolve)); }
+  });
+});
+
+test("fallback handles transport failures but preserves stream/output boundaries", async (t) => {
+  const backend = { type: "api", apiBase: "https://primary.test/v1", model: "primary", apiKey: "k-p1", maxTokens: 100, reasoningEffort: "max", fallbackApiBase: "https://openrouter.ai/api/v1", fallbackModel: "fallback", fallbackApiKey: "k-f1" };
+  const stream = (content, reason = "stop") => new Response(`data: ${JSON.stringify({ choices: [{ delta: { content }, ...(reason ? { finish_reason: reason } : {}) }] })}\n`);
+  const cases = [
+    ["network TypeError", () => { throw new TypeError("connection reset"); }, true],
+    ["early AbortError", () => { throw new DOMException("aborted", "AbortError"); }, true],
+    ["quota response", () => new Response('{"error":{"code":1113,"message":"usage limit"}}'), true],
+    ["incomplete stream", () => stream("partial", null), true],
+    ["length", () => stream("partial", "length"), false],
+    ["content filter", () => stream("partial", "content_filter"), false],
+    ["valid output about quotas", () => stream("Document the quota and usage limit."), false],
+    ["invalid output stays with validation", () => stream("Missing required FILE blocks."), false],
+  ];
+  for (const [name, primary, fallback] of cases) await t.test(name, async (t) => {
+    const requests = [];
+    t.mock.method(globalThis, "fetch", async (url, options) => { requests.push({ url, options }); return requests.length === 1 ? primary() : stream("answer"); });
+    const result = await runApiBackend("glm", backend, "prompt", 1000);
+    assert.equal(requests.length, fallback ? 2 : 1);
+    if (fallback) {
+      assert.equal(result.code, 0);
+      assert.equal(result.servedBy, "openrouter.ai");
+      assert.equal(JSON.parse(requests[1].options.body).reasoning_effort, "xhigh");
+    }
+  });
+  await t.test("partial configuration disables fallback", async (t) => {
+    let calls = 0;
+    t.mock.method(globalThis, "fetch", async () => { calls++; return new Response("failure", { status: 503 }); });
+    for (const key of ["fallbackApiBase", "fallbackModel", "fallbackApiKey"]) assert.equal((await runApiBackend("glm", { ...backend, [key]: "" }, "prompt", 1000)).code, 503);
+    assert.equal(calls, 3);
+  });
+  await t.test("fallback 429 is never retried", async (t) => {
+    let calls = 0;
+    t.mock.method(globalThis, "fetch", async () => new Response("failure", { status: ++calls === 1 ? 503 : 429 }));
+    assert.equal((await runApiBackend("glm", backend, "prompt", 1000)).code, 429);
+    assert.equal(calls, 2);
+  });
+  await t.test("errors cannot echo configured keys", async (t) => {
+    t.mock.method(globalThis, "fetch", async () => new Response("echo k-p1 k-f1", { status: 400 }));
+    assert.doesNotMatch((await runApiBackend("glm", backend, "prompt", 1000)).stderr, /k-p1|k-f1/);
+  });
+  await t.test("malformed primary URL is a configuration error and never falls back", async (t) => {
+    let calls = 0;
+    t.mock.method(globalThis, "fetch", async () => { if (++calls === 1) throw new TypeError("invalid URL"); return stream("answer"); });
+    assert.notEqual((await runApiBackend("glm", { ...backend, apiBase: "invalid" }, "prompt", 1000)).code, 0);
+    assert.equal(calls, 0);
+  });
+  await t.test("fallback shares the primary timeout budget", async (t) => {
+    let calls = 0;
+    t.mock.method(globalThis, "fetch", async (_url, options) => {
+      if (++calls === 1) { await new Promise(resolve => setTimeout(resolve, 45)); return new Response("failure", { status: 503 }); }
+      return new Promise((_resolve, reject) => options.signal.addEventListener("abort", () => reject(options.signal.reason), { once: true }));
+    });
+    const keepAlive = setTimeout(() => {}, 300);
+    try {
+      const start = Date.now();
+      assert.equal((await runApiBackend("glm", backend, "prompt", 100)).timedOut, true);
+      assert.equal(calls, 2);
+      assert.ok(Date.now() - start < 145, "fallback must not receive a fresh timeout budget");
+    } finally { clearTimeout(keepAlive); }
+  });
+});
+
+test("provider contract metadata retains defaults and adds max effort", () => {
+  const env = { ...process.env };
+  for (const key of ["DOCS_AGENT_GLM_API_BASE", "DOCS_AGENT_GLM_MODEL", "DOCS_AGENT_GLM_REASONING_EFFORT", "DOCS_AGENT_GLM_MAX_TOKENS"]) delete env[key];
+  const probe = spawnSync(process.execPath, ["--input-type=module", "--eval", `const m = await import(${JSON.stringify(driverPath)}); console.log(JSON.stringify(m.getGlmProviderContract()));`], { env, encoding: "utf8" });
+  assert.equal(probe.status, 0, probe.stderr);
+  const contract = JSON.parse(probe.stdout);
+  assert.equal(contract.defaultApiBase, "https://api.z.ai/api/coding/paas/v4");
+  assert.equal(contract.defaultModel, TASK_1_PROVIDER_FIXTURE.defaultModel);
+  assert.equal(contract.defaultReasoningEffort, TASK_1_PROVIDER_FIXTURE.defaultReasoningEffort);
+  assert.deepEqual(normalizeProviderFixture(contract.allowedReasoningEfforts), normalizeProviderFixture(TASK_1_PROVIDER_FIXTURE.allowedReasoningEfforts));
+  assert.equal(contract.maxTokens, TASK_1_PROVIDER_FIXTURE.maxTokens);
+});
+
+test("fallback eligibility: 409 surfaces, quota-bodied 4xx falls back, 400/422 never do", () => {
+  assert.equal(isFallbackEligibleStatus(409, "conflict"), false);
+  assert.equal(isFallbackEligibleStatus(404, "not found"), false);
+  assert.equal(isFallbackEligibleStatus(402, '{"error":{"code":"1113","message":"Insufficient balance"}}'), true);
+  assert.equal(isFallbackEligibleStatus(403, "forbidden"), true);
+  assert.equal(isFallbackEligibleStatus(400, "quota parameter invalid"), false);
+  assert.equal(isFallbackEligibleStatus(422, "usage limit field invalid"), false);
+});
+
+test("fallbackReasoningEffort tolerates a malformed fallback base", () => {
+  assert.equal(fallbackReasoningEffort("not a url", "max"), "max");
+  assert.equal(fallbackReasoningEffort("", "high"), "high");
+});
+
+test("stream classification: quota words in reasoning and explicit error objects do not fall back", async (t) => {
+  const { createServer: createHttpServer } = await import("node:http");
+  const cases = [
+    ["reasoning mentions quota, no content", 'data: {"choices":[{"delta":{"reasoning_content":"the quota for this plan"},"finish_reason":"stop"}]}\n\ndata: [DONE]\n', false],
+    ["explicit non-quota error object without finish", 'data: {"error":{"code":"1210","message":"invalid parameter"}}\n\n', false],
+    ["explicit 401 error object without finish", 'data: {"error":{"status":401,"message":"invalid key"}}\n\n', true],
+    ["explicit 503 error object without finish", 'data: {"error":{"code":503,"message":"overloaded"}}\n\n', true],
+    ["plain JSON deterministic error body", '{"error":{"status":400,"message":"bad request"}}', false],
+    ["plain JSON quota error body", '{"error":{"code":"1113","message":"Insufficient balance"}}', true],
+    ["status-free auth error object", 'data: {"error":{"code":"1001","type":"authentication_error","message":"Authentication failed"}}\n\n', true],
+    ["snake_case auth type only", 'data: {"error":{"code":"1001","type":"authentication_error","message":"denied"}}\n\n', true],
+    ["deterministic code with transient-sounding message", 'data: {"error":{"code":"1210","message":"timeout parameter is invalid"}}\n\n', false],
+    ["eligible error alongside length truncation", 'data: {"choices":[{"delta":{"content":"x"},"finish_reason":"length"}]}\n\ndata: {"error":{"status":503,"message":"overloaded"}}\n\n', false],
+    ["bare quota word in deterministic error object", 'data: {"error":{"code":"1210","message":"parameter quota_tier is invalid"}}\n\n', false],
+    ["eligible error after reasoning with DONE", 'data: {"choices":[{"delta":{"reasoning_content":"thinking"},"finish_reason":null}]}\n\ndata: {"error":{"status":503,"message":"overloaded"}}\n\ndata: [DONE]\n', true],
+    ["deterministic error after content with DONE", 'data: {"choices":[{"delta":{"content":"partial"},"finish_reason":null}]}\n\ndata: {"error":{"status":400,"message":"bad"}}\n\ndata: [DONE]\n', false],
+    ["quota word in content with deterministic error", 'data: {"choices":[{"delta":{"content":"quota"},"finish_reason":null}]}\n\ndata: {"error":{"status":400,"message":"bad request"}}\n\n', false],
+    ["explicit quota error object without finish", 'data: {"error":{"code":"1113","message":"Insufficient balance"}}\n\n', true],
+    ["dropped stream without error object", 'data: {"choices":[{"delta":{"content":"partial"},"finish_reason":null}]}\n\n', true],
+  ];
+  for (const [name, primaryBody, expectFallback] of cases) await t.test(name, async () => {
+    const paths = [];
+    const server = createHttpServer((req, res) => {
+      req.resume();
+      req.on("end", () => {
+        paths.push(req.url);
+        res.writeHead(200, { "Content-Type": "text/event-stream" });
+        if (req.url.startsWith("/primary")) res.end(primaryBody);
+        else res.end('data: {"choices":[{"delta":{"content":"ok"},"finish_reason":"stop"}]}\n\ndata: [DONE]\n');
+      });
+    });
+    await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const base = `http://127.0.0.1:${server.address().port}`;
+    try {
+      const result = await runApiBackend("glm", { type: "api", apiBase: `${base}/primary`, model: "m", apiKey: "k-p9", maxTokens: 100, reasoningEffort: "high", fallbackApiBase: `${base}/fallback`, fallbackModel: "fm", fallbackApiKey: "k-f9" }, "prompt", 2000);
+      assert.equal(paths.some((p) => p.startsWith("/fallback")), expectFallback);
+      assert.equal(result.code === 0, expectFallback);
+    } finally {
+      await new Promise((resolve) => server.close(resolve));
+    }
+  });
+});
+
+test("an invalid primary API base is a configuration error, not a fallback trigger", async () => {
+  const result = await runApiBackend("glm", { type: "api", apiBase: "not a url", model: "m", apiKey: "k-p8", maxTokens: 100, reasoningEffort: "high", fallbackApiBase: "http://127.0.0.1:9/fallback", fallbackModel: "fm", fallbackApiKey: "k-f8" }, "prompt", 1000);
+  assert.notEqual(result.code, 0);
+  assert.match(result.stderr, /invalid API base/);
+});
+
+test("workflow template keeps the stable hosted check name and token split", () => {
+  const template = readFileSync(path.resolve(testDir, "..", "docs-agent.yml"), "utf8");
+  assert.match(template, /name:\s+hosted \(GLM 5\.2 — drafts doc update\)/);
+  assert.match(template, /DOCS_AGENT_SOURCE_TOKEN:\s*\$\{\{\s*github\.token\s*\}\}/);
+  assert.match(template, /GH_TOKEN:\s*\$\{\{\s*secrets\.DOCS_REPO_PAT\s*\}\}/);
+  assert.match(template, /GLM_API_KEY:\s*\$\{\{\s*secrets\.ZAI_API_KEY\s*\}\}/);
+  assert.match(template, /GLM_FALLBACK_API_KEY:\s*\$\{\{\s*secrets\.OPENROUTER_API_KEY\s*\}\}/);
+  assert.doesNotMatch(template, /secrets\.GLM_API_KEY|CLOUDFLARE_WORKERS_AI_TOKEN|CLOUDFLARE_ACCOUNT_ID|@cf\//);
+});
+
+test("provider error detail is redacted before truncation", async () => {
+  const { createServer: createHttpServer } = await import("node:http");
+  const key = "k-" + "z".repeat(600);
+  const server = createHttpServer((req, res) => { req.resume(); req.on("end", () => {
+    res.writeHead(200, { "Content-Type": "text/event-stream" });
+    res.end(`data: {"error":{"status":400,"message":"${"x".repeat(470)} ${key}"}}\n\n`);
+  }); });
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  try {
+    const result = await runApiBackend("glm", { type: "api", apiBase: `http://127.0.0.1:${server.address().port}/v1`, model: "m", apiKey: key, maxTokens: 100, reasoningEffort: "high" }, "prompt", 2000);
+    assert.notEqual(result.code, 0);
+    assert.doesNotMatch(result.stderr, /k-zzzz/);
+  } finally { await new Promise((resolve) => server.close(resolve)); }
+});
+
+test("a non-http(s) primary API base is a configuration error", async () => {
+  const result = await runApiBackend("glm", { type: "api", apiBase: "ftp://example.test/v1", model: "m", apiKey: "k-p7", maxTokens: 100, reasoningEffort: "high", fallbackApiBase: "http://127.0.0.1:9/fallback", fallbackModel: "fm", fallbackApiKey: "k-f7" }, "prompt", 1000);
+  assert.notEqual(result.code, 0);
+  assert.match(result.stderr, /invalid API base/);
+});
+
+test("a disconnect after a received terminal error is not reclassified as transport", async () => {
+  const { createServer: createHttpServer } = await import("node:http");
+  for (const [body, label] of [['data: {"error":{"status":400,"message":"bad"}}\n\n', "deterministic error"], ['data: {"choices":[{"delta":{"content":"x"},"finish_reason":"length"}]}\n\n', "length"]]) {
+    const paths = [];
+    const server = createHttpServer((req, res) => { req.resume(); req.on("end", () => {
+      paths.push(req.url);
+      res.writeHead(200, { "Content-Type": "text/event-stream" });
+      if (req.url.startsWith("/primary")) { res.write(body); setTimeout(() => res.socket.destroy(), 20); }
+      else res.end('data: {"choices":[{"delta":{"content":"ok"},"finish_reason":"stop"}]}\n\ndata: [DONE]\n');
+    }); });
+    await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const base = `http://127.0.0.1:${server.address().port}`;
+    try {
+      const result = await runApiBackend("glm", { type: "api", apiBase: `${base}/primary`, model: "m", apiKey: "k-p6", maxTokens: 100, maxTokensEnv: "X", reasoningEffort: "high", fallbackApiBase: `${base}/fallback`, fallbackModel: "fm", fallbackApiKey: "k-f6" }, "prompt", 2000);
+      assert.notEqual(result.code, 0, label);
+      assert.equal(paths.some((p) => p.startsWith("/fallback")), false, label);
+    } finally { await new Promise((resolve) => server.close(resolve)); }
+  }
+});
+
+test("credentialed API base and request-construction errors never fall back", async (t) => {
+  const cred = await runApiBackend("glm", { type: "api", apiBase: "http://u:p@127.0.0.1:9/v1", model: "m", apiKey: "k-p5", maxTokens: 100, reasoningEffort: "high", fallbackApiBase: "http://127.0.0.1:9/fallback", fallbackModel: "fm", fallbackApiKey: "k-f5" }, "prompt", 1000);
+  assert.match(cred.stderr, /invalid API base/);
+  let calls = 0;
+  t.mock.method(globalThis, "fetch", async () => { calls++; throw new TypeError("Request cannot be constructed from a URL that includes credentials"); });
+  const result = await runApiBackend("glm", { type: "api", apiBase: "https://primary.test/v1", model: "m", apiKey: "k-p5", maxTokens: 100, reasoningEffort: "high", fallbackApiBase: "https://fallback.test/v1", fallbackModel: "fm", fallbackApiKey: "k-f5" }, "prompt", 1000);
+  assert.notEqual(result.code, 0);
+  assert.equal(calls, 1);
 });
