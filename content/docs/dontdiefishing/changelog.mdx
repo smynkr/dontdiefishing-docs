@@ -3,6 +3,19 @@ title: Changelog
 description: What's new in DontDieFishing.
 ---
 
+## November 8–14, 2026
+
+1 user-facing change shipped.
+
+### Updates
+
+- One vessel-length rule everywhere: a positive number up to 200 ft, entered as
+  plain digits. The web vessel form already refused anything else; the iPhone
+  app's vessel form now does the same, and the database enforces it too, so a
+  typo like 220 for 22 can no longer be saved from any app. Existing profiles
+  are unaffected; leave the field blank if you do not know your overall length —
+  a blank is treated as covered by every sized restriction ([#307](https://github.com/smynkr/dontdiefishing/pull/307))
+
 ## November 1–7, 2026
 
 No user-facing changes shipped this window. (0 merged PRs were filtered as non-user-facing.)
