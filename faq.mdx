@@ -1,0 +1,151 @@
+---
+title: "FAQ & troubleshooting"
+description: "Answers about DontDieFishing accounts, launch sites, conditions, forecasts, regulations, location permissions, alerts, and tracks."
+---
+
+Common questions about the DontDieFishing web app and mobile functionality
+present in source code.
+
+## Plans and accounts
+
+### Is DontDieFishing free?
+
+The current source lists Free access to core launch-site, condition, and trip
+screens. Pro adds a seven-day Fishable Days response, week-ahead comparison, and
+a next-GO-day summary. The app currently lists $4.99/month or $39.99/year; the
+current checkout display is authoritative and can change.
+
+### How do I create an account?
+
+Use **Sign up** with email and password or an available provider. Google is
+available; Apple sign-in is shown only when its provider is configured. Email
+confirmation may be required before the first sign-in. Protected app pages
+require an authenticated session.
+
+### Is there a public mobile app?
+
+The repository's release status says no public App Store or Google Play build
+has reached users. Source code for mobile screens is not proof of store
+availability. Use the web app unless current official store listings confirm a
+release.
+
+## Launch sites, location, and privacy
+
+### Do I need to share my location to browse sites?
+
+No. Browse Launch Sites by region. The web map uses the selected region's map
+view and its security policy disables browser geolocation. The optional mobile
+site map also uses site/catalog data rather than phone GPS. Neither browsing
+flow asks for your location, so denying browser or device location access does
+not require a location-permission fallback to continue browsing.
+
+### What happens if I deny location permission?
+
+Mobile GPS track recording requires foreground location permission. Background
+access is optional: if you deny it, foreground recording can continue, but the
+background task cannot. If foreground access is denied, track recording cannot
+start; grant it in device settings before trying again. See [GPS tracks](/dontdiefishing/tracks).
+
+### Are saved or custom sites public?
+
+Saving a curated site changes only your account's saved list. A custom launch
+site that you place on the web map is owner-scoped, non-curated, and automatically
+saved to the creating account; it is not a public suggestion or a shared map
+submission. A float-plan link explicitly shares that trip's launch site and plan
+details with anyone holding the link. Do not post the link publicly; revoke it
+when no longer needed. See [Finding spots](/dontdiefishing/finding-spots) and
+[Trip plans and safety](/dontdiefishing/trips-and-safety).
+
+### Can other users read recorded GPS tracks?
+
+Other users cannot read your recorded tracks or their GPS points; access is
+scoped to the owning account. See [GPS tracks](/dontdiefishing/tracks).
+
+### Does the app recommend tackle or fishing gear?
+
+No fishing-tackle recommendation catalog is documented in the current app
+routes. The web app has vessel profiles and personal vessel records such as
+notes, maintenance, photos, and documents; those are not tackle advice.
+
+## Scores, forecasts, and regulations
+
+### Why is a score missing, stale, or incomplete?
+
+A dash or **NO DATA** can mean that no timestamped trusted snapshot is available.
+**STALE** means the last result is more than 30 minutes old. Some sources can be
+unavailable even when the snapshot has a timestamp. Reconnect, refresh or retry,
+check the age and available-signal count, and verify directly with NWS or NOAA.
+Never read a missing value as safe.
+
+### Are forecasts guarantees? Does GO mean I can launch?
+
+No. Forecasts are probabilistic and future scores omit some live marine inputs,
+including active warnings, waves, tides, currents, water temperature, and UV.
+**GO** is a modeled result from available inputs, not a safety clearance. Check
+current official warnings and conditions immediately before departure.
+
+### Does a regulation status prove a closure or open season?
+
+No. The catalog contains selected cited saltwater-rule references. **VERIFY**
+means the app cannot establish current status; it is neither OPEN nor CLOSED.
+Even **OPEN** or **CLOSED** can be superseded by an emergency order or local
+restriction. Follow the linked authority before fishing or keeping a catch.
+
+### What do tides show?
+
+Tide height/phase is based on NOAA CO-OPS predictions where a station and site
+timezone are configured; current predictions may be unavailable. Conditions
+pages with a configured station and valid site timezone also draw a 24-hour
+tide curve interpolated from those high/low predictions, with a "now" marker
+and the next predicted turn labelled in local time. The curve is an
+interpolation, not a harmonic prediction or a measured water level, and is
+omitted when prediction coverage is too thin. Future Fishable Days scores do
+not include tides or tidal current.
+
+### Does the app know whether a coastal bar is restricted or closed?
+
+No. Bar restrictions are announced by the Coast Guard on VHF-FM channels 16
+and 22A and by rough-bar warning lights, not by any online feed. For nine
+curated Pacific-coast launch sites behind regulated bars, the conditions page
+shows a bar-crossing panel naming the bar and the station to hail before
+crossing; it does not report the bar's current status. The planning score does
+not read bar status, and a restricted bar overrides any GO. See
+[Safety & conditions](/dontdiefishing/safety-conditions#bar-crossings).
+
+## Reports and alerts
+
+### Are Community Reports official hazard reports?
+
+No. The site-detail form accepts a 1–5 condition rating with optional wind,
+waves, visibility, or notes; it lists recent reports from the last 24 hours.
+These are attributed user observations, not verified sensor data, official
+forecasts, or an emergency-response channel.
+
+### Why are alerts not arriving?
+
+Web Push requires a signed-in browser with HTTPS notification permission and an
+active subscription. Saved-site events are transition-based, not continuous.
+Monitored trips are checked every 30 minutes and can create a separate status
+event. Do not assume a push was seen or that its conditions remain current.
+Native push code is not verified for a public store release; saved-site alerts
+do not use email or SMS.
+
+## Network and replay
+
+### The app says it cannot connect
+
+Reconnect and use the page's **Retry** or refresh action. The offline web app
+may display cached content; verify that condition age is current before relying
+on it. A failed data request is not a GO result.
+
+### Why can't I export a GPS track?
+
+Only a finalized track can be exported. Finish recording, wait for finalization,
+then choose **EXPORT GPX** on the web replay. The file is capped at 20,000
+points. Mobile recording depends on foreground location permission and the
+mobile app's release status.
+
+## Contact
+
+For product bugs, data corrections, or feature requests, contact
+[support@dontdiefishing.com](mailto:support@dontdiefishing.com).
