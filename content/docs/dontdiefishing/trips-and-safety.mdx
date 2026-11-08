@@ -69,16 +69,38 @@ a launch site that is otherwise private to your account.
 ## Configure a return check-in
 
 On an active trip, set **TRIP CHECK-IN** to **ENABLED**, enter a shore contact
-email and an **EXPECTED BACK BY** time, then save. When you return, choose
-**I'M BACK — CHECK IN**. This is an acknowledgement workflow, not an emergency
-response service.
+email and an **EXPECTED BACK BY** time, then save. The return time must be in
+the future. When you return, choose **I'M BACK — CHECK IN**. This is an
+acknowledgement workflow, not an emergency response service.
 
-If an active check-in remains unacknowledged past the return time plus a
-two-hour grace period, the monitor can mark it overdue, send a push to the trip
-owner, and attempt an email to the shore contact. Contact-email delivery is
-environment-gated; do not assume it will arrive. If an escalation has already
-happened, check in and call the contact directly. Disabling the check-in clears
-the contact and return time; configure it again for another trip.
+If the check-in is still unacknowledged, the escalation ladder runs in three
+steps:
+
+1. **Reminder to you.** On the first monitor pass after the expected return
+   time, you receive one push: check in by the grace deadline or your shore
+   contact will be emailed. It is sent once per check-in window, and only when
+   a shore contact email is set.
+2. **Overdue escalation.** Past the return time plus a two-hour grace period,
+   the monitor marks the trip overdue, sends you a push, and attempts an email
+   to the shore contact. The email follows the U.S. Coast Guard float-plan
+   shape: launch site, planned departure and expected return in the site's time
+   zone, how long the trip is overdue, the vessel, the last recorded GPS track
+   position when one exists, the float-plan link when sharing is on, and caller
+   steps from the Coast Guard Boating Emergency Guide. Details that were never
+   recorded are stated as missing rather than omitted. Contact-email delivery is
+   environment-gated; do not assume it will arrive.
+3. **All-clear on check-in.** When you check in after an escalation, the shore
+   contact is sent an all-clear email that asks them — if they already reported
+   you overdue — to tell the rescue authority of your safe return. If the
+   all-clear send fails, the app says so, and you must tell the contact yourself.
+
+While a trip is overdue, the check-in settings are locked until you check in:
+the contact email and return time cannot be changed and the check-in cannot be
+disabled, so the contact does not miss the all-clear. Check in first, then
+change the plan. Rescheduling an overdue trip keeps the escalation open until
+you check in; rescheduling an unescalated trip resets the check-in lifecycle and
+its reminder. Disabling the check-in (when it is not overdue) clears the contact
+and return time; configure it again for another trip.
 
 See [Alerts](/dontdiefishing/alerts) for notification sensitivity and delivery
 limits, and [Safety & conditions](/dontdiefishing/safety-conditions) for data
