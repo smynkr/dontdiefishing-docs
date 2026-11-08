@@ -26,17 +26,17 @@ The web aggregator requests available sources in parallel and timestamps the
 resulting snapshot. It does not promise a fixed refresh cadence for every
 provider or station.
 
-| Data shown or used                                                          | Source                                                                                                  | Availability and limits                                                                                                                                                                                                                 |
-| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Wind, gusts, air temperature, visibility, precipitation, lightning estimate | National Weather Service (NWS) forecast                                                                 | Forecast values are location- and time-dependent; some values can be unavailable. Lightning and visibility may be inferred from forecast text.                                                                                          |
-| Waves, period, swell direction, and fallback wind or water temperature      | NOAA National Data Buoy Center (NDBC), when a buoy is configured; NWS grid data may provide wave values | Buoy readings are observations at a station, not conditions everywhere along a route. NWS grid wave values are forecasts, not buoy observations; a missing buoy reading does not mean seas are calm. Missing values remain unavailable. |
-| Active marine warnings                                                      | NWS alerts                                                                                              | The displayed alert is a snapshot; it can change after the update.                                                                                                                                                                      |
-| Tide height/phase                                                           | NOAA CO-OPS high/low predictions                                                                        | The snapshot uses the next predicted high or low tide when a station and site timezone are available. A prediction is not an observed water level.                                                                                      |
-| Tidal-current speed                                                         | NOAA CO-OPS current predictions                                                                         | Only available for a configured station and bin; the closest prediction is used.                                                                                                                                                        |
-| Water temperature                                                           | NOAA CO-OPS, with NDBC buoy fallback                                                                    | Not available at every site.                                                                                                                                                                                                            |
-| UV index                                                                    | U.S. EPA UV data                                                                                        | May be unavailable.                                                                                                                                                                                                                     |
-| Sunrise and sunset                                                          | Calculated from site coordinates and timezone                                                           | Context only; not a scored safety signal.                                                                                                                                                                                               |
-| Water quality                                                               | Not currently supplied by the conditions aggregator                                                     | It is unavailable, not a claim that water is clean.                                                                                                                                                                                     |
+| Data shown or used                                                          | Source                                                                                                  | Availability and limits                                                                                                                                                                                                                                                                                                                                                                                                  |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Wind, gusts, air temperature, visibility, precipitation, lightning estimate | National Weather Service (NWS) forecast                                                                 | Forecast values are location- and time-dependent; some values can be unavailable. Lightning and visibility may be inferred from forecast text.                                                                                                                                                                                                                                                                           |
+| Waves, period, swell direction, and fallback wind or water temperature      | NOAA National Data Buoy Center (NDBC), when a buoy is configured; NWS grid data may provide wave values | Buoy readings are observations at a station, not conditions everywhere along a route. NWS grid wave values are forecasts, not buoy observations; a missing buoy reading does not mean seas are calm. Missing values remain unavailable.                                                                                                                                                                                  |
+| Active marine warnings                                                      | NWS alerts                                                                                              | Alerts are checked for the site point and, at regulated bar ports, the site's NWS marine zones (for example PZZ210, Columbia River Bar), so coastal-waters products such as Hazardous Seas Warning or Gale Warning are included. The displayed alert is a snapshot; it can change after the update. If part of the alert check fails, the app reports the alert status as unavailable instead of showing a clear result. |
+| Tide height/phase                                                           | NOAA CO-OPS high/low predictions                                                                        | The snapshot uses the next predicted high or low tide when a station and site timezone are available. A prediction is not an observed water level.                                                                                                                                                                                                                                                                       |
+| Tidal-current speed                                                         | NOAA CO-OPS current predictions                                                                         | Only available for a configured station and bin; the closest prediction is used.                                                                                                                                                                                                                                                                                                                                         |
+| Water temperature                                                           | NOAA CO-OPS, with NDBC buoy fallback                                                                    | Not available at every site.                                                                                                                                                                                                                                                                                                                                                                                             |
+| UV index                                                                    | U.S. EPA UV data                                                                                        | May be unavailable.                                                                                                                                                                                                                                                                                                                                                                                                      |
+| Sunrise and sunset                                                          | Calculated from site coordinates and timezone                                                           | Context only; not a scored safety signal.                                                                                                                                                                                                                                                                                                                                                                                |
+| Water quality                                                               | Not currently supplied by the conditions aggregator                                                     | It is unavailable, not a claim that water is clean.                                                                                                                                                                                                                                                                                                                                                                      |
 
 USGS streamflow and water-quality measurements are not current inputs to this
 launch-site conditions aggregator. Do not interpret the score as a river-gauge
@@ -63,11 +63,17 @@ swell direction can be displayed without being scored.
 ### Hard vetoes
 
 The score returns 100 / **NO-GO** before building weighted signal rows when a
-veto applies. Current vetoes include a marine warning containing small craft
-advisory, hurricane, tropical storm, gale warning, or storm warning; high
+veto applies. Current vetoes include a marine warning whose event name starts
+with small craft advisory (including Small Craft Advisory For Rough Bar),
+hurricane, tropical storm, typhoon, gale warning, storm warning, hazardous seas
+warning, hurricane force wind, extreme wind warning, storm surge warning, heavy
+freezing spray warning, special marine warning, or tsunami warning; high
 lightning risk; wind, gusts, waves, or tidal current above 1.5 times the selected
 vessel threshold; visibility below half its threshold; or water temperature
-below 75% of its threshold. Other warnings can still be shown without
+below 75% of its threshold. Matching is against the start of the event name, so
+land products that merely contain a phrase (for example, Winter Storm Warning)
+do not veto. Marine watches and advisories such as Gale Watch or Hazardous Seas
+Watch are weighted, not vetoed. Other warnings can still be shown without
 triggering a veto. Read the full [scoring guide](/dontdiefishing/how-scoring-works)
 for the exact calculations.
 
@@ -107,14 +113,16 @@ unknown, check official NWS/NOAA sources, and make the decision using current
 conditions and your own judgment.
 
 <Callout type="warn">
-  An individual warning fetch can fail and return an empty list, which the scorer
-  still treats as an available zero-risk marine-warning signal. The forecast
-  failure fallback can likewise supply `"none"` for lightning. If numeric
-  conditions are missing and only these zero-valued defaults remain, the current
-  scorer can return **0 / GO**. The aggregate can timestamp that result as fresh;
-  the separate **LOW** completeness label does not withhold the favorable score.
-  Neither a fresh timestamp nor an empty warning list proves that hazards were
-  checked successfully. Verify official conditions and warnings independently.
+  A failed NWS marine-alert lookup is recorded as an incomplete check and shown
+  as "NWS alert status unavailable", not as an empty list; that marker scores
+  like an unclassified advisory and never vetoes. An empty warning list
+  therefore reflects a completed check. The forecast failure fallback can still
+  supply `"none"` for lightning. If numeric conditions are missing and only
+  these zero-valued defaults remain, the current scorer can return **0 / GO**.
+  The aggregate can timestamp that result as fresh; the separate **LOW**
+  completeness label does not withhold the favorable score. Neither a fresh
+  timestamp nor a favorable score proves that every hazard was measured. Verify
+  official conditions and warnings independently.
 </Callout>
 
 ## Forecasts and tides
