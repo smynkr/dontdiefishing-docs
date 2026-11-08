@@ -26,7 +26,7 @@ provider or station.
 | --- | --- | --- |
 | Wind, gusts, air temperature, visibility, precipitation, lightning estimate | National Weather Service (NWS) forecast | Forecast values are location- and time-dependent; some values can be unavailable. Lightning and visibility may be inferred from forecast text. |
 | Waves, period, swell direction, and fallback wind or water temperature | NOAA National Data Buoy Center (NDBC), when a buoy is configured; NWS grid data may provide wave values | Buoy readings are observations at a station, not conditions everywhere along a route. NWS grid wave values are forecasts, not buoy observations; a missing buoy reading does not mean seas are calm. Missing values remain unavailable. |
-| Active marine warnings | NWS alerts | The displayed alert is a snapshot; it can change after the update. |
+| Active marine warnings | NWS alerts | The displayed alert is a snapshot; it can change after the update. Launch sites behind Coast Guard regulated bars also poll the NWS marine zone for their bar (for example, Columbia River Bar or Grays Harbor Bar), so bar-water products such as a Hazardous Seas Warning or Gale Warning are included. A failed alert check is shown as "NWS alert status unavailable" rather than a clear-sky result. |
 | Tide height/phase | NOAA CO-OPS high/low predictions | The snapshot uses the next predicted high or low tide when a station and site timezone are available. A prediction is not an observed water level. |
 | Tidal-current speed | NOAA CO-OPS current predictions | Only available for a configured station and bin; the closest prediction is used. |
 | Water temperature | NOAA CO-OPS, with NDBC buoy fallback | Not available at every site. |
@@ -59,13 +59,18 @@ swell direction can be displayed without being scored.
 ### Hard vetoes
 
 The score returns 100 / **NO-GO** before building weighted signal rows when a
-veto applies. Current vetoes include a marine warning containing small craft
-advisory, hurricane, tropical storm, gale warning, or storm warning; high
+veto applies. Current vetoes include an active NWS marine alert matching the
+marine alert vocabulary — such as Small Craft Advisory (including for Rough
+Bar), Gale Warning, Storm Warning, Hurricane Force Wind Warning, Hazardous Seas
+Warning, Storm Surge Warning, Extreme Wind Warning, Heavy Freezing Spray
+Warning, Special Marine Warning, Tsunami Warning, or Typhoon Warning; high
 lightning risk; wind, gusts, waves, or tidal current above 1.5 times the selected
 vessel threshold; visibility below half its threshold; or water temperature
-below 75% of its threshold. Other warnings can still be shown without
-triggering a veto. Read the full [scoring guide](/dontdiefishing/how-scoring-works)
-for the exact calculations.
+below 75% of its threshold. Marine alert matching is prefix-based against the
+NWS alert vocabulary, so a land product that merely contains a marine phrase
+(for example, a Winter Storm Warning) does not count as a marine warning. Other
+warnings can still be shown without triggering a veto. Read the full
+[scoring guide](/dontdiefishing/how-scoring-works) for the exact calculations.
 
 A NOAA or NWS marine warning is not the same as a fishing-regulation closure.
 Rule status is a separate cited reference and is not a substitute for checking
@@ -103,14 +108,17 @@ unknown, check official NWS/NOAA sources, and make the decision using current
 conditions and your own judgment.
 
 <Warning>
-  An individual warning fetch can fail and return an empty list, which the scorer
-  still treats as an available zero-risk marine-warning signal. The forecast
-  failure fallback can likewise supply `"none"` for lightning. If numeric
-  conditions are missing and only these zero-valued defaults remain, the current
-  scorer can return **0 / GO**. The aggregate can timestamp that result as fresh;
-  the separate **LOW** completeness label does not withhold the favorable score.
-  Neither a fresh timestamp nor an empty warning list proves that hazards were
-  checked successfully. Verify official conditions and warnings independently.
+  A failed marine-alert check is no longer read as a clear sky: the page shows
+  **NWS alert status unavailable** and the incomplete check contributes a mild
+  advisory score instead of an available zero-risk marine-warning signal. It
+  does not yet cap the verdict at CAUTION, however, and the forecast failure
+  fallback can still supply `"none"` for lightning. If numeric conditions are
+  missing and only that zero-valued default remains, the current scorer can
+  return **0 / GO**. The aggregate can timestamp that result as fresh; the
+  separate **LOW** completeness label does not withhold the favorable score.
+  Neither a fresh timestamp nor an unavailable alert status proves that hazards
+  were checked successfully. Verify official conditions and warnings
+  independently.
 </Warning>
 
 ## Forecasts and tides
