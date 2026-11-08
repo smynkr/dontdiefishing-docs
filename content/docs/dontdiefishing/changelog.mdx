@@ -3,6 +3,23 @@ title: Changelog
 description: What's new in DontDieFishing.
 ---
 
+## November 8–14, 2026
+
+1 user-facing change shipped.
+
+### Updates
+
+- Marine alert coverage for bar ports: launch sites behind Coast Guard regulated
+  bars now read the NWS marine zone for their bar (for example Columbia River
+  Bar, Grays Harbor Bar, Humboldt Bay Bar), not only the harbour point, so a
+  Small Craft Advisory for Rough Bar, Hazardous Seas Warning, or Gale Warning on
+  the bar waters reaches the score. The marine alert list follows the full NWS
+  vocabulary, so Hazardous Seas, Gale Watch, Storm Surge, Hurricane Force Wind,
+  and Freezing Spray products are no longer dropped, and the warning-level ones
+  force NO-GO like Gale and Storm Warnings. When part of an alert check fails,
+  the page now says the alert status is unavailable instead of showing a clear
+  sky ([#296](https://github.com/smynkr/dontdiefishing/pull/296))
+
 ## November 1–7, 2026
 
 No user-facing changes shipped this window. (0 merged PRs were filtered as non-user-facing.)
