@@ -53,12 +53,13 @@ The shared scorer clamps its 0–100 result and maps it to these bands:
 | 60–100 | **NO-GO**   | High modeled risk, or a hard veto has applied.                                 |
 
 The selected vessel type supplies default environmental thresholds. You can
-choose a **Cautious**, **Moderate**, or **Experienced** profile and configure
-custom thresholds or weights. The scorer uses wind/gusts, wave height, marine
-warnings, visibility, tidal current, lightning, precipitation, water quality,
-UV, water temperature, and optional travel time when those signals are
-available. Tide height/phase, sunrise/sunset, air temperature, wave period, and
-swell direction can be displayed without being scored.
+choose a **Cautious**, **Moderate**, or **Experienced** profile, set the
+vessel's overall length in feet, and configure custom thresholds or weights.
+The scorer uses wind/gusts, wave height, marine warnings, visibility, tidal
+current, lightning, precipitation, water quality, UV, water temperature, and
+optional travel time when those signals are available. Tide height/phase,
+sunrise/sunset, air temperature, wave period, and swell direction can be
+displayed without being scored.
 
 ### Hard vetoes
 
@@ -67,9 +68,13 @@ veto applies. Current vetoes include a marine warning containing small craft
 advisory, hurricane, tropical storm, gale warning, or storm warning; high
 lightning risk; wind, gusts, waves, or tidal current above 1.5 times the selected
 vessel threshold; visibility below half its threshold; or water temperature
-below 75% of its threshold. Other warnings can still be shown without
-triggering a veto. Read the full [scoring guide](/dontdiefishing/how-scoring-works)
-for the exact calculations.
+below 75% of its threshold. Coast Guard bar closures and restrictions also
+veto, scoped to the vessel: a restriction stated for vessels up to a stated
+length covers vessels of that length or less and any vessel with no length set,
+while a longer vessel keeps the entry as a weighted warning and the verdict is
+held at CAUTION or worse; closures and all-vessel restrictions veto every
+vessel. Other warnings can still be shown without triggering a veto. Read the
+full [scoring guide](/dontdiefishing/how-scoring-works) for the exact calculations.
 
 A NOAA or NWS marine warning is not the same as a fishing-regulation closure.
 Rule status is a separate cited reference and is not a substitute for checking

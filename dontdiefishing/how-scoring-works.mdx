@@ -32,7 +32,7 @@ The web aggregator uses the following inputs when available:
 | --- | --- |
 | Wind / gusts | NWS forecast, with NDBC buoy fallback for missing values; the higher normalized wind/gust risk is used. |
 | Waves / swell | NDBC buoy first, with NWS grid waves as fallback; wave height is scored. Period and swell direction are display details. |
-| Marine warnings | Active NWS alert text is shown; the scorer normalizes recognized warning language and some phrases veto. |
+| Marine warnings | Active NWS alert text is shown; the scorer normalizes recognized warning language and some phrases veto. Coast Guard bar entries carried from the NWS bar report are read against the vessel's length (see [Hard vetoes](#hard-vetoes)). |
 | Visibility | NWS forecast; unavailable where the forecast does not provide a usable value. |
 | Tidal current | NOAA CO-OPS current prediction, only where a station and bin are configured. |
 | Lightning | NWS forecast text mapped to none, low, moderate, or high. High is a hard veto. |
@@ -61,6 +61,13 @@ can override them.
 There is no vessel-specific lightning threshold. High lightning risk is a hard
 veto for every vessel.
 
+The vessel profile also carries an overall length in feet. Length does not
+change the environmental thresholds above; it decides whether a sized Coast
+Guard bar restriction covers the vessel (see [Hard vetoes](#hard-vetoes)). The
+public conditions pages score a reference vessel without a length, so bar
+restrictions apply there; set a length on your vessel profile in the app for a
+vessel-specific verdict.
+
 ## Normalization and weights
 
 Wind, gusts, wave height, and tidal current use a piecewise scale: 0 at the
@@ -73,7 +80,9 @@ Lightning maps to none = 0, low = 30, moderate = 70, high = 100. Precipitation
 is its percentage. UV rises from 0 at index 0 to 70 at index 8 and 100 at 12.
 Marine warning text maps advisory = 40, watch = 70, warning = 100; the highest
 recognized warning is used, and an unrecognized non-empty warning defaults to
-40. Water-quality values have model mappings but are unavailable from the
+40. A Coast Guard bar entry that did not veto — the vessel is longer than the
+restriction's stated size — is weighted at the watch level, 70.
+Water-quality values have model mappings but are unavailable from the
 current aggregator.
 
 The three profiles use these base weights before missing signals are removed:
@@ -114,14 +123,28 @@ Veto checks run before weighted scoring. A matching veto returns `100`,
 - A marine warning contains **small craft advisory**, **hurricane**,
   **tropical storm**, **gale warning**, **storm warning**, **hurricane warning**,
   or **hurricane watch**.
+- A Coast Guard bar restriction or Captain of the Port closure appears in the
+  NWS bar report. A closure, a restriction stated for all vessels ("ALL"), or a
+  restriction whose size cannot be read vetoes every vessel. A restriction
+  stated for vessels up to N ft vetoes a vessel of N ft or less, and any vessel
+  whose length is not set (fail closed).
 - Lightning risk is **high**.
 - Wind, gusts, waves, or tidal current exceed 1.5 times the selected threshold.
 - Visibility is below half its selected threshold.
 - Water temperature is below 75% of its selected threshold.
 
+A bar restriction that does not veto — the vessel is longer than its stated
+size — still marks a hazardous bar: the entry is weighted into the score and
+the final verdict is floored at CAUTION, so a restricted bar is never GO for
+any vessel. When a sized restriction vetoes, the reason states the scope, for
+example `Active: USCG Bar Restriction · Chetco River · Recreational:40 FOOT / …
+(covers recreational vessels up to 40 ft; yours is 22 ft)`.
+
 A warning in the UI is not automatically a veto: only the listed phrases do so.
-Check current official NWS guidance. Fishing regulation closures are separate
-from these score vetoes and must be verified with the relevant authority.
+Check current official NWS guidance. Set an overall length on your vessel
+profile so a sized restriction is judged against your boat. Fishing regulation
+closures are separate from these score vetoes and must be verified with the
+relevant authority.
 
 ## Freshness, forecast confidence, and missing data
 
