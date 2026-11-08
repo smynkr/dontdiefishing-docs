@@ -1,0 +1,160 @@
+---
+title: "Safety & conditions"
+description: "How DontDieFishing collects launch-site conditions, labels freshness, calculates a vessel-specific planning score, and handles missing data and warnings."
+---
+
+DontDieFishing combines available environmental inputs into a lower-is-better
+planning score for the selected launch site and vessel profile. It is a decision
+aid, not a safety clearance. The score cannot establish that a trip is safe,
+that a launch is open, or that a species may legally be retained.
+
+<Warning>
+  Forecasts are probabilistic, observations can be delayed or incomplete, and
+  conditions can change faster than a refresh. Verify current weather and marine
+  warnings with the official source, check applicable closures and fishing rules,
+  and assess the site before departure. Never treat GO, a blank field, or an
+  unavailable source as permission to launch.
+</Warning>
+
+## Condition sources
+
+The web aggregator requests available sources in parallel and timestamps the
+resulting snapshot. It does not promise a fixed refresh cadence for every
+provider or station.
+
+| Data shown or used | Source | Availability and limits |
+| --- | --- | --- |
+| Wind, gusts, air temperature, visibility, precipitation, lightning estimate | National Weather Service (NWS) forecast | Forecast values are location- and time-dependent; some values can be unavailable. Lightning and visibility may be inferred from forecast text. |
+| Waves, period, swell direction, and fallback wind or water temperature | NOAA National Data Buoy Center (NDBC), when a buoy is configured; NWS grid data may provide wave values | Buoy readings are observations at a station, not conditions everywhere along a route. NWS grid wave values are forecasts, not buoy observations; a missing buoy reading does not mean seas are calm. Missing values remain unavailable. |
+| Active marine warnings | NWS alerts; at bar ports, Coast Guard bar status republished by NWS Portland | The displayed alert is a snapshot; it can change after the update. The bar-status copy can lag or stop and is never a substitute for hailing the station. |
+| Tide height/phase | NOAA CO-OPS high/low predictions | The snapshot uses the next predicted high or low tide when a station and site timezone are available. A prediction is not an observed water level. |
+| Tidal-current speed | NOAA CO-OPS current predictions | Only available for a configured station and bin; the closest prediction is used. |
+| Water temperature | NOAA CO-OPS, with NDBC buoy fallback | Not available at every site. |
+| UV index | U.S. EPA UV data | May be unavailable. |
+| Sunrise and sunset | Calculated from site coordinates and timezone | Context only; not a scored safety signal. |
+| Water quality | Not currently supplied by the conditions aggregator | It is unavailable, not a claim that water is clean. |
+
+USGS streamflow and water-quality measurements are not current inputs to this
+launch-site conditions aggregator. Do not interpret the score as a river-gauge
+or water-quality assessment.
+
+## Score and status
+
+The shared scorer clamps its 0–100 result and maps it to these bands:
+
+| Score | Status | Meaning |
+| ---: | --- | --- |
+| 0–39 | **GO** | Lower modeled risk from the available scored inputs. |
+| 40–59 | **CAUTION** | Elevated modeled risk; inspect the contributing signals and official guidance. |
+| 60–100 | **NO-GO** | High modeled risk, or a hard veto has applied. |
+
+The selected vessel type supplies default environmental thresholds. You can
+choose a **Cautious**, **Moderate**, or **Experienced** profile and configure
+custom thresholds or weights. The scorer uses wind/gusts, wave height, marine
+warnings, visibility, tidal current, lightning, precipitation, water quality,
+UV, water temperature, and optional travel time when those signals are
+available. Tide height/phase, sunrise/sunset, air temperature, wave period, and
+swell direction can be displayed without being scored.
+
+### Hard vetoes
+
+The score returns 100 / **NO-GO** before building weighted signal rows when a
+veto applies. Current vetoes include a marine warning containing small craft
+advisory, hurricane, tropical storm, gale warning, or storm warning; a current
+Coast Guard bar closure or restriction at a bar port; high lightning risk; wind,
+gusts, waves, or tidal current above 1.5 times the selected vessel threshold;
+visibility below half its threshold; or water temperature below 75% of its
+threshold. Other warnings can still be shown without triggering a veto. Read
+the full [scoring guide](/dontdiefishing/how-scoring-works) for the exact
+calculations.
+
+A NOAA or NWS marine warning is not the same as a fishing-regulation closure.
+Rule status is a separate cited reference and is not a substitute for checking
+an official closure, emergency order, or access restriction.
+
+## Bar crossings
+
+Curated launch sites at regulated coastal bars show a **BAR CROSSING** panel.
+The panel reads the U.S. Coast Guard's bar status as republished by NWS
+Portland's Local Bar Observations feed:
+
+- A current **COTP closure** or **restriction** is shown with its observation
+  time, the restricted vessel classes, and the Coast Guard's conditions
+  narrative, and it forces a **NO-GO** veto in the score.
+- **NO RESTRICTIONS REPORTED** is shown only while the report is current; an
+  hours-old open report is labeled as possibly predating current conditions.
+- A report older than 24 hours, a station reporting itself unmanned, an unclear
+  status, or an unreachable feed is labeled as such — never as a clear bar. A
+  bar-status check that cannot complete is recorded as an incomplete check,
+  like a failed alert lookup.
+
+The feed is a convenience copy that can lag or stop, and bar reports typically
+run first light to last light. Hail the listed Coast Guard station on VHF
+16 / 22A before every bar crossing regardless of what the panel shows.
+
+## Freshness and confidence
+
+The current web interface labels snapshot age as **FRESH**, **AGING**, **STALE**,
+or **NO DATA**:
+
+- **FRESH** — at most 15 minutes old.
+- **AGING** — more than 15 and at most 30 minutes old.
+- **STALE** — older than 30 minutes; it is a last-known result, not a current
+  conditions check.
+- **NO DATA** — missing, invalid, or future timestamp; no trusted score is
+  shown.
+
+The authenticated conditions API reuses a snapshot only while it is under 30
+minutes old. Otherwise it fetches new conditions; if the aggregate fetch fails,
+it returns an error instead of calculating a score from an old snapshot. The
+site-detail page renders request-time data and labels a last-known stale result
+as stale. A failed update may leave the last labeled result visible with an
+error and retry action; do not mistake it for a successful refresh.
+
+The **HIGH / MED / LOW** confidence label counts how many score signals are
+available. It is a data-completeness description, not a statistical probability
+that the score or forecast is correct. A timestamp also does not prove that
+every provider succeeded. Some individual sources can fail independently and
+leave fields unavailable or warnings missing.
+
+Missing numeric signals do not contribute weight; the scorer redistributes the
+remaining available weights. Some provider fallbacks can still understate an
+unknown hazard. Treat a missing, stale, degraded, or incomplete input as
+unknown, check official NWS/NOAA sources, and make the decision using current
+conditions and your own judgment.
+
+<Warning>
+  An individual warning fetch can fail and return an empty list, which the scorer
+  still treats as an available zero-risk marine-warning signal. The forecast
+  failure fallback can likewise supply `"none"` for lightning. If numeric
+  conditions are missing and only these zero-valued defaults remain, the current
+  scorer can return **0 / GO**. The aggregate can timestamp that result as fresh;
+  the separate **LOW** completeness label does not withhold the favorable score.
+  Neither a fresh timestamp nor an empty warning list proves that hazards were
+  checked successfully. Verify official conditions and warnings independently.
+</Warning>
+
+## Forecasts and tides
+
+The site-detail weather card shows up to seven NWS daily forecast rows when
+available. A forecast is not a guarantee and is not the same as a current
+condition snapshot. The Fishable Days forward score uses only forecast-derived
+inputs and omits live marine warnings, waves, tides, tidal current, water
+temperature, and UV. The score does not promise conditions at a future hour.
+
+Tide height/phase comes from NOAA CO-OPS predictions where station metadata is
+configured; current speed may also be unavailable. Predictions and solunar
+windows are context, not a measured reading, safe-launch certification, or
+fish-catch guarantee. See [Fishable Days](/dontdiefishing/fishable-days).
+
+<Cards>
+  <Card title="How scoring works" icon="chart-line" href="/dontdiefishing/how-scoring-works">
+    Follow thresholds, signal normalization, missing data, weights, and vetoes.
+  </Card>
+  <Card title="Trip plans and safety" icon="shield-check" href="/dontdiefishing/trips-and-safety">
+    Recheck a plan and understand float-plan and check-in limits.
+  </Card>
+  <Card title="Fishing regulations" icon="gavel" href="/dontdiefishing/regulations">
+    Verify current fishing rules and closures with their cited authorities.
+  </Card>
+</Cards>

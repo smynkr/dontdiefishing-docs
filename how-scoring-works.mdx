@@ -1,0 +1,146 @@
+---
+title: "How scoring works"
+description: "The DontDieFishing planning score: available inputs, vessel thresholds, signal normalization, weights, freshness, and hard vetoes."
+---
+
+The shared scorer converts available launch-site conditions into a 0–100
+planning score for the selected vessel. Lower is lower modeled risk. The order
+is: choose default and custom vessel thresholds, choose the profile and custom
+weights, check hard vetoes, build the available signal rows, renormalize their
+weights, then round, clamp, and classify the result.
+
+<Warning>
+  This is a planning model, not a probability, forecast guarantee, navigation
+  instrument, or authorization to launch. Forecasts are uncertain; a stale score,
+  missing signal, or incomplete source set is not evidence of safe conditions.
+  Verify current official guidance and conditions before departure.
+</Warning>
+
+## Status bands
+
+| Final score | Status | How to read it |
+| ---: | --- | --- |
+| 0–39 | **GO** | Lower modeled risk from the scored inputs that were available. |
+| 40–59 | **CAUTION** | Elevated modeled risk; inspect the contributing signals. |
+| 60–100 | **NO-GO** | High modeled risk. A hard veto also returns 100 / NO-GO. |
+
+## Signals
+
+The web aggregator uses the following inputs when available:
+
+| Signal | Source and scoring behavior |
+| --- | --- |
+| Wind / gusts | NWS forecast, with NDBC buoy fallback for missing values; the higher normalized wind/gust risk is used. |
+| Waves / swell | NDBC buoy first, with NWS grid waves as fallback; wave height is scored. Period and swell direction are display details. |
+| Marine warnings | Active NWS alert text is shown; at bar ports, a current Coast Guard bar closure or restriction from the NWS bar observations feed is added as a marine warning. The scorer normalizes recognized warning language and some phrases veto. |
+| Visibility | NWS forecast; unavailable where the forecast does not provide a usable value. |
+| Tidal current | NOAA CO-OPS current prediction, only where a station and bin are configured. |
+| Lightning | NWS forecast text mapped to none, low, moderate, or high. High is a hard veto. |
+| Precipitation | NWS forecast probability, clamped to 0–100. |
+| Water temperature | NOAA CO-OPS first, then NDBC buoy where configured. |
+| UV index | EPA UV data. |
+| Water quality | Present in the shared model, but the current aggregator supplies `null`; it is unavailable. |
+| Travel time | Optional scorer input; scales from 0 at 0 minutes to 100 at 120 minutes. |
+
+Tide height/phase, sunrise/sunset, air temperature, wave period, and swell
+direction can be shown in the conditions view but are not weighted score rows.
+The current aggregator does not use USGS streamflow.
+
+## Vessel thresholds
+
+Default thresholds are adjusted by the selected vessel type; custom thresholds
+can override them.
+
+| Vessel type | Wind (kts) | Gust (kts) | Waves (ft) | Visibility (mi) | Current (kts) | Water temperature (°F) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Powerboat | 25 | 35 | 6 | 1 | 4 | 45 |
+| Sailboat | 30 | 40 | 8 | 1 | 4 | 45 |
+| Kayak | 15 | 20 | 2 | 0.5 | 2 | 55 |
+| Paddleboard | 15 | 20 | 2 | 0.5 | 2 | 55 |
+
+There is no vessel-specific lightning threshold. High lightning risk is a hard
+veto for every vessel.
+
+## Normalization and weights
+
+Wind, gusts, wave height, and tidal current use a piecewise scale: 0 at the
+ideal value, 70 at the vessel threshold, and 100 at 1.5 times that threshold.
+Visibility and water temperature use inverse scales: visibility is 0 at 10
+miles, 70 at its threshold, and 100 at half the threshold; water temperature is
+0 at 70°F, 70 at its threshold, and 100 at half the threshold.
+
+Lightning maps to none = 0, low = 30, moderate = 70, high = 100. Precipitation
+is its percentage. UV rises from 0 at index 0 to 70 at index 8 and 100 at 12.
+Marine warning text maps advisory = 40, watch = 70, warning = 100; the highest
+recognized warning is used, and an unrecognized non-empty warning defaults to
+40. Water-quality values have model mappings but are unavailable from the
+current aggregator.
+
+The three profiles use these base weights before missing signals are removed:
+
+| Signal | Cautious | Moderate | Experienced |
+| --- | ---: | ---: | ---: |
+| Wind / gusts | 22% | 20% | 15% |
+| Waves / swell | 20% | 18% | 14% |
+| Marine warnings | 18% | 15% | 12% |
+| Visibility | 12% | 12% | 12% |
+| Tidal current | 8% | 10% | 12% |
+| Lightning | 8% | 8% | 8% |
+| Precipitation | 4% | 5% | 7% |
+| Water quality | 3% | 4% | 5% |
+| UV index | 2% | 3% | 5% |
+| Water temperature | 2% | 3% | 5% |
+| Travel time | 1% | 2% | 5% |
+
+Custom weights override profile defaults. Missing numeric signals do not
+contribute; the remaining available weights are redistributed proportionally.
+Therefore the same physical conditions can produce a different score for a
+different vessel, profile, or available signal set.
+
+An empty marine-warning list is an exception to missing-input handling: it is
+always treated as available and normalizes to zero, even when a warning fetch
+failed. The forecast failure fallback can also report `"none"` for lightning.
+With all numeric conditions unavailable and only those defaults remaining, the
+scorer can return **0 / GO**, not **NO DATA**. Snapshot freshness is determined
+separately and can still be **FRESH**. Read the [missing-source
+warning](/dontdiefishing/safety-conditions#freshness-and-confidence); an apparently
+favorable score is not evidence that the missing hazards were absent.
+
+## Hard vetoes
+
+Veto checks run before weighted scoring. A matching veto returns `100`,
+**NO-GO**, `vetoed: true`, a reason, and no weighted signal breakdown:
+
+- A marine warning contains **small craft advisory**, **hurricane**,
+  **tropical storm**, **gale warning**, **storm warning**, **hurricane warning**,
+  or **hurricane watch**, or is a **Coast Guard bar closure or restriction**
+  written from the NWS bar observations feed at a bar port.
+- Lightning risk is **high**.
+- Wind, gusts, waves, or tidal current exceed 1.5 times the selected threshold.
+- Visibility is below half its selected threshold.
+- Water temperature is below 75% of its selected threshold.
+
+A warning in the UI is not automatically a veto: only the listed phrases do so.
+Check current official NWS guidance and, at a bar port, hail the Coast Guard
+station before crossing. Fishing regulation closures are separate from these
+score vetoes and must be verified with the relevant authority.
+
+## Freshness, forecast confidence, and missing data
+
+The web verdict labels snapshot age **FRESH** through 15 minutes, **AGING** from
+more than 15 through 30 minutes, and **STALE** after 30 minutes. Missing,
+invalid, or future timestamps are **NO DATA**. The authenticated conditions
+endpoint uses only an under-30-minute cache; otherwise it fetches new data and
+returns an error if the aggregate fetch fails. The site detail marks a displayed
+last-known result as stale and offers a retry when an update fails.
+
+The separate **HIGH / MED / LOW** label measures the fraction of score signals
+available, not the probability that a forecast or verdict is correct. A recent
+`fetched_at` timestamp does not guarantee every provider succeeded. Some source
+failures can leave warnings or forecast fields unknown.
+
+Forward Fishable Days results use NWS forecast windows, not live marine
+measurements. If a day lacks usable wind data or complete hourly forecast
+coverage, the score is unavailable rather than a best-case GO. Future-day
+scores omit active marine warnings, waves, tide/current, water temperature, and
+UV. See [Fishable Days](/dontdiefishing/fishable-days) and [Safety & conditions](/dontdiefishing/safety-conditions).
