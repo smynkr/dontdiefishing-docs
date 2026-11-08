@@ -3,6 +3,28 @@ title: "Changelog"
 description: "What's new in DontDieFishing."
 ---
 
+## November 8–14, 2026
+
+1 user-facing change shipped.
+
+### Updates
+
+- Wave steepness enters the waves signal: the dominant wave period now affects
+  the live planning score — a steep sea scores as 1.25× and a very steep sea as
+  1.5× its measured height against the vessel wave limit (NDBC steepness
+  classes; the hard veto stays on measured height, and forecast days are
+  unchanged) ([#302](https://github.com/smynkr/dontdiefishing/pull/302))
+
+## November 8, 2026
+
+### Updates
+
+- Updated [Safety & conditions](/dontdiefishing/safety-conditions) and
+  [How scoring works](/dontdiefishing/how-scoring-works) for the wave-steepness
+  scoring change: wave period now enters live scores through NDBC steepness
+  classification, the hard veto still uses the measured height, and
+  [Fishable Days](/dontdiefishing/fishable-days) forecast behavior is unchanged.
+
 ## November 1–7, 2026
 
 No user-facing changes shipped this window. (0 merged PRs were filtered as non-user-facing.)
