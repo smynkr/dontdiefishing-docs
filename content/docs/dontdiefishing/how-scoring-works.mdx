@@ -29,23 +29,24 @@ weights, then round, clamp, and classify the result.
 
 The web aggregator uses the following inputs when available:
 
-| Signal            | Source and scoring behavior                                                                                              |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Wind / gusts      | NWS forecast, with NDBC buoy fallback for missing values; the higher normalized wind/gust risk is used.                  |
-| Waves / swell     | NDBC buoy first, with NWS grid waves as fallback; wave height is scored. Period and swell direction are display details. |
-| Marine warnings   | Active NWS alert text is shown; the scorer normalizes recognized warning language and some phrases veto.                 |
-| Visibility        | NWS forecast; unavailable where the forecast does not provide a usable value.                                            |
-| Tidal current     | NOAA CO-OPS current prediction, only where a station and bin are configured.                                             |
-| Lightning         | NWS forecast text mapped to none, low, moderate, or high. High is a hard veto.                                           |
-| Precipitation     | NWS forecast probability, clamped to 0–100.                                                                              |
-| Water temperature | NOAA CO-OPS first, then NDBC buoy where configured.                                                                      |
-| UV index          | EPA UV data.                                                                                                             |
-| Water quality     | Present in the shared model, but the current aggregator supplies `null`; it is unavailable.                              |
-| Travel time       | Optional scorer input; scales from 0 at 0 minutes to 100 at 120 minutes.                                                 |
+| Signal            | Source and scoring behavior                                                                                                                                                                                       |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Wind / gusts      | NWS forecast, with NDBC buoy fallback for missing values; the higher normalized wind/gust risk is used.                                                                                                           |
+| Waves / swell     | NDBC buoy first, with NWS grid waves as fallback; wave height is scored, adjusted for steepness when a dominant period is available (see [Wave steepness](#wave-steepness)). Swell direction is a display detail. |
+| Marine warnings   | Active NWS alert text is shown; the scorer normalizes recognized warning language and some phrases veto.                                                                                                          |
+| Visibility        | NWS forecast; unavailable where the forecast does not provide a usable value.                                                                                                                                     |
+| Tidal current     | NOAA CO-OPS current prediction, only where a station and bin are configured.                                                                                                                                      |
+| Lightning         | NWS forecast text mapped to none, low, moderate, or high. High is a hard veto.                                                                                                                                    |
+| Precipitation     | NWS forecast probability, clamped to 0–100.                                                                                                                                                                       |
+| Water temperature | NOAA CO-OPS first, then NDBC buoy where configured.                                                                                                                                                               |
+| UV index          | EPA UV data.                                                                                                                                                                                                      |
+| Water quality     | Present in the shared model, but the current aggregator supplies `null`; it is unavailable.                                                                                                                       |
+| Travel time       | Optional scorer input; scales from 0 at 0 minutes to 100 at 120 minutes.                                                                                                                                          |
 
-Tide height/phase, sunrise/sunset, air temperature, wave period, and swell
-direction can be shown in the conditions view but are not weighted score rows.
-The current aggregator does not use USGS streamflow.
+Tide height/phase, sunrise/sunset, air temperature, and swell direction can be
+shown in the conditions view but are not weighted score rows. Wave period is
+not its own weighted row either, but it now enters the waves score through
+steepness classification. The current aggregator does not use USGS streamflow.
 
 ## Vessel thresholds
 
@@ -66,9 +67,29 @@ veto for every vessel.
 
 Wind, gusts, wave height, and tidal current use a piecewise scale: 0 at the
 ideal value, 70 at the vessel threshold, and 100 at 1.5 times that threshold.
-Visibility and water temperature use inverse scales: visibility is 0 at 10
-miles, 70 at its threshold, and 100 at half the threshold; water temperature is
-0 at 70°F, 70 at its threshold, and 100 at half the threshold.
+For waves, the value normalized is the steepness-adjusted height described
+below, not the raw reading. Visibility and water temperature use inverse scales:
+visibility is 0 at 10 miles, 70 at its threshold, and 100 at half the threshold;
+water temperature is 0 at 70°F, 70 at its threshold, and 100 at half the
+threshold.
+
+### Wave steepness
+
+When a live reading carries both significant wave height and a dominant period,
+the scorer classifies the sea with the NDBC steepness algorithm: the height in
+metres is compared against `period^3.3` ÷ 250, 500, and 1000 for very steep,
+steep, and average, and a reading below the average line with a period of
+10 seconds or more is treated as swell. A steep sea is scored as 1.25× and a
+very steep sea as 1.5× its measured height against the vessel wave limit, so
+5 ft at 7 s meets a 6 ft powerboat limit while 5 ft at 14 s does not. The method
+follows the NWS Western Region hazardous-seas criteria; the 1.25× and 1.5×
+factors are DDF calibration. Readings under 1 ft or with a period under 2 s are
+not classified.
+
+The hard veto still compares the measured height, so steepness alone can never
+produce a NO-GO. Scores are computed on read, so historical snapshots that
+carried a period re-score under this rule. Forecast day rows carry no period,
+so steepness applies to live scoring only; fair-weather odds remain height-only.
 
 Lightning maps to none = 0, low = 30, moderate = 70, high = 100. Precipitation
 is its percentage. UV rises from 0 at index 0 to 70 at index 8 and 100 at 12.
@@ -117,6 +138,7 @@ Veto checks run before weighted scoring. A matching veto returns `100`,
   or **hurricane watch**.
 - Lightning risk is **high**.
 - Wind, gusts, waves, or tidal current exceed 1.5 times the selected threshold.
+  The waves veto uses the measured height, not the steepness-adjusted value.
 - Visibility is below half its selected threshold.
 - Water temperature is below 75% of its selected threshold.
 
