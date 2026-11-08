@@ -25,7 +25,7 @@ provider or station.
 | Data shown or used | Source | Availability and limits |
 | --- | --- | --- |
 | Wind, gusts, air temperature, visibility, precipitation, lightning estimate | National Weather Service (NWS) forecast | Forecast values are location- and time-dependent; some values can be unavailable. Lightning and visibility may be inferred from forecast text. |
-| Waves, period, swell direction, and fallback wind or water temperature | NOAA National Data Buoy Center (NDBC), when a buoy is configured; NWS grid data may provide wave values | Buoy readings are observations at a station, not conditions everywhere along a route. NWS grid wave values are forecasts, not buoy observations; a missing buoy reading does not mean seas are calm. Missing values remain unavailable. |
+| Waves, period, swell direction, and fallback wind or water temperature | NOAA National Data Buoy Center (NDBC), when a buoy is configured; NWS grid data may provide wave values | Buoy readings are observations at a station, not conditions everywhere along a route. NWS grid wave values are forecasts, not buoy observations; a missing buoy reading does not mean seas are calm. Missing values remain unavailable. A live reading with a dominant period is classified as very steep, steep, average, or swell, and the WAVES cell shows the period and class next to the Douglas sea state. |
 | Active marine warnings | NWS alerts | The displayed alert is a snapshot; it can change after the update. |
 | Tide height/phase | NOAA CO-OPS high/low predictions | The snapshot uses the next predicted high or low tide when a station and site timezone are available. A prediction is not an observed water level. |
 | Tidal-current speed | NOAA CO-OPS current predictions | Only available for a configured station and bin; the closest prediction is used. |
@@ -53,8 +53,13 @@ choose a **Cautious**, **Moderate**, or **Experienced** profile and configure
 custom thresholds or weights. The scorer uses wind/gusts, wave height, marine
 warnings, visibility, tidal current, lightning, precipitation, water quality,
 UV, water temperature, and optional travel time when those signals are
-available. Tide height/phase, sunrise/sunset, air temperature, wave period, and
-swell direction can be displayed without being scored.
+available. When a live wave reading carries a dominant period, its NDBC
+steepness class (very steep, steep, average, or swell) adjusts the wave height
+used against the vessel wave limit: a steep sea counts as 1.25 times and a very
+steep sea as 1.5 times its measured height. Tide height/phase, sunrise/sunset,
+air temperature, and swell direction can be displayed without being scored;
+wave period is not a scored row on its own, but its steepness class changes the
+effective wave height.
 
 ### Hard vetoes
 
@@ -62,7 +67,8 @@ The score returns 100 / **NO-GO** before building weighted signal rows when a
 veto applies. Current vetoes include a marine warning containing small craft
 advisory, hurricane, tropical storm, gale warning, or storm warning; high
 lightning risk; wind, gusts, waves, or tidal current above 1.5 times the selected
-vessel threshold; visibility below half its threshold; or water temperature
+vessel threshold (the wave veto uses the measured height — steepness alone never
+vetoes); visibility below half its threshold; or water temperature
 below 75% of its threshold. Other warnings can still be shown without
 triggering a veto. Read the full [scoring guide](/dontdiefishing/how-scoring-works)
 for the exact calculations.
