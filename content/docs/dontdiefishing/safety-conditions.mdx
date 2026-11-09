@@ -98,7 +98,10 @@ The **HIGH / MED / LOW** confidence label counts how many score signals are
 available. It is a data-completeness description, not a statistical probability
 that the score or forecast is correct. A timestamp also does not prove that
 every provider succeeded. Some individual sources can fail independently and
-leave fields unavailable or warnings missing.
+leave fields unavailable or warnings missing. When the marine alert lookup
+itself fails, the check is incomplete: the verdict is capped at **CAUTION**
+instead of reading **GO**, and the verdict says the marine alert status is
+unavailable rather than presenting a clear sky.
 
 Missing numeric signals do not contribute weight; the scorer redistributes the
 remaining available weights. Some provider fallbacks can still understate an
@@ -107,14 +110,15 @@ unknown, check official NWS/NOAA sources, and make the decision using current
 conditions and your own judgment.
 
 <Callout type="warn">
-  An individual warning fetch can fail and return an empty list, which the scorer
-  still treats as an available zero-risk marine-warning signal. The forecast
-  failure fallback can likewise supply `"none"` for lightning. If numeric
-  conditions are missing and only these zero-valued defaults remain, the current
-  scorer can return **0 / GO**. The aggregate can timestamp that result as fresh;
-  the separate **LOW** completeness label does not withhold the favorable score.
-  Neither a fresh timestamp nor an empty warning list proves that hazards were
-  checked successfully. Verify official conditions and warnings independently.
+  An individual marine alert lookup can fail, and the forecast failure fallback
+  can supply `"none"` for lightning. An incomplete marine alert check is not
+  read as a clear sky: the day tops out at **CAUTION** instead of **GO**, and
+  the verdict says the marine alert status is unavailable. A fresh timestamp and
+  the separate **LOW** completeness label still do not prove that every hazard
+  was checked successfully. An outage alone never turns a **GO** trip into a
+  **NO-GO**; limit breaches, vetoes, and Coast Guard bar restrictions keep
+  their own, stronger verdicts. Verify official conditions and warnings
+  independently.
 </Callout>
 
 ## Forecasts and tides
