@@ -3,6 +3,20 @@ title: "Changelog"
 description: "What's new in DontDieFishing."
 ---
 
+## November 8–14, 2026
+
+1 user-facing change shipped.
+
+### New features
+
+- Scoring: per-vessel minimum wave period limit ([#327](https://github.com/smynkr/dontdiefishing/pull/327)) — an optional
+  minimum wave period (whole seconds, 3–12, off unless set) on each vessel
+  profile, on web and mobile. A dominant period shorter than the limit at 1 ft
+  or more holds the day at CAUTION and names the limit in the reason; it never
+  vetoes by itself. A missing or unusable period is disclosed as not checked
+  rather than passed. Forecast days carry no wave period, so the limit applies
+  to live conditions only.
+
 ## November 1–7, 2026
 
 No user-facing changes shipped this window. (0 merged PRs were filtered as non-user-facing.)
