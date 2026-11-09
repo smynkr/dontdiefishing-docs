@@ -55,9 +55,14 @@ email to the shore contact; contact-email delivery is environment-gated. See
 
 Active trip plans are checked by a server monitor scheduled every 30 minutes.
 A status transition can create Web Push and native-push deliveries when eligible
-subscriptions exist. The monitor can also attempt a pre-trip brief. Delivery
-acceptance does not prove that you saw the alert or that conditions remain
-unchanged. Open the plan, refresh, and verify current official sources.
+subscriptions exist. The monitor can also attempt a pre-trip brief. If the
+marine alert lookup fails during a check, the recheck tops out at **CAUTION**
+and says the marine alert status is unavailable. A trip that was **NO-GO** stays
+**NO-GO** through the outage rather than being re-labeled good to go, because
+the outage can hide the advisory that vetoed the trip; an outage alone never
+moves a **GO** trip to **NO-GO**. Delivery acceptance does not prove that you
+saw the alert or that conditions remain unchanged. Open the plan, refresh, and
+verify current official sources.
 
 See [Safety & conditions](/dontdiefishing/safety-conditions),
 [Trip plans and safety](/dontdiefishing/trips-and-safety), and

@@ -59,7 +59,10 @@ gusts, precipitation, and forecast-derived visibility/lightning signals; marine
 warnings are active-only and are not forecast. Waves, tide height/phase,
 tidal current, water temperature, UV, and water quality are not included in
 forward-day scores. A **FORECAST** label does not mean that each source is
-present or that the result is a guarantee.
+present or that the result is a guarantee. On the live day, an incomplete
+marine alert lookup caps the result at **CAUTION** and the day reports the
+marine alert status as unavailable; missing alert data is never presented as a
+clean **GO**.
 
 A daily summary with usable wind can supply a forecast window. Otherwise the
 system requires complete hourly coverage and usable wind signals for the local
