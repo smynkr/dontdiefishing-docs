@@ -32,7 +32,7 @@ The web aggregator uses the following inputs when available:
 | --- | --- |
 | Wind / gusts | NWS forecast, with NDBC buoy fallback for missing values; the higher normalized wind/gust risk is used. |
 | Waves / swell | NDBC buoy first, with NWS grid waves as fallback; wave height is scored. Period and swell direction are display details. |
-| Marine warnings | Active NWS alert text is shown; the scorer normalizes recognized warning language and some phrases veto. |
+| Marine warnings | Active NWS alert text is shown; the scorer normalizes recognized warning language and some phrases veto. A failed alert lookup records a sentinel that scores like an unclassified advisory and holds the verdict at CAUTION. |
 | Visibility | NWS forecast; unavailable where the forecast does not provide a usable value. |
 | Tidal current | NOAA CO-OPS current prediction, only where a station and bin are configured. |
 | Lightning | NWS forecast text mapped to none, low, moderate, or high. High is a hard veto. |
@@ -76,6 +76,13 @@ recognized warning is used, and an unrecognized non-empty warning defaults to
 40. Water-quality values have model mappings but are unavailable from the
 current aggregator.
 
+When the NWS marine alert lookup or the Coast Guard bar status lookup does not
+complete, the snapshot records the sentinel `Marine alert check incomplete`
+instead of an empty list. The sentinel scores like an unclassified advisory
+(40), never vetoes, and floors the total at 40, so the verdict reads CAUTION or
+worse and never GO. A total already above 40 is unchanged. Forecast cells have
+no alert input and are not held.
+
 The three profiles use these base weights before missing signals are removed:
 
 | Signal | Cautious | Moderate | Experienced |
@@ -97,9 +104,11 @@ contribute; the remaining available weights are redistributed proportionally.
 Therefore the same physical conditions can produce a different score for a
 different vessel, profile, or available signal set.
 
-An empty marine-warning list is an exception to missing-input handling: it is
-always treated as available and normalizes to zero, even when a warning fetch
-failed. The forecast failure fallback can also report `"none"` for lightning.
+An empty marine-warning list is an exception to missing-input handling: when
+the alert check completes and finds no active alerts, it is treated as
+available and normalizes to zero. A check that does not complete is not treated
+this way; it records the sentinel described above and holds the verdict at
+CAUTION. The forecast failure fallback can still report `"none"` for lightning.
 With all numeric conditions unavailable and only those defaults remaining, the
 scorer can return **0 / GO**, not **NO DATA**. Snapshot freshness is determined
 separately and can still be **FRESH**. Read the [missing-source
@@ -120,8 +129,10 @@ Veto checks run before weighted scoring. A matching veto returns `100`,
 - Water temperature is below 75% of its selected threshold.
 
 A warning in the UI is not automatically a veto: only the listed phrases do so.
-Check current official NWS guidance. Fishing regulation closures are separate
-from these score vetoes and must be verified with the relevant authority.
+An incomplete marine alert check is never a veto; it holds the verdict at
+CAUTION instead (see the marine-warning notes above). Check current official
+NWS guidance. Fishing regulation closures are separate from these score vetoes
+and must be verified with the relevant authority.
 
 ## Freshness, forecast confidence, and missing data
 
@@ -135,7 +146,9 @@ last-known result as stale and offers a retry when an update fails.
 The separate **HIGH / MED / LOW** label measures the fraction of score signals
 available, not the probability that a forecast or verdict is correct. A recent
 `fetched_at` timestamp does not guarantee every provider succeeded. Some source
-failures can leave warnings or forecast fields unknown.
+failures can leave warnings or forecast fields unknown. An incomplete marine
+alert check holds the live verdict at CAUTION rather than GO; forward forecast
+cells have no alert input and are not held.
 
 Forward Fishable Days results use NWS forecast windows, not live marine
 measurements. If a day lacks usable wind data or complete hourly forecast
