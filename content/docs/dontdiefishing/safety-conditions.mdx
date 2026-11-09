@@ -57,8 +57,24 @@ choose a **Cautious**, **Moderate**, or **Experienced** profile and configure
 custom thresholds or weights. The scorer uses wind/gusts, wave height, marine
 warnings, visibility, tidal current, lightning, precipitation, water quality,
 UV, water temperature, and optional travel time when those signals are
-available. Tide height/phase, sunrise/sunset, air temperature, wave period, and
-swell direction can be displayed without being scored.
+available. Tide height/phase, sunrise/sunset, air temperature, and swell
+direction can be displayed without being scored; wave period affects the
+verdict only through the optional minimum-period limit described below.
+
+### Minimum wave period limit
+
+A vessel can also set an optional **minimum wave period** — whole seconds from
+3 to 12, off unless set — in its vessel profile. On a live reading of 1 ft or
+more whose dominant period is shorter than the limit, the result is held at
+CAUTION and the reason line names the period; the limit never vetoes a trip by
+itself and does not change the weighted score. A result that is already NO-GO
+stays NO-GO.
+
+If the wave height is unknown, or the period is missing or under 2 s, the
+verdict line and the pre-trip brief say the limit could not be checked rather
+than passed. The limit reads the dominant period only, so short chop under a
+longer swell is not seen, and it applies to live conditions only because
+forecast days carry no wave period.
 
 ### Hard vetoes
 
