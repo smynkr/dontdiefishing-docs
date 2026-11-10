@@ -1,0 +1,107 @@
+---
+title: "Fishable Days"
+description: "Compare vessel-specific current and forecast days for launch sites, with explicit limits for missing weather data and forecast confidence."
+---
+
+**Fishable Days** scores a limited set of dates for a selected vessel and launch
+site. The calendar uses the same lower-is-better GO / CAUTION / NO-GO scale as
+current conditions, but forward days are NWS forecast-based planning results,
+not promises of safe conditions.
+
+<Warning>
+  Forecasts are probabilistic and may have gaps. Future-day results do not model
+  all live marine conditions or active warnings. Always recheck current weather,
+  official marine warnings, closures, regulations, and on-site conditions before
+  departure.
+</Warning>
+
+## Access and vessel selection
+
+Fishable Days is part of the authenticated web app and requires a vessel profile.
+If there is no vessel, the page prompts you to add one in **Settings**. The
+selected vessel supplies the thresholds and score profile; change it in the
+vessel selector before comparing a different craft.
+
+The current response window is **one day on Free** and **seven days on Pro**.
+The **NEXT 30 DAYS** label on the summary is not a promise of 30 scored days; it
+summarizes only the days in the current response. The free view can offer an
+upgrade prompt for the longer forecast window.
+
+The endpoint normally uses saved launch sites. If the saved-site read fails or
+there are no saved sites, it falls back to curated sites; it labels those rows
+**CURATED**. No more than 12 sites are returned at a time.
+
+## Month and week views
+
+Use **MONTH** or **WEEK** to change the visible calendar. The arrows move the
+month or seven-day range, and selecting a day opens its summary.
+
+- **Month:** each returned day shows the best available score among resolved
+  sites, a status/color, a compact wind/rain summary, and a trip marker if you
+  already planned a trip that day. The day detail shows the first available
+  best window in the site's local time and compares available sites from lower
+  score to higher score.
+- **Week:** rows compare sites and columns show days. A **TRIP** badge means a
+  trip plan uses that site on that date; the plan marker does not change the
+  score.
+
+A planned trip is context, not an input to the forecast score. Choose a scored
+day and **PLAN THIS DAY** to open the trip form.
+
+## Live day and forecast days
+
+The current day can use a live conditions snapshot. Forward days are built from
+NWS forecast data and site-local calendar dates. They score available wind and
+gusts, precipitation, and forecast-derived visibility/lightning signals; marine
+warnings are active-only and are not forecast. Waves, tide height/phase,
+tidal current, water temperature, UV, and water quality are not included in
+forward-day scores. A **FORECAST** label does not mean that each source is
+present or that the result is a guarantee.
+
+A daily summary with usable wind can supply a forecast window. Otherwise the
+system requires complete hourly coverage and usable wind signals for the local
+day. If weather periods are missing, invalid, or incomplete, that date stays
+unscored. It is shown as unavailable, not assigned a favorable status from the
+few hours that happened to arrive. A hard vessel limit can still veto a scored
+window to **NO-GO**.
+
+The best-window detail uses the first available solunar window for the selected
+site and formats it in that site's timezone. Solunar windows are optional
+planning context, not a safety or catch guarantee; if unavailable, the page
+says **NO WINDOW DATA**.
+
+## Planning beyond the forecast grid
+
+A trip date more than a week out is past the forecast window. For such dates,
+the trip form shows how often past days around that date stayed inside your
+boat's own limits, drawn from up to 15 years of NOAA buoy history near the
+ramp. It pools the date plus or minus seven days and shows each past year's
+reading for the date itself as a dot. This is history, not a forecast: it
+leaves out warnings, fog, and lightning, and a past pattern does not promise
+future conditions. For San Francisco Bay marinas, the history comes from the
+ocean buoy outside the Golden Gate and says so.
+
+## Safety and official sources
+
+A forecast score is not the same as the latest conditions score. A source age or
+confidence label is not the probability that a forecast is right. Read the
+signal and source information, then verify the official forecast and active
+warnings directly. Regulatory closure status is a separate reference view; it
+is not incorporated as a guarantee that the site or trip is legal.
+
+See [How scoring works](/dontdiefishing/how-scoring-works) for status bands and
+vessel thresholds, [Safety & conditions](/dontdiefishing/safety-conditions) for
+freshness and source limitations, and [Trip plans and safety](/dontdiefishing/trips-and-safety)
+for planned-trip readiness.
+
+<Cards>
+  <Card title="Getting started" icon="rocket" href="/dontdiefishing/getting-started">
+    Configure a vessel, save launch sites, and plan a trip before opening the calendar.
+  </Card>
+  <Card title="How scoring works" icon="chart-line" href="/dontdiefishing/how-scoring-works">
+    Understand the inputs, weights, thresholds, and vetoes.
+  </Card>
+  <Card title="Safety & conditions" icon="shield-check" href="/dontdiefishing/safety-conditions">
+    Verify what a current-data label does and does not establish.
+  </Card>
+</Cards>

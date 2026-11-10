@@ -1,0 +1,65 @@
+---
+title: "Alerts"
+description: "Configure saved-site alert sensitivity and understand browser push, native-push release limits, and trip-monitor notifications."
+---
+
+Alerts are prompts to reopen the app and reassess a saved launch site or trip.
+They are not a guarantee that conditions are safe, that a notification will
+reach you, or that anyone is monitoring your trip.
+
+<Warning>
+  Recheck current conditions, official weather and marine warnings, applicable
+  rules and closures, and your vessel limits before departure. An alert is a
+  snapshot and does not replace an official source or an on-site assessment.
+</Warning>
+
+## Saved-site alert sensitivity
+
+Saved-site alerts compare current and (when available for the account's tier)
+forward-day observations against the previous observation for the same saved
+site and default vessel. Choose the account-level **ALERT SENSITIVITY** option
+in Settings:
+
+| Preference | Changes that can generate an event |
+| --- | --- |
+| **Minimal** | A direct **GO ↔ NO-GO** transition. |
+| **Standard** | Any status transition, including changes to or from **CAUTION**. |
+| **All changes** | Any status transition, or a score change of at least 5 points. |
+
+The option changes which observations qualify; it does not turn device
+notifications on. Unavailable observations are not treated as **NO-GO** alerts,
+and unchanged readings do not create continuous updates.
+
+## Delivery and permissions
+
+The web app uses browser Web Push for saved-site and monitored-trip notifications.
+Sign in and allow notifications for DontDieFishing in the browser over HTTPS. If
+permission is blocked or an old subscription has expired, correct the browser's
+site permission and retry; you can also reopen the site to recheck the current
+data instead of relying on an alert.
+
+Expo/native push registration and server delivery code exists, and mobile
+Settings has a separate device-notification control. However, the source release
+record says there is no public App Store or Google Play build and no completed
+real-device delivery verification. Do not rely on native push as a released or
+verified service.
+
+Saved-site condition alerts are push events, not email or SMS. The trip
+check-in escalation is separate: after a configured return time plus its
+two-hour grace period, the monitor can send an owner-facing push and attempt an
+email to the shore contact; contact-email delivery is environment-gated. See
+[Trip plans and safety](/dontdiefishing/trips-and-safety).
+
+## Monitored trips
+
+Active trip plans are checked by a server monitor scheduled every 30 minutes.
+A status transition can create Web Push and native-push deliveries when eligible
+subscriptions exist. The monitor can also attempt a pre-trip brief. A marine
+advisory on water a planned trip would cross to go further holds the trip from
+being marked good to go while it is in force. Delivery
+acceptance does not prove that you saw the alert or that conditions remain
+unchanged. Open the plan, refresh, and verify current official sources.
+
+See [Safety & conditions](/dontdiefishing/safety-conditions),
+[Trip plans and safety](/dontdiefishing/trips-and-safety), and
+[Account & billing](/dontdiefishing/account-billing).
