@@ -37,7 +37,7 @@ The web aggregator uses the following inputs when available:
 | Tidal current | NOAA CO-OPS current prediction, only where a station and bin are configured. |
 | Lightning | NWS forecast text mapped to none, low, moderate, or high. High is a hard veto. |
 | Precipitation | NWS forecast probability, clamped to 0–100. |
-| Water temperature | NOAA CO-OPS first, then NDBC buoy where configured. |
+| Water temperature | NOAA CO-OPS station reading while it is current. A station reading more than 24 hours old, or timed more than 15 minutes ahead, is stale: the colder of the stale station reading and a fresh NDBC buoy reading is scored, so a stale cold reading is never lifted by a warmer offshore buoy. With no buoy reading, the station value is kept. |
 | UV index | EPA UV data. |
 | Water quality | Present in the shared model, but the current aggregator supplies `null`; it is unavailable. |
 | Travel time | Optional scorer input; scales from 0 at 0 minutes to 100 at 120 minutes. |
