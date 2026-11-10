@@ -3,6 +3,19 @@ title: "Changelog"
 description: "What's new in DontDieFishing."
 ---
 
+## November 8–14, 2026
+
+1 user-facing change shipped.
+
+### Updates
+
+- Stop scoring open-ocean buoy waves for seven San Francisco Bay marinas; the
+  conditions page shows NDBC 46026 as a not-scored outside reference and waves
+  inside the Bay read as not measured, while wind, gusts, and advisories still
+  apply ([#337](https://github.com/smynkr/dontdiefishing/pull/337)). Snapshots
+  written in the 30 minutes before deploy could still show a CAUTION from the
+  ocean waves until they expired; that cleared on the next snapshot.
+
 ## November 1–7, 2026
 
 No user-facing changes shipped this window. (0 merged PRs were filtered as non-user-facing.)
