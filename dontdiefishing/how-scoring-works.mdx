@@ -119,6 +119,10 @@ Veto checks run before weighted scoring. A matching veto returns `100`,
 - Visibility is below half its selected threshold.
 - Water temperature is below 75% of its selected threshold.
 
+Because the signal rows are skipped, the confidence label on a hard-veto
+verdict reads **N/A · HARD VETO, SIGNALS NOT SCORED** rather than a
+HIGH / MED / LOW completeness level.
+
 A warning in the UI is not automatically a veto: only the listed phrases do so.
 Check current official NWS guidance. Fishing regulation closures are separate
 from these score vetoes and must be verified with the relevant authority.
@@ -133,9 +137,11 @@ returns an error if the aggregate fetch fails. The site detail marks a displayed
 last-known result as stale and offers a retry when an update fails.
 
 The separate **HIGH / MED / LOW** label measures the fraction of score signals
-available, not the probability that a forecast or verdict is correct. A recent
-`fetched_at` timestamp does not guarantee every provider succeeded. Some source
-failures can leave warnings or forecast fields unknown.
+available, not the probability that a forecast or verdict is correct. A hard
+veto skips the signal rows, so the label reads **N/A · HARD VETO, SIGNALS NOT
+SCORED** instead. A recent `fetched_at` timestamp does not guarantee every
+provider succeeded. Some source failures can leave warnings or forecast fields
+unknown.
 
 Forward Fishable Days results use NWS forecast windows, not live marine
 measurements. If a day lacks usable wind data or complete hourly forecast

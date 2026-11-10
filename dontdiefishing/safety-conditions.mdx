@@ -92,9 +92,12 @@ error and retry action; do not mistake it for a successful refresh.
 
 The **HIGH / MED / LOW** confidence label counts how many score signals are
 available. It is a data-completeness description, not a statistical probability
-that the score or forecast is correct. A timestamp also does not prove that
-every provider succeeded. Some individual sources can fail independently and
-leave fields unavailable or warnings missing.
+that the score or forecast is correct. When a hard veto applies, the signal
+breakdown is skipped and the label reads **N/A · HARD VETO, SIGNALS NOT
+SCORED** instead of a completeness level; it reports that scoring was skipped,
+not doubt about the NO-GO. A timestamp also does not prove that every provider
+succeeded. Some individual sources can fail independently and leave fields
+unavailable or warnings missing.
 
 Missing numeric signals do not contribute weight; the scorer redistributes the
 remaining available weights. Some provider fallbacks can still understate an
