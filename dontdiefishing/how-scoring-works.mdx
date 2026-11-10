@@ -31,7 +31,7 @@ The web aggregator uses the following inputs when available:
 | Signal | Source and scoring behavior |
 | --- | --- |
 | Wind / gusts | NWS forecast, with NDBC buoy fallback for missing values; the higher normalized wind/gust risk is used. |
-| Waves / swell | NDBC buoy first, with NWS grid waves as fallback; wave height is scored. Period and swell direction are display details. |
+| Waves / swell | NDBC buoy first, with NWS grid waves as fallback; wave height is scored. Period and swell direction are display details. For curated enclosed-water sites whose mapped buoy sits outside that water — currently seven San Francisco Bay marinas mapped to open-ocean NDBC 46026 — the buoy's waves are dropped before scoring and waves read as not measured; wind, gusts, and advisories still apply. |
 | Marine warnings | Active NWS alert text is shown; the scorer normalizes recognized warning language and some phrases veto. |
 | Visibility | NWS forecast; unavailable where the forecast does not provide a usable value. |
 | Tidal current | NOAA CO-OPS current prediction, only where a station and bin are configured. |

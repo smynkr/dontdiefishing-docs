@@ -42,6 +42,18 @@ USGS streamflow and water-quality measurements are not current inputs to this
 launch-site conditions aggregator. Do not interpret the score as a river-gauge
 or water-quality assessment.
 
+<Callout>
+  A small, curated list of launch sites sits on enclosed water whose mapped wave
+  buoy is outside that water. For the seven San Francisco Bay marinas currently
+  on this list, the mapped buoy is NDBC 46026 in the open ocean roughly 18–27 nm
+  outside the Golden Gate, so its waves describe ocean swell that does not reach
+  the Bay. Those buoy waves are dropped before scoring on every scorer path, the
+  conditions page shows the buoy's latest reading as an outside reference
+  labeled NOT SCORED, and waves inside the Bay read as not measured. Wind,
+  gusts, and marine advisories from the same sources still apply and are still
+  scored.
+</Callout>
+
 ## Score and status
 
 The shared scorer clamps its 0–100 result and maps it to these bands:
