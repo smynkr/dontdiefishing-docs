@@ -32,7 +32,7 @@ The web aggregator uses the following inputs when available:
 | --- | --- |
 | Wind / gusts | NWS forecast, with NDBC buoy fallback for missing values; the higher normalized wind/gust risk is used. |
 | Waves / swell | NDBC buoy first, with NWS grid waves as fallback; wave height is scored. Period and swell direction are display details. |
-| Marine warnings | Active NWS alert text is shown; the scorer normalizes recognized warning language and some phrases veto. |
+| Marine warnings | Active NWS alert text is shown; the scorer normalizes recognized warning language and some phrases veto. Curated launches also poll home marine zones and, for some sites, reviewed route zones; a route-prefixed warning ("Where: Event") weighs like its event. |
 | Visibility | NWS forecast; unavailable where the forecast does not provide a usable value. |
 | Tidal current | NOAA CO-OPS current prediction, only where a station and bin are configured. |
 | Lightning | NWS forecast text mapped to none, low, moderate, or high. High is a hard veto. |
@@ -73,8 +73,9 @@ Lightning maps to none = 0, low = 30, moderate = 70, high = 100. Precipitation
 is its percentage. UV rises from 0 at index 0 to 70 at index 8 and 100 at 12.
 Marine warning text maps advisory = 40, watch = 70, warning = 100; the highest
 recognized warning is used, and an unrecognized non-empty warning defaults to
-40. Water-quality values have model mappings but are unavailable from the
-current aggregator.
+40. A route-prefixed warning ("Outside the Golden Gate: Small Craft Advisory")
+is weighed like its event; the prefix only says where the water is. Water-quality
+values have model mappings but are unavailable from the current aggregator.
 
 The three profiles use these base weights before missing signals are removed:
 
@@ -118,6 +119,14 @@ Veto checks run before weighted scoring. A matching veto returns `100`,
 - Wind, gusts, waves, or tidal current exceed 1.5 times the selected threshold.
 - Visibility is below half its selected threshold.
 - Water temperature is below 75% of its selected threshold.
+
+An alert on route water is the exception to the marine-warning veto. Route
+water is a reviewed zone a boater crosses beyond the launch's own water, such
+as the ocean outside a bay mouth; its alerts are stored with a place prefix,
+for example "Outside the Golden Gate: Small Craft Advisory". A route-prefixed
+warning never vetoes by itself. When its event would veto on home water, it
+holds the day at CAUTION or worse instead, and a monitored trip is never marked
+good to go while it is in force.
 
 A warning in the UI is not automatically a veto: only the listed phrases do so.
 Check current official NWS guidance. Fishing regulation closures are separate
