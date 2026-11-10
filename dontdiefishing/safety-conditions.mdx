@@ -29,7 +29,7 @@ provider or station.
 | Active marine warnings | NWS alerts | The displayed alert is a snapshot; it can change after the update. |
 | Tide height/phase | NOAA CO-OPS high/low predictions | The snapshot uses the next predicted high or low tide when a station and site timezone are available. A prediction is not an observed water level. |
 | Tidal-current speed | NOAA CO-OPS current predictions | Only available for a configured station and bin; the closest prediction is used. |
-| Water temperature | NOAA CO-OPS, with NDBC buoy fallback | Not available at every site. |
+| Water temperature | NOAA CO-OPS, with NDBC buoy fallback | Not available at every site. When no reading exists, the verdict says the water-temperature limit could not be checked instead of counting it as within limits. |
 | UV index | U.S. EPA UV data | May be unavailable. |
 | Sunrise and sunset | Calculated from site coordinates and timezone | Context only; not a scored safety signal. |
 | Water quality | Not currently supplied by the conditions aggregator | It is unavailable, not a claim that water is clean. |
@@ -64,7 +64,12 @@ advisory, hurricane, tropical storm, gale warning, or storm warning; high
 lightning risk; wind, gusts, waves, or tidal current above 1.5 times the selected
 vessel threshold; visibility below half its threshold; or water temperature
 below 75% of its threshold. Other warnings can still be shown without
-triggering a veto. Read the full [scoring guide](/dontdiefishing/how-scoring-works)
+triggering a veto. A veto or limit can only fire on a reading that exists: when
+no water temperature is available, the cold-water veto and the water-temperature
+limit are skipped, and the verdict says the water-temperature limit could not be
+checked against the vessel's limit rather than counting it as passed. Like the
+minimum wave-period limit, this disclosure never changes the score or vetoes a
+trip. Read the full [scoring guide](/dontdiefishing/how-scoring-works)
 for the exact calculations.
 
 A NOAA or NWS marine warning is not the same as a fishing-regulation closure.
@@ -97,10 +102,12 @@ every provider succeeded. Some individual sources can fail independently and
 leave fields unavailable or warnings missing.
 
 Missing numeric signals do not contribute weight; the scorer redistributes the
-remaining available weights. Some provider fallbacks can still understate an
-unknown hazard. Treat a missing, stale, degraded, or incomplete input as
-unknown, check official NWS/NOAA sources, and make the decision using current
-conditions and your own judgment.
+remaining available weights. A missing water temperature is also disclosed in
+the verdict as an unchecked limit, so an "inside limits" or GO result never
+silently implies that water temperature was checked. Some provider fallbacks
+can still understate an unknown hazard. Treat a missing, stale, degraded, or
+incomplete input as unknown, check official NWS/NOAA sources, and make the
+decision using current conditions and your own judgment.
 
 <Warning>
   An individual warning fetch can fail and return an empty list, which the scorer
