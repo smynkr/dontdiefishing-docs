@@ -29,19 +29,19 @@ weights, then round, clamp, and classify the result.
 
 The web aggregator uses the following inputs when available:
 
-| Signal            | Source and scoring behavior                                                                                              |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Wind / gusts      | NWS forecast, with NDBC buoy fallback for missing values; the higher normalized wind/gust risk is used.                  |
-| Waves / swell     | NDBC buoy first, with NWS grid waves as fallback; wave height is scored. Period and swell direction are display details. |
-| Marine warnings   | Active NWS alert text is shown; the scorer normalizes recognized warning language and some phrases veto.                 |
-| Visibility        | NWS forecast; unavailable where the forecast does not provide a usable value.                                            |
-| Tidal current     | NOAA CO-OPS current prediction, only where a station and bin are configured.                                             |
-| Lightning         | NWS forecast text mapped to none, low, moderate, or high. High is a hard veto.                                           |
-| Precipitation     | NWS forecast probability, clamped to 0–100.                                                                              |
-| Water temperature | NOAA CO-OPS first, then NDBC buoy where configured.                                                                      |
-| UV index          | EPA UV data.                                                                                                             |
-| Water quality     | Present in the shared model, but the current aggregator supplies `null`; it is unavailable.                              |
-| Travel time       | Optional scorer input; scales from 0 at 0 minutes to 100 at 120 minutes.                                                 |
+| Signal            | Source and scoring behavior                                                                                                                                                                                                                                                          |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Wind / gusts      | NWS forecast, with NDBC buoy fallback for missing values; the higher normalized wind/gust risk is used.                                                                                                                                                                              |
+| Waves / swell     | NDBC buoy first, with NWS grid waves as fallback; wave height is scored. Period and swell direction are display details; a swell period shorter than the vessel's minimum is flagged **SHORT PERIOD** in the signal rows, and a wave-height breach on the same row takes precedence. |
+| Marine warnings   | Active NWS alert text is shown; the scorer normalizes recognized warning language and some phrases veto.                                                                                                                                                                             |
+| Visibility        | NWS forecast; unavailable where the forecast does not provide a usable value.                                                                                                                                                                                                        |
+| Tidal current     | NOAA CO-OPS current prediction, only where a station and bin are configured.                                                                                                                                                                                                         |
+| Lightning         | NWS forecast text mapped to none, low, moderate, or high. High is a hard veto.                                                                                                                                                                                                       |
+| Precipitation     | NWS forecast probability, clamped to 0–100.                                                                                                                                                                                                                                          |
+| Water temperature | NOAA CO-OPS first, then NDBC buoy where configured.                                                                                                                                                                                                                                  |
+| UV index          | EPA UV data.                                                                                                                                                                                                                                                                         |
+| Water quality     | Present in the shared model, but the current aggregator supplies `null`; it is unavailable.                                                                                                                                                                                          |
+| Travel time       | Optional scorer input; scales from 0 at 0 minutes to 100 at 120 minutes.                                                                                                                                                                                                             |
 
 Tide height/phase, sunrise/sunset, air temperature, wave period, and swell
 direction can be shown in the conditions view but are not weighted score rows.
@@ -110,7 +110,9 @@ favorable score is not evidence that the missing hazards were absent.
 ## Hard vetoes
 
 Veto checks run before weighted scoring. A matching veto returns `100`,
-**NO-GO**, `vetoed: true`, a reason, and no weighted signal breakdown:
+**NO-GO**, `vetoed: true`, a reason, a confidence label of **N/A** (the weighted
+signals are not scored, so there is no completeness fraction to report), and no
+weighted signal breakdown:
 
 - A marine warning contains **small craft advisory**, **hurricane**,
   **tropical storm**, **gale warning**, **storm warning**, **hurricane warning**,
@@ -134,7 +136,8 @@ returns an error if the aggregate fetch fails. The site detail marks a displayed
 last-known result as stale and offers a retry when an update fails.
 
 The separate **HIGH / MED / LOW** label measures the fraction of score signals
-available, not the probability that a forecast or verdict is correct. A recent
+available, not the probability that a forecast or verdict is correct. When a
+hard veto applies, the label reads **N/A** instead. A recent
 `fetched_at` timestamp does not guarantee every provider succeeded. Some source
 failures can leave warnings or forecast fields unknown.
 

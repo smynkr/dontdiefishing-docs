@@ -3,6 +3,26 @@ title: Changelog
 description: What's new in DontDieFishing.
 ---
 
+## November 8–14, 2026
+
+7 user-facing changes shipped.
+
+### New features
+
+- Tide at the bar: the bar crossing panel at six West Coast bars (Columbia River, Grays Harbor, Tillamook Bay, Yaquina Bay, Coos Bay and Humboldt Bay) now shows NOAA's predicted tidal current — whether the ebb or flood is running, when it is predicted to turn, and the next slack and maximum times. Information only; it does not change the score, and the Coast Guard's bar status always governs ([#345](https://github.com/smynkr/dontdiefishing/pull/345))
+
+### Updates
+
+- Coast Guard bar restrictions in the warnings list now read in plain words, for example "all recreational vessels", instead of the raw feed text; on the dashboard, water colder than the vessel's minimum is now coloured amber instead of green, and each row states the difference in words ([#347](https://github.com/smynkr/dontdiefishing/pull/347))
+- A hard veto now shows confidence **N/A** instead of LOW, and a swell period shorter than the vessel's minimum reads SHORT PERIOD instead of OVER LIMIT ([#346](https://github.com/smynkr/dontdiefishing/pull/346))
+- Species photos in the regulations panel are now served from this site and credit their photographer and license under each picture; the credits page lists all 76 ([#343](https://github.com/smynkr/dontdiefishing/pull/343))
+
+### Fixes
+
+- A tide station that stops updating can no longer report an old water temperature as current: a reading more than 24 hours old is compared with the site's buoy and the colder of the two is used ([#344](https://github.com/smynkr/dontdiefishing/pull/344))
+- Fort Lauderdale water temperature now reads the offshore buoy instead of a tide gauge near a power plant that read up to 11 °F warmer ([#342](https://github.com/smynkr/dontdiefishing/pull/342))
+- A mistyped conditions site address now answers with a real "not found" status, the not-found page links to the launch-site list, and regulation pages in the sitemap carry the date the rule was last checked ([#348](https://github.com/smynkr/dontdiefishing/pull/348))
+
 ## November 1–7, 2026
 
 No user-facing changes shipped this window. (0 merged PRs were filtered as non-user-facing.)
