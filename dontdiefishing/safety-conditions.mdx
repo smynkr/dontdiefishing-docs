@@ -29,7 +29,7 @@ provider or station.
 | Active marine warnings | NWS alerts | The displayed alert is a snapshot; it can change after the update. |
 | Tide height/phase | NOAA CO-OPS high/low predictions | The snapshot uses the next predicted high or low tide when a station and site timezone are available. A prediction is not an observed water level. |
 | Tidal-current speed | NOAA CO-OPS current predictions | Only available for a configured station and bin; the closest prediction is used. |
-| Water temperature | NOAA CO-OPS, with NDBC buoy fallback | Not available at every site. |
+| Water temperature | NOAA CO-OPS, with NDBC buoy fallback | Not available at every site. A CO-OPS station whose reading does not describe the water a boater launches into (for example, one influenced by a power plant's warm-water discharge) is skipped for water temperature only; its tide predictions are still used and the buoy reading is used instead. With no buoy reading, water temperature stays unavailable rather than passing the unrepresentative value. |
 | UV index | U.S. EPA UV data | May be unavailable. |
 | Sunrise and sunset | Calculated from site coordinates and timezone | Context only; not a scored safety signal. |
 | Water quality | Not currently supplied by the conditions aggregator | It is unavailable, not a claim that water is clean. |
