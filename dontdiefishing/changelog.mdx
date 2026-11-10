@@ -3,6 +3,14 @@ title: "Changelog"
 description: "What's new in DontDieFishing."
 ---
 
+## November 8–14, 2026
+
+1 user-facing change shipped.
+
+### New features
+
+- Bar crossing: predicted tide at the bar ([#345](https://github.com/smynkr/dontdiefishing/pull/345)). The BAR CROSSING panel on West Coast bar sites now shows NOAA's predicted tidal current at the bar entrance — the phase now (ebb running, flood running, or near slack), the next slack and maximum events, and the station it comes from. Display only: the planning score, vetoes, and best-window logic are unchanged, and the panel never names a safe crossing time. Bars without a nearby NOAA current station (Depoe Bay, Noyo River, Crescent City, Morro Bay) say so and point to the Coast Guard station on VHF 16 or 22A. See [Safety & conditions](/dontdiefishing/safety-conditions).
+
 ## November 1–7, 2026
 
 No user-facing changes shipped this window. (0 merged PRs were filtered as non-user-facing.)
@@ -222,8 +230,6 @@ No user-facing changes shipped this window. (0 merged PRs were filtered as non-u
 - 'safety score' phrasing -&gt; 'planning score' ([#111](https://github.com/smynkr/dontdiefishing/pull/111))
 - one popup surface per marker in detail mode ([#110](https://github.com/smynkr/dontdiefishing/pull/110))
 - distinct notification tags for briefs and check-in escalations ([#109](https://github.com/smynkr/dontdiefishing/pull/109))
-- veto copy uses planning voice ([#107](https://github.com/smynkr/dontdiefishing/pull/107))
-- detail-mode NO-GO chips render red ([#106](https://github.com/smynkr/dontdiefishing/pull/106))
 - site markers reflect GO/CAUTION/NO-GO conditions ([#105](https://github.com/smynkr/dontdiefishing/pull/105))
 - map layout rework — sidebar labels, less tall, load-gated radar ([#104](https://github.com/smynkr/dontdiefishing/pull/104))
 - restore DDF-61 review fixes lost in stale PR #88 merge ([#95](https://github.com/smynkr/dontdiefishing/pull/95))

@@ -130,6 +130,36 @@ configured; current speed may also be unavailable. Predictions and solunar
 windows are context, not a measured reading, safe-launch certification, or
 fish-catch guarantee. See [Fishable Days](/dontdiefishing/fishable-days).
 
+## Bar crossing tide display
+
+On West Coast bar sites, the BAR CROSSING panel can include a **TIDE AT THE
+BAR** block: NOAA CO-OPS predicted tidal current at the bar entrance, the next
+predicted slack and maximum-current events in site time, and the phase now —
+for example "EBB RUNNING · TURNS ABOUT 8:58 PM", "FLOOD RUNNING", or "NEAR
+SLACK · FLOOD NEXT". An ebb, whether running or next after a slack, is labeled
+as a caution; a flood is shown in plain text, never as a favorable signal.
+
+This block is display only. It never changes the planning score, the vetoes, or
+the best-window logic, and it never names a safe time to cross.
+
+Columbia River, Grays Harbor, Tillamook Bay, Yaquina Bay, Coos Bay, and
+Humboldt Bay have a NOAA current prediction station near the entrance, named in
+the panel. Depoe Bay, Noyo River, Crescent City, and Morro Bay do not; their
+panels say so and direct you to the Coast Guard station on VHF 16 or 22A. When
+the prediction request fails, the panel says predictions are unavailable rather
+than substituting tide-height times, which are not a safe stand-in for current
+phase.
+
+<Callout type="warn">
+  These are predictions, not observations. They do not account for the day's
+  river flow or storm surge, so the actual current turn can come earlier or
+  later than shown. Long-standing guidance for coastal bars, published by the
+  Oregon State Marine Board, is to cross at slack or on the flood and avoid the
+  ebb, when the outgoing current steepens the bar's seas — but river flow and
+  swell can make a bar dangerous at any stage, and the Coast Guard's bar status
+  always governs. Verify bar status with the Coast Guard before crossing.
+</Callout>
+
 <Cards>
   <Card icon={<ChartLine />} title="How scoring works" href="/dontdiefishing/how-scoring-works">
     Follow thresholds, signal normalization, missing data, weights, and vetoes.
