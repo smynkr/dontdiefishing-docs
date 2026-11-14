@@ -53,9 +53,15 @@ current offer. Mobile source currently has no in-app subscription purchase.
 From web Settings, choose the monthly or yearly option to start Stripe Checkout.
 An active Pro account cannot start another Pro checkout; use **Billing Portal**
 to manage billing. The portal may expose invoices and the cancellation or
-renewal controls available for your subscription. If the portal cannot be
-opened, Settings shows an error so you can retry. A current checkout display is
-not a promise of future price or availability.
+renewal controls available for your subscription. If checkout or the portal
+cannot be opened, Settings shows an error so you can retry. A current checkout
+display is not a promise of future price or availability.
+
+When a cancellation is scheduled for the end of the current billing period, Pro
+remains active until that period ends and the subscription card shows **ENDS**
+followed by that date instead of **RENEWS**. An active Pro plan with no recorded
+end date shows **ACTIVE SUBSCRIPTION**, and the header badge shows **PRO** for
+an active Pro plan regardless of billing interval.
 
 ## Request account deletion
 
