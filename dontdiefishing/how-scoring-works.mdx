@@ -58,6 +58,16 @@ can override them.
 | Kayak | 15 | 20 | 2 | 0.5 | 2 | 55 |
 | Paddleboard | 15 | 20 | 2 | 0.5 | 2 | 55 |
 
+Each vessel can also carry **custom operating limits** that override these
+defaults: max sustained wind (5–60 kts), max gusts (8–80 kts, which must be at
+least the sustained-wind limit), max wave height (0.5–25 ft, checked against
+steepness-adjusted effective wave height), minimum visibility (0.25–10 mi),
+max tidal current (0.5–10 kts), minimum water temperature (32–85 °F), and an
+optional minimum wave-period floor. A blank field keeps the vessel-type
+default. Values outside these ranges, or a gust limit below the sustained-wind
+limit, are rejected when the vessel is saved. Overrides merge into the vessel's
+stored thresholds, so a partial edit leaves other saved limits untouched.
+
 There is no vessel-specific lightning threshold. High lightning risk is a hard
 veto for every vessel.
 
